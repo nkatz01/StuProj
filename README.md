@@ -6,3 +6,7 @@ https://docs.google.com/spreadsheets/d/1rYASTMRiUI_e3UMlvyGwNUit4lp0YNsK4HnnD4rH
 
 biddingSfotDesignV2
 https://docs.google.com/document/d/1rS10Y5J3YXOE5hW5t6rcgTs38T9ZcUXddyq41qRgN4U/edit
+
+project report
+
+https://docs.google.com/document/d/1FamHxvXw1Vg5bw9L9vyTjZZSKFeKZ6a4VJsBap-P21I/edit
