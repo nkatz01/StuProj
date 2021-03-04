@@ -1,0 +1,3 @@
+10:17:55.327 [main] INFO  c.p.b.BiddingSoftwareApplicationIntegTests - Starting BiddingSoftwareApplicationIntegTests using Java 10.0.2 on DESKTOP-AEM1CBO with PID 17780 (started by nuche in C:\Users\nuche\OneDrive\Documents\StuProj\java\biddingSoft)
+10:17:55.327 [main] DEBUG c.p.b.BiddingSoftwareApplicationIntegTests - Running with Spring Boot v2.4.3, Spring v5.3.4
+10:17:55.327 [main] INFO  c.p.b.BiddingSoftwareApplicationIntegTests - No active profile set, falling back to default profiles: default

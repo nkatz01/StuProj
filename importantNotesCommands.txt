@@ -1,0 +1,30 @@
+netstat -ano |findstr 8080
+taskkill /F /pid 8300
+tskill typeyourPIDhere 
+
+in command line: mvnw spring-boot:run
+http://localhost:8080
+
+in eclipse Right click project - > Run As -> Maven Build: 
+(as goal) spring-boot:run
+
+mvn dependency:tree
+
+sc.exe delete tomcat8
+
+ping localhost
+
+Add define before a word or phrase to get a definition of it, or add etymology before a word to see its origins
+
+And add in [language] after a foreign language word 
+
+ set timer for [amount of time] 
+
+add cache: in front of the URL you want to view
+
+site:[website address] searchterm
+
+81.101.163.42
+
+important maven commands https://dzone.com/articles/creating-a-spring-boot-project-with-eclipse-and-ma
+
