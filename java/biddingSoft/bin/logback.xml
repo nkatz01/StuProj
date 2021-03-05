@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration debug="true">
+<timestamp key="bySecond" datePattern="dd-MM-yyyy;HH-mm-ss"/>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+  </appender>
+  
+<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logs-${bySecond}.log</file>
+    <append>true</append>
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+      </filter>
+</appender>
+<!--root logger should only write to file-->
+ <root level="debug" >
+     <appender-ref ref="FILE" /> 
+  </root>
+  <!-- custom loggers should write to both-->
+  <logger name="com.project.biddingSoft" additivity="false"> 
+ <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+</logger>
+  
+<!-- <logger name="someClass" level="debug">
+ <appender-ref ref="FILE" /> 
+  </logger>-->
+  
+</configuration>

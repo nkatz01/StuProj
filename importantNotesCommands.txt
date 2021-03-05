@@ -28,3 +28,6 @@ site:[website address] searchterm
 
 important maven commands https://dzone.com/articles/creating-a-spring-boot-project-with-eclipse-and-ma
 
+see how far local repo is behind from master: git diff --stat origin/master
+
+force changes upon push: git push origin master --force
