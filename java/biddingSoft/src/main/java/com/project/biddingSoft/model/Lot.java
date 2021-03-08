@@ -5,33 +5,54 @@ package com.project.biddingSoft.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
+
 
 /**
  * @author nuchem
  *
  */
+@Entity
 public class Lot {
-
-	private final List<Bid> bidList; 
-	private final UUID userID;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private  Integer id;
+	@Transient
+	private  List<Bid> bidList; 
+	@Transient
+	private  User user;
+	
+	private  String userName;  
 	/**
 	 * @param bidList
-	 * @param userID
+	 * @param user
 	 */
-	public Lot(List<Bid> bidList, UUID userID) {
+	public Lot(List<Bid> bidList, User user) {
 		
 		this.bidList = bidList;
-		this.userID = userID;
+		this.user = user;
 	}
 	
-	public Lot(UUID userID) {
-		this(new ArrayList<Bid>(), userID);
+	public Lot(User user) {
+		this(new ArrayList<Bid>(), user);
 	}
 	
 	public Lot() {
-		this(new ArrayList<Bid>(), UUID.randomUUID());
+		this(new ArrayList<Bid>(), new User());
 	}
+	
+	public Lot(String user) {
+		userName = user;
+		
+	}
+	
+	
 	
 	
 }
