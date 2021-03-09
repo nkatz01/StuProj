@@ -10,6 +10,6 @@ import com.project.biddingSoft.model.Lot;
  * @author nuchem
  *
  */
-public interface ILotRepo extends CrudRepository<Lot, Integer> {
+public interface ILotRepo extends CrudRepository<Lot, Long> {
 
 }
