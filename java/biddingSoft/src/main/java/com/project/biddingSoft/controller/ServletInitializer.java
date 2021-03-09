@@ -58,7 +58,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		    lotServiceImpl.persistLot(userName);
 		 }
 			catch (Exception e) {
-				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+				throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, e.getMessage());
 			}
 			
 		 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -89,4 +89,17 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		  }
 		return response; 
 	  }
+	  @DeleteMapping(value = "/delalllots")
+	  public ResponseEntity<String>    deleteAllLots()  {
+		  ResponseEntity<String> response = null;
+		  try {
+ 		 response = lotServiceImpl.deleteAllLots() == true ?  ResponseEntity.status(HttpStatus.OK).build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
+		  }
+		  catch(IllegalArgumentException e) {
+			  throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+		  }
+		return response; 
+	  }
+	  
+	  
 }

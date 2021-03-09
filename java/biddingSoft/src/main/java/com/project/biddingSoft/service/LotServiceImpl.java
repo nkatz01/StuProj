@@ -3,6 +3,7 @@
  */
 package com.project.biddingSoft.service;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,10 @@ public class LotServiceImpl {
 	    return iLotRepo.findAll();
 	  }
 	  
+	  public boolean deleteAllLots() {
+		  return StreamSupport.stream(getAllUsers().spliterator(), false).allMatch(l ->   deleteLotById( l.getId()) == true);
+	  }
+	  
 	  public boolean deleteLotById(Long id) throws IllegalArgumentException{
 		  try {
  		  iLotRepo.deleteById(id);
@@ -61,7 +66,6 @@ public class LotServiceImpl {
 	
 	  public Optional<Lot> getLotById(Long id) {
 		  return iLotRepo.findById(id);
-		//return   lot.isPresent() ? lot : new L("dsf");
-	  }
+ 	  }
 	  
  }
