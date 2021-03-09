@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,7 +51,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 //	     return ResponseEntity.ok(lotServiceImpl.helloService());
 //	   }
 //	 
-	 @PostMapping(path="/add") 
+	 @PostMapping(path="/addlot") 
 	ResponseEntity<String> addNewLot(@RequestParam String userName ) {
 		 
 		 try {
@@ -65,14 +66,27 @@ public class ServletInitializer extends SpringBootServletInitializer {
 			
 				 
 	 }
-	  @GetMapping(path="/all")
+	  @GetMapping(path="/alllots")
 	  public @ResponseBody Iterable<Lot> getAllLots() {
 		  return lotServiceImpl.getAllUsers();
 	  }
+	  @GetMapping(path="/getlot/{id}")
+	  public ResponseEntity<Lot>  getLot(@PathVariable Long id) {
+		  if( lotServiceImpl.getLotById(id).isPresent())
+			 return ResponseEntity.ok( lotServiceImpl.getLotById(id).get() )  ;
+		  else
+			  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	  }
 	  
-	  @DeleteMapping(path="/id")
-	  public @ResponseBody String deleteLot(@RequestParam Long id)  {
-		return lotServiceImpl.deleteLotById(id);
-		  
+	  @DeleteMapping(value = "/dellot/{id}")
+	  public ResponseEntity<String>    deleteLot(@PathVariable Long id)  {
+		  ResponseEntity<String> response = null;
+		  try {
+ 		 response = lotServiceImpl.deleteLotById(id) == true ?  ResponseEntity.status(HttpStatus.OK).build() : ResponseEntity.status(HttpStatus.NOT_FOUND).build() ;
+		  }
+		  catch(IllegalArgumentException e) {
+			  throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+		  }
+		return response; 
 	  }
 }

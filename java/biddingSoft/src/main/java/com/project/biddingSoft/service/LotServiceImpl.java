@@ -2,6 +2,8 @@
  * 
  */
 package com.project.biddingSoft.service;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class LotServiceImpl {
 		Lot lot = new Lot(userName);
 		 
 		try {
-	 Lot success = iLotRepo.save(null);
+	 Lot success = iLotRepo.save(lot);
 	 	}
 		catch(IllegalArgumentException e) {
 			logger.info("Error is " ,e);
@@ -41,12 +43,25 @@ public class LotServiceImpl {
 	}
 	  
 	  public Iterable<Lot> getAllUsers() {
-	    // This returns a JSON or XML with the users
+		  
 	    return iLotRepo.findAll();
 	  }
 	  
-	  public String deleteLotById(Long id) {
-		  iLotRepo.deleteById(id);
-		  return "deleted";
+	  public boolean deleteLotById(Long id) throws IllegalArgumentException{
+		  try {
+ 		  iLotRepo.deleteById(id);
+		  }
+		  catch(IllegalArgumentException e) {
+				logger.info("Error is " ,e);
+				throw e; 
+			}
+		 return   iLotRepo.findById(id).isEmpty(); 
+		  
 	  }
+	
+	  public Optional<Lot> getLotById(Long id) {
+		  return iLotRepo.findById(id);
+		//return   lot.isPresent() ? lot : new L("dsf");
+	  }
+	  
  }

@@ -11,5 +11,5 @@ import com.project.biddingSoft.model.Lot;
  *
  */
 public interface ILotRepo extends CrudRepository<Lot, Long> {
-
+//	public Lot findByUserName();
 }

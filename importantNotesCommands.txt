@@ -31,3 +31,13 @@ important maven commands https://dzone.com/articles/creating-a-spring-boot-proje
 see how far local repo is behind from master: git diff --stat origin/master
 
 force changes upon push: git push origin master --force
+
+curl -i -X GET http://rest-api.io/items
+curl -i -X GET http://rest-api.io/items/5069b47aa892630aae059584
+curl -i -X DELETE http://rest-api.io/items/5069b47aa892630aae059584
+curl -i -X POST -H 'Content-Type: application/json' -d '{"name": "New item", "year": "2009"}' http://rest-api.io/items
+curl -i -X PUT -H 'Content-Type: application/json' -d '{"name": "Updated item", "year": "2010"}' http://rest-api.io/items/5069b47aa892630aae059584
+
+curl http://localhost:8080/add -d userName=shimi
+curl -X DELETE http://localhost:8080/dellot/4
+curl -X DELETE http://localhost:8080/alllots/4
