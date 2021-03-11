@@ -6,9 +6,9 @@ package com.project.biddingSoft.service;
 import java.util.List;
 import java.util.UUID;
 
-import com.project.biddingSoft.model.Bid;
-import com.project.biddingSoft.model.Lot;
-import com.project.biddingSoft.model.User;
+import com.project.biddingSoft.domain.Bid;
+import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.User;
 
 /**
  * @author nuchem

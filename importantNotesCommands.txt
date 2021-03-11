@@ -41,3 +41,4 @@ curl -i -X PUT -H 'Content-Type: application/json' -d '{"name": "Updated item", 
 curl http://localhost:8080/add -d userName=shimi
 curl -X DELETE http://localhost:8080/dellot/4
 curl -X DELETE http://localhost:8080/alllots/4
+curl -X DELETE http://localhost:8080/delalllots

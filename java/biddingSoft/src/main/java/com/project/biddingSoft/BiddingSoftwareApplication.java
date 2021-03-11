@@ -10,11 +10,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.biddingSoft.service.LotServiceImpl;
+import com.project.biddingSoft.service.DaoServiceImpl2;
 
+//@Configuration
+//@EnableJpaRepositories(basePackages = "com.project.biddingSoft.*")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
  
 public class BiddingSoftwareApplication implements CommandLineRunner {
