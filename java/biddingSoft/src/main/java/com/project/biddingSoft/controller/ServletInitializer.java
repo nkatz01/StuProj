@@ -51,27 +51,8 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
 
-//	 @RequestMapping(value = "/")
-//	   public ResponseEntity<String> addLot() {
-//		 
-//	     return ResponseEntity.ok(daoServiceImpl.helloService());
-//	   }
+	 
 
-//	 @PostMapping(path="/addlot") 
-//	ResponseEntity<String> addNewLot(@RequestParam String userName ) {
-//		 
-//		 try {
-//		    daoServiceImpl.persistEntity(userName);
-//		 }
-//			catch (Exception e) {
-//				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-//			}
-//			
-//		 return ResponseEntity.status(HttpStatus.CREATED).build();
-//		   
-//			
-//				 
-//	 }
 	@PostMapping(path = "/addent")
 	ResponseEntity<Object> addNewEntity(@RequestBody IStorable entity) {
 		try {
