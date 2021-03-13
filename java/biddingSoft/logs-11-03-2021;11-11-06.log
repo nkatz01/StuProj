@@ -1,9 +1,0 @@
-11:11:06.779 [restartedMain] INFO  c.p.b.BiddingSoftwareApplication - Starting BiddingSoftwareApplication using Java 15.0.2 on DESKTOP-AEM1CBO with PID 8224 (C:\Users\nuche\Documents\StuProj\java\biddingSoft\target\classes started by nuche in C:\Users\nuche\Documents\StuProj\java\biddingSoft)
-11:11:06.780 [restartedMain] DEBUG c.p.b.BiddingSoftwareApplication - Running with Spring Boot v2.4.3, Spring v5.3.4
-11:11:06.780 [restartedMain] INFO  c.p.b.BiddingSoftwareApplication - No active profile set, falling back to default profiles: default
-11:11:06.907 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-11:11:06.918 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 9 ms. Found 1 JPA repository interfaces.
-11:11:06.996 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
-11:11:06.996 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
-11:11:06.997 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-11:11:06.997 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.43]

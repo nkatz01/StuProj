@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
-import com.project.biddingSoft.dao.IRepo;
+import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.Lot;
 

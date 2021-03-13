@@ -19,11 +19,11 @@ import com.project.biddingSoft.dao.IStorable;
  *
  */
 
-@MappedSuperclass
+//@MappedSuperclass
 //@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 //@DiscriminatorColumn(name="storable_type")
 //@Table(name="Storable")
-public   class Storable implements IStorable {
+public   class Storable {
 	
 	
  
@@ -32,12 +32,11 @@ public   class Storable implements IStorable {
 	protected  Long id;
 	
 	// public abstract Long getId() ;
-	@Override
+	 
 	public void setId(Long id) {
 		this.id = id;
 	}
-	@Override
-	public Long getId() {
+ 	public Long getId() {
 		return id;
 	}
 }
