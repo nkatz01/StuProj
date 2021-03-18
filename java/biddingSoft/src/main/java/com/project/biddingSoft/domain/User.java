@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,11 +29,41 @@ import com.project.biddingSoft.dao.IUserRepo;
 @Entity
 @Component
 public class User implements IStorable {
-
+	
+	
+	public static class UserBuilder{
+		@Id
+		@GeneratedValue(strategy = GenerationType.AUTO)
+		private Long id;
+		private final String userName; 
+		private String address; 
+		private char[] password; 
+		
+		public UserBuilder(String userName, String password) {
+			this.userName = userName; 
+			this.password = password.toCharArray();
+		
+		}
+		public UserBuilder address(String address) {
+			this.address = address;
+			return this;
+		}
+		public User build()
+		{
+			return new User(this);
+		}
+	
+	}
+	
+	public User(UserBuilder userBuilder) {
+		this( userBuilder.id, userBuilder.userName, userBuilder.address, userBuilder.password);
+	}
 	@JsonCreator
-	public User(String username) {
-
+	public User(Long id, String username, String address, char[] password ) {
+		this.id = id;
 		this.username = username;
+		this.address = address;
+		this.password = password; 
 	}
 
 	public User() {
@@ -49,7 +80,8 @@ public class User implements IStorable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-
+	private String address; 
+	private char[] password; 
 	public Long getId() {
 		return id;
 	}
@@ -104,6 +136,11 @@ public class User implements IStorable {
 		} catch (IllegalArgumentException e) {
 			throw e;
 		}
+	}
+	@Override
+	public Long setId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

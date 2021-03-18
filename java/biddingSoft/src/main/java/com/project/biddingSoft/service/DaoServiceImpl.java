@@ -27,9 +27,9 @@ import com.project.biddingSoft.domain.Lot;
 @Service
 @Component
 public class DaoServiceImpl {
-	private static final Logger logger = LoggerFactory.getLogger(DaoServiceImpl2.class);
+	private static final Logger logger = LoggerFactory.getLogger(DaoServiceImpl.class);
 
-	public boolean persistEntity(IStorable entity) throws IllegalArgumentException {
+	public synchronized boolean persistEntity(IStorable entity) throws IllegalArgumentException {
 
 		try {
 			entity.saveToRepo();
@@ -46,7 +46,7 @@ public class DaoServiceImpl {
 		return entity.findAll();
 	}
 
-	public boolean deleteAllEntities(IStorable entity) {
+	public synchronized boolean deleteAllEntities(IStorable entity) {
 		try {
 			StreamSupport.stream(getAllRecordsForEnt(entity).spliterator(), false)
 					.forEach(l -> l.deleteById(l.getId()));
@@ -57,7 +57,7 @@ public class DaoServiceImpl {
 		return getAllRecordsForEnt(entity).iterator().hasNext() == false; 
 	}
 
-	public boolean deleteEntityById(Long id, IStorable entity) throws IllegalArgumentException {
+	public synchronized boolean deleteEntityById(Long id, IStorable entity) throws IllegalArgumentException {
 		try {
 			entity.deleteById(id);
 		} catch (IllegalArgumentException e) {

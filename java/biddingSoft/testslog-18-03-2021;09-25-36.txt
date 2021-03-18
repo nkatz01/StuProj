@@ -1,0 +1,4 @@
+09:25:36.073 [main] INFO  c.p.b.u.BiddingSoftwareApplicationUnitTests - Starting BiddingSoftwareApplicationUnitTests using Java 15.0.2 on DESKTOP-AEM1CBO with PID 16896 (started by nuche in C:\Users\nuche\DocumentsLocal\StuProj\java\biddingSoft)
+09:25:36.075 [main] DEBUG c.p.b.u.BiddingSoftwareApplicationUnitTests - Running with Spring Boot v2.4.3, Spring v5.3.4
+09:25:36.077 [main] INFO  c.p.b.u.BiddingSoftwareApplicationUnitTests - No active profile set, falling back to default profiles: default
+09:25:39.594 [main] INFO  c.p.b.u.BiddingSoftwareApplicationUnitTests - Started BiddingSoftwareApplicationUnitTests in 3.737 seconds (JVM running for 4.589)

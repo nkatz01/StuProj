@@ -42,3 +42,8 @@ curl http://localhost:8080/add -d userName=shimi
 curl -X DELETE http://localhost:8080/dellot/4
 curl -X DELETE http://localhost:8080/alllots/4
 curl -X DELETE http://localhost:8080/delalllots
+
+to compare local and remote in git: 
+git fetch origin master
+git diff --summary FETCH_HEAD
+or git diff FETCH_HEAD -- mydir/myfile.js (for individual file)

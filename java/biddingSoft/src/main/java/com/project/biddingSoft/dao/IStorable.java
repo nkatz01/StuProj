@@ -28,7 +28,7 @@ public interface IStorable {
 
 	public Long getId();
 
-	public void setId(Long id);
+	public Long setId();
 
 	public boolean saveToRepo();
 

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.service.DaoServiceImpl;
-import com.project.biddingSoft.service.DaoServiceImpl2;
 
 //@Configuration
 //@ComponentScan({"com.project.biddingSoft.domain","com.project.biddingSoft.dao","com.project.biddingSoft.controller","com.project.biddingSoft.service"})

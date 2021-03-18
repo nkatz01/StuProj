@@ -87,4 +87,10 @@ public class Bid implements IStorable {
 		
 	}
 
+	@Override
+	public Long setId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
