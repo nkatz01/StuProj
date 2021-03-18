@@ -4,17 +4,16 @@ import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LotService {
 
-	 
-	public static Instant between(Instant startInclusive, Instant endExclusive) {//https://www.baeldung.com/java-random-dates
-	    long startSeconds = startInclusive.getEpochSecond();
-	    long endSeconds = endExclusive.getEpochSecond();
-	    long random = ThreadLocalRandom
-	      .current()
-	      .nextLong(startSeconds, endSeconds);
+	public static Instant between(Instant startInclusive, Instant endExclusive) {// https://www.baeldung.com/java-random-dates
+		long startSeconds = startInclusive.getEpochSecond();
+		long endSeconds = endExclusive.getEpochSecond();
+		long random = ThreadLocalRandom.current().nextLong(startSeconds, endSeconds);
 
-	    return Instant.ofEpochSecond(random);
+		return Instant.ofEpochSecond(random);
 	}
 }

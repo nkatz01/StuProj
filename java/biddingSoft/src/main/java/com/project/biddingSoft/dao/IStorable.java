@@ -14,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
- import com.project.biddingSoft.domain.User; 
- 
- 
+import com.project.biddingSoft.domain.User;
+
 /**
  * @author nuche
  *
@@ -28,7 +27,7 @@ public interface IStorable {
 
 	public Long getId();
 
-	public Long setId();
+	public void setId(Long id);
 
 	public boolean saveToRepo();
 

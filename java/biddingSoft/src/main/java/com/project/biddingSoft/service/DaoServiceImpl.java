@@ -54,7 +54,7 @@ public class DaoServiceImpl {
 			logger.info("Error is ", e);
 			throw e;
 		}
-		return getAllRecordsForEnt(entity).iterator().hasNext() == false; 
+		return getAllRecordsForEnt(entity).iterator().hasNext() == false;
 	}
 
 	public synchronized boolean deleteEntityById(Long id, IStorable entity) throws IllegalArgumentException {

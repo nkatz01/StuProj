@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import com.project.biddingSoft.dao.IStorable;
  *
  */
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Component
 public class Bid implements IStorable {
 	@Id
@@ -87,10 +90,6 @@ public class Bid implements IStorable {
 		
 	}
 
-	@Override
-	public Long setId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	 
 
 }

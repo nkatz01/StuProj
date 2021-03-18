@@ -2,6 +2,7 @@
  * 
  */
 package com.project.biddingSoft.domain;
+
 import com.project.biddingSoft.service.UserService;
 
 import java.time.Duration;
@@ -14,6 +15,7 @@ import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
@@ -22,6 +24,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -50,69 +54,32 @@ import com.project.biddingSoft.dao.IStorable;
  */
 @Entity
 @Component
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Lot implements IStorable {
 
-	 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private final Long id;
-	@Autowired
-	@Qualifier("getMeSimpleUser")
-	@OneToOne
- 	private final User user;
-	@ElementCollection(targetClass=Lot.class)
-	private final List<Bid> bidList = new ArrayList<Bid>();
-	@Value("${Lot.title}")
-	private final String title;
- 	private final double startingPrice;
- 	@Value("${Lot.biddingIncrement}")
-	private final double biddingIncrement; 
-	private final double reservePrice; 
-	
-	private final Instant startTime = Instant.now(); 
-	private  Instant endTime = Instant.now().plus(Duration.ofDays(1)); 
-	@Value("${Lot.triggerDuration}") 	
-	private final Duration triggerDuration;
-	@Value("${Lot.autoExtendDuration}")
-	private final Duration autoExtendDuration;
-	private  Instant extendedEndtime; 
-	public Lot(LotBuilder lotBuilder) {
-		this(
-		lotBuilder.id,
-		 lotBuilder.user,
-		 lotBuilder.description,
-		 lotBuilder.title,
-		 lotBuilder.startingPrice,
-		 lotBuilder.biddingIncrement,
-		lotBuilder.reservePrice,
-		 
-		lotBuilder.endTime,
-		lotBuilder.triggerDuration,
-		 lotBuilder.autoExtendDuration,
-		 lotBuilder.extendedEndtime);
-	}
-	@JsonCreator
-	public Lot(Long id, @Qualifier("getMeSimpleUser") User user, String title, String description,       
-	double startingPrice,       
-	double biddingIncrement,    
-	double reservePrice,  
-	Instant endTime,       
-	Duration triggerDuration,   
-	Duration autoExtendDuration,
-	Instant extendedEndtime   ) {
-		this.id =id;
-		this.user = user;
-		this.title = title;
-		this.startingPrice = startingPrice;
-		this.biddingIncrement = biddingIncrement;
-		this.reservePrice = reservePrice;
-		this.endTime = endTime;
-		this.triggerDuration = triggerDuration;
-		this.autoExtendDuration =autoExtendDuration;
-		this.extendedEndtime =extendedEndtime;
+	private Instant extendedEndtime;
 
+	public Lot(LotBuilder lotBuilder) {
+
+		this(lotBuilder.user, lotBuilder.bidList, lotBuilder.title, lotBuilder.startingPrice, lotBuilder.reservePrice,
+				lotBuilder.biddingIncrement, lotBuilder.triggerDuration, lotBuilder.autoExtendDuration);
+		this.id = id;
+		this.endTime = lotBuilder.endTime;
+		this.extendedEndtime = lotBuilder.extendedEndtime;
 	}
- 
+//	@JsonCreator
+//	public Lot(Long id, @Qualifier("getMeSimpleUser") User user, String title, String description,       
+//	double startingPrice,       
+//	double biddingIncrement,    
+//	double reservePrice,  
+//	Instant endTime,       
+//	Duration triggerDuration,   
+//	Duration autoExtendDuration,
+//	Instant extendedEndtime , List<Bid> bidList  ) {
+//		
+	//
+//	}
+
 	@Override
 	public String toString() {
 		return "Lot [id=" + id + ", user=" + user + ", bidList=" + bidList + ", title=" + title + ", startingPrice="
@@ -121,11 +88,10 @@ public class Lot implements IStorable {
 				+ ", autoExtendDuration=" + autoExtendDuration + ", extendedEndtime=" + extendedEndtime
 				+ ", description=" + description + ", username=" + username + "]";
 	}
+
 	public Long getId() {
 		return id;
 	}
-
-	 
 
 //	@JsonIgnore
 //	@JsonProperty(value = "bidList")
@@ -154,10 +120,47 @@ public class Lot implements IStorable {
 		this.username = username;
 	}
 
-	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	// @ElementCollection(targetClass=Lot.class)
+	@OneToMany
+	private final List<Bid> bidList;
 
-//	public Lot() {
-//	}
+	private final String title;
+	private final double startingPrice = 0.0;
+
+	private final double biddingIncrement;
+	private final double reservePrice = 0.0;
+	@Basic
+	private final Instant startTime = Instant.now();
+	@Basic
+	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
+
+	@Basic
+	private final Duration triggerDuration;
+
+	@Basic
+	private final Duration autoExtendDuration;
+	@Basic
+	@OneToOne
+	private final User user;
+
+	@Autowired
+	public Lot(@Qualifier("getMeSimpleUser") User user, List<Bid> bidList, @Value("${Lot.title}") String title,
+			@Value("${Lot.startingPrice}") double startingPrice, @Value("${Lot.reservePrice}") double reservePrice,
+			@Value("${Lot.biddingIncrement}") double biddingIncrement,
+			@Value("#{T(java.time.Duration).parse('${spring.redis.triggerDuration}')}") Duration triggerDuration,
+			@Value("#{T(java.time.Duration).parse('${spring.redis.autoExtendDuration}')}") Duration autoExtendDuration
+	
+	) {
+		this.user = user;
+		this.title = title;
+		this.biddingIncrement = biddingIncrement;
+		this.triggerDuration = triggerDuration;
+		this.bidList = new ArrayList<Bid>(bidList);
+		this.autoExtendDuration = autoExtendDuration;
+	}
 
 //	@Transient
 //	private  List<Bid> bidList; 
@@ -194,12 +197,11 @@ public class Lot implements IStorable {
 //	public Lot() {
 //		this(new ArrayList<Bid>(), new User("defualt"));
 //	}
-	
 
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
 		try {
-			 iLotRepo.save(this);
+			iLotRepo.save(this);
 		} catch (IllegalArgumentException e) {
 			throw e;
 		}
@@ -211,14 +213,13 @@ public class Lot implements IStorable {
 		return iLotRepo.findAll();
 	}
 
- 
 	@Transient
 	@Autowired
 	private static ILotRepo iLotRepo;
 
 	@Autowired
 	public void setILotRepo(ILotRepo ilotrepo) {
-		 iLotRepo = ilotrepo;
+		iLotRepo = ilotrepo;
 	}
 
 	@Override
@@ -240,89 +241,102 @@ public class Lot implements IStorable {
 			throw e;
 		}
 	}
-	
-	
+
 	public static class LotBuilder {
 		public Instant getExtendedEndtime() {
 			return extendedEndtime;
 		}
+
 		public void setExtendedEndtime(Instant extendedEndtime) {
 			this.extendedEndtime = extendedEndtime;
 		}
+
 		@Id
 		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
-		private  User user; 
-		
-		private  String title;
-		private  String description;
-		private  double startingPrice;
-		private  double biddingIncrement; 
-		private  double reservePrice; 
-		 
-		private  Instant endTime; 
+		private User user;
+
+		private String title;
+		private String description;
+		private double startingPrice;
+		private double biddingIncrement;
+		private double reservePrice;
+
+		private Instant endTime;
+
 		public Instant getEndTime() {
 			return endTime;
 		}
+
 		public void setEndTime(Instant endTime) {
 			this.endTime = endTime;
 		}
-		private  Duration triggerDuration; 
-		private  Duration autoExtendDuration;
-		private  Instant extendedEndtime; 
-		public  LotBuilder() {
-			 
+
+		private Duration triggerDuration;
+		private Duration autoExtendDuration;
+		private Instant extendedEndtime;
+		private final List<Bid> bidList;
+
+		public LotBuilder(ArrayList<Bid> bidList) {
+			this.bidList = new ArrayList<>(bidList);
 		}
+
 		public LotBuilder reservePrice(double reservePrice) {
-			this.reservePrice = reservePrice; 
-			return this; 
+			this.reservePrice = reservePrice;
+			return this;
 		}
-	 
+
 		public LotBuilder endTime(Instant endTime) {
 			this.endTime = endTime;
 			this.extendedEndtime = this.endTime;
-			return this; 
+			return this;
 		}
+
 		public LotBuilder triggerDuration(Duration triggerDuration) {
 			this.triggerDuration = triggerDuration;
-			return this; 
+			return this;
 		}
+
 		public LotBuilder autoExtendDuration(Duration autoExtendDuration) {
 			this.autoExtendDuration = autoExtendDuration;
-			return this; 
+			return this;
 		}
-		
-	public Lot build() {
-		return new Lot(this);
-	}
+
+		public Lot build() {
+			return new Lot(this);
+		}
+
 		public LotBuilder user(User user) {
 			this.user = user;
-			return this; 
+			return this;
 		}
-	
+
 		public LotBuilder title(String title) {
 			this.title = title;
-			return this; 
+			return this;
 		}
+
 		public LotBuilder description(String description) {
 			this.description = description;
-			return this; 
+			return this;
 		}
+
 		public LotBuilder startingPrice(double startingPrice) {
 			this.startingPrice = startingPrice;
-			return this; 
+			return this;
 		}
+
 		public LotBuilder biddingIncrement(double biddingIncrement) {
 			this.biddingIncrement = biddingIncrement;
-			return this; 
+			return this;
 		}
-	
-	}
 
+	}
 
 	@Override
-	public Long setId() {
-		// TODO Auto-generated method stub
-		return null;
+	public void setId(Long id) {
+		this.id = id;		
 	}
+
+	 
 }

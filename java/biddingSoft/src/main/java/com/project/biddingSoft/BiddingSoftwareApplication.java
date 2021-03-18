@@ -41,10 +41,10 @@ public class BiddingSoftwareApplication implements CommandLineRunner {
 			//Arrays.asList(args).forEach(arg -> logger.info(ANSI_RED+ arg+ANSI_RESET ) ) ;
 		  
 
-//		     String[] allBeanNames = applicationContext.getBeanDefinitionNames();
-//		        for(String beanName : allBeanNames) {
-//		            System.out.println(beanName);	  }
-//		       System.out.println(allBeanNames.length);
+ 		     String[] allBeanNames = applicationContext.getBeanDefinitionNames();
+ 		        for(String beanName : allBeanNames) {
+ 		            System.out.println(beanName);	  }
+ 		       System.out.println(allBeanNames.length);
 	  }
 
 }
