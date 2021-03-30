@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.context.annotation.Lazy"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="com.project.biddingSoft.domain.Lot"/>
+    <fullyQualifiedTypeName name="com.project.biddingSoft.service.UserService"/>
+    <fullyQualifiedTypeName name="com.project.biddingSoft.domain.User"/>
+</qualifiedTypeNameHistroy>

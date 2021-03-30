@@ -1,0 +1,203 @@
+package com.project.biddingSoft.unitTests;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.time.Duration;
+import java.time.Instant;
+
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+import com.project.biddingSoft.BiddingSoftwareApplication;
+import com.project.biddingSoft.controller.ServletInitializer;
+import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.User;
+import com.project.biddingSoft.service.ILotService;
+import com.project.biddingSoft.service.LotService;
+import com.project.biddingSoft.service.UserService;
+import com.project.biddingSoft.testServices.TestLotService;
+
+@SpringBootTest
+class LotsUnitTests {
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_RESET = "\u001B[0m";
+	private static final Logger logger = LoggerFactory.getLogger(LotsUnitTests.class);
+	@Autowired
+	ServletInitializer servletInitializer;
+	@Autowired
+	Lot lot;
+	@Autowired
+	TestLotService testLotService;
+	@Autowired 
+	UserService userService; 
+	@Test
+	void contextLoads() throws Exception {
+		assertThat(servletInitializer).isNotNull();
+
+	}
+
+	@Test
+	void createLot_canBeSavedToDtbs() throws Exception {
+		//logger.info(lot.getDescription());
+		//lot.getUser().saveToRepo();
+		
+		Lot lot = testLotService.getMeSimpleLot();
+		lot.saveToRepo();
+		//assertThat(lot, is(notNullValue()));
+		assertThat(lot.getId(), equalTo(lot.findById(lot.getId()).get().getId()));
+
+	}
+	
+	@Test
+	void createLot_withAutowired_canBeSavedToDtbs() throws Exception {
+	//User user =	userService.getMeSimpleUser();
+	//logger.info(""+!lot.getUser().findById(lot.getUser().getId()).isEmpty());
+		//logger.info("" + lot.getUser());
+		lot.getUser().addLotToList(lot);
+		lot.getUser().saveToRepo();
+ 		// lot.setUser(user);
+ 		lot.saveToRepo();
+		//assertThat(lot, is(notNullValue()));
+		assertThat(lot.getId(), equalTo(lot.findById(lot.getId()).get().getId()));
+
+	}
+	
+	@Test
+	void canCreateLot_byAutowire() throws Exception {
+		logger.info(""+lot.getUser().getUsername());
+		assertThat(lot.getDescription(), is(notNullValue()));
+	}
+	
+	@Test
+	void newLot_canBeSavedToDtbs() throws Exception {
+		Lot lot = testLotService.getMeSimpleLot();
+		lot.saveToRepo();
+		assertThat(lot.getId(), equalTo(lot.findById(lot.getId()).get().getId()));
+	}
+//	@Test
+//	void newLot_canBeSavedToDtbs2() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot();
+//		lot.saveToRepo();
+//		Lot lot1 = (Lot)lot.findById(lot.getId()).get();
+//		logger.info(" "+lot.hashCode());
+//	 	assertThat( lot.toString(), equalTo(lot1.toString()));
+//	}
+//	@Test
+//	void newLot_canBeSavedToDtbs3() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot();
+//		lot.saveToRepo();
+//		assertTrue(lot.equals(lot.findById(lot.getId()).get()));
+//	}
+	@Test
+	void createTwoLots_areNotTheSame() throws Exception {
+		Lot lot1 = testLotService.getMeSimpleLot();
+		Lot lot2 = testLotService.getMeSimpleLot();
+		assertThat(lot1, not(lot2));
+	}
+ 
+
+//	@Test
+//	void createLot_highestBidEquals_startingBid() throws Exception {
+//		Lot lot = Lot.giveDependencies(testLotService.getMeSimpleLot());
+//		assertThat(lot.getStartingBid(), equalTo(lot.getHighestBid()));
+//	}
+//
+//	@Test
+//	void placeOneBidIncr_bumpsHighestBidUp_byOne() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot());
+//		Class<?> prevHighestBid = lot.getHighestBid();
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		assertThat(lot.getHighestBid(), equalTo(prevHighestBid.bumpUpOne()));
+//	}
+//
+//	@Test
+//	void placeOneBid_afterEndTime_ThrowsException() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot());
+//		lot.endLot();
+//		Exception exception = assertThrows(Exception.class, () -> {
+//			lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		});
+//		String expectedMessage = "Bid rejected - Lot expired";
+//		assertThat(exception.getMessage(), equalTo(expectedMessage));
+//	}
+//
+//	@Test
+//	void placeBid_thatIsBelowAutoBid_kicksHighestBidUp_byOne() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot());
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.threeIncr().build()));
+//		Class<?> prevHighestBid = lot.getHighestBid();
+//		User userWithPrevHigestBid = prevHighestBid.getUser();
+//		Class<?> pendingAutoBid = lot.getPendingAutobid();
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		assertThat(lot.getHighestBid(), equalTo(prevHighestBid.bumpUpOne()));
+//		assertThat(userWithPrevHigestBid, equalTo(lot.getLeadingBidder()));
+//		assertThat(pendingAutoBid, equalTo(lot.getPendingAutobid()));
+//	}
+//
+//	@Test
+//	void placeBid_thatIsEqualToAutoBid_autoBidIsRemoved() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot());
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.threeIncr().build()));
+//		Class<?> prevHighestBid = lot.getHighestBid();
+//		User userWithPrevHigestBid = prevHighestBid.getUser();
+//		assertThat(lot.getPendingAutoBit(), is(true));
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.twoIncr().build()));
+//		assertThat(lot.getHighestBid(), equalTo(prevHighestBid.bumpUpTwo()));
+//		assertThat(userWithPrevHigestBid, equalTo(lot.getLeadingBidder()));
+//		Exception exception = assertThrows(Exception.class, () -> {
+//			lot.getPendingAutobid();
+//		});
+//		String expectedMessage = "Lot doesn't have an autobid";
+//		assertThat(exception.getMessage(), equalTo(expectedMessage));
+//	}
+//
+//	@Test
+//	void placeBid_thatIsAboveAutoBid_leadingBidderChanges() throws Exception {
+//		Lot lot = testLotService.getMeSimpleLot());
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.threeIncr().build()));
+//		Class<?> prevHighestBid = lot.getHighestBid();
+//		Class<?> pendingAutoBid = lot.getPendingAutobid();
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.threeIncr().build()));
+//		User userWithNewHigestBid = lot.getHighestBid().getUser();
+//
+//		assertThat(lot.getHighestBid(), equalTo(prevHighestBid.bumpUpTwo()));
+//		assertThat(userWithNewHigestBid, equalTo(lot.getLeadingBidder()));
+//		assertThat(pendingAutoBid, equalTo(lot.getPendingAutobid()));
+//
+//		String expectedMessage = "Lot doesn't have an autobid";
+//		assertThat(exception.getMessage(), equalTo(expectedMessage));
+//	}
+//
+//	@Test
+//	void triggerDurationPeriodOnLot_andPushTimeToEnd_endsLot
+//	{
+//		Lot lot = testLotService.getMeSimpleLot());
+//		lot.beginTriggerDuration();
+//		lot.setTimeToEnd();
+//		Exception exception = assertThrows(Exception.class, () -> {
+//			lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		});
+//		String expectedMessage = "Bid rejected - Lot expired";
+//		assertThat(exception.getMessage(), equalTo(expectedMessage));
+//	}
+//
+//	@Test
+//	void placeBidWithin_triggerDuration_extendsEndTime
+//	{
+//		Lot lot = testLotService.getMeSimpleLot());
+//
+//		lot.beginTriggerDuration();
+//		assertThat(lot.getEndTime() < (lot.getTickingTime() - Duration.ofMinutes(3)));
+//		lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		assertThat(lot.getEndTime() > (lot.getTickingTime() - Duration.ofMinutes(3)));
+//
+//	}
+
+}
