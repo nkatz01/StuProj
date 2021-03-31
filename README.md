@@ -31,3 +31,9 @@ https://drive.google.com/file/d/1eLzCNzuMGlMW03tH-fO_aWEJbJfIxxke/view?usp=shari
 
 project briefing word
 https://drive.google.com/file/d/1Ga2pVIhtB28_UxQQ71pE54tPeZyp-4rz/view?usp=sharing
+
+https://drive.google.com/file/d/1LOlvHNTtFY8x3UgL0WD4YVUomHktIudk/view?usp=sharing
+https://drive.google.com/file/d/1MFFbq-bTCqlNftEpYPZOFN5x-haQGyXu/view?usp=sharing
+https://drive.google.com/file/d/1zGtvwTl8PSR4gk2JarbD8Oj_s_hCf-lR/view?usp=sharing
+https://drive.google.com/file/d/11OcN5GgCskeaQew_VJCVQtNuCypWYPmu/view?usp=sharing
+https://drive.google.com/file/d/1cWZajS3ZhA08-RTyQDa3BWKjQaBQzFjT/view?usp=sharing
