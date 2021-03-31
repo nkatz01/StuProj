@@ -25,4 +25,9 @@ https://docs.google.com/spreadsheets/d/1rYASTMRiUI_e3UMlvyGwNUit4lp0YNsK4HnnD4rH
 project ideas: 
 https://docs.google.com/document/d/1GNuKoWR0Pn5PUIoHHdMfBLMDNL4jJuTfjWt26r7l3hg/edit?usp=sharing
 
+project briefing pdf
 
+https://drive.google.com/file/d/1eLzCNzuMGlMW03tH-fO_aWEJbJfIxxke/view?usp=sharing
+
+project briefing word
+https://drive.google.com/file/d/1Ga2pVIhtB28_UxQQ71pE54tPeZyp-4rz/view?usp=sharing
