@@ -109,10 +109,11 @@ public class Lot implements IStorable {
 	//@JsonCreator
 	public Lot() {  
 
-		 this.bidList =  new ArrayList<Bid>();
-		  addBid(this, new Bid(this,this.startingBid));
+//		  this.bidList =  new ArrayList<Bid>();
+//		   addBid(this, new Bid(this,this.startingBid));
 
 		   this.bidList =  new ArrayList<Bid>(Arrays.asList(new Bid(this,this.startingBid) ));
+		   //user.addLotToList(this);
 		
 	}
 //	@PostConstruct

@@ -48,7 +48,6 @@ class LotsUnitTests    {
 	TestUserService testUserService; 
 	@Autowired
     private MockMvc mvc;
-	
 	@Test
 	void contextLoads() throws Exception {
 		assertThat(servletInitializer).isNotNull();
@@ -78,9 +77,8 @@ class LotsUnitTests    {
 	 
 	void createLot_withAutowired_canBeSavedToDtbs() throws Exception {
 		 lot.setUser(testUserService.getMeSimpleUser());
-		 lot.delete();
-  	 	 lot.saveToRepo();
-	  assertThat(true, equalTo(lot.find().isPresent()));
+		  lot.saveToRepo();
+   assertThat(true, equalTo(lot.find().isPresent()));
 
 	}
 	 

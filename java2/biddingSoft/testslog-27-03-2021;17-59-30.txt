@@ -1,4 +1,0 @@
-17:59:31.041 [main] INFO  c.p.b.unitTests.LotsUnitTests - Starting LotsUnitTests using Java 11.0.10 on DESKTOP-AEM1CBO with PID 18964 (started by nuche in C:\Users\nuche\DocumentsLocal\StuProj\java2\biddingSoft)
-17:59:31.048 [main] DEBUG c.p.b.unitTests.LotsUnitTests - Running with Spring Boot v2.4.3, Spring v5.3.4
-17:59:31.053 [main] INFO  c.p.b.unitTests.LotsUnitTests - No active profile set, falling back to default profiles: default
-17:59:36.171 [main] INFO  c.p.b.unitTests.LotsUnitTests - Started LotsUnitTests in 5.475 seconds (JVM running for 6.465)

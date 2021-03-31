@@ -35,32 +35,10 @@ import com.project.biddingSoft.dao.IStorable;
 public class Bid implements IStorable {
 	
 	public Bid() {
+
 		
 	}
-	public static class BidBuilder{
-		@Id
-		@GeneratedValue(strategy = GenerationType.AUTO)
-		private Long id;
-		@ManyToOne(
-				cascade = CascadeType.PERSIST,
-				fetch = FetchType.LAZY)
-		@JoinColumn(name="lot_id", nullable = false )
-		private Lot lot;
-		private double amount;
-		
-		public BidBuilder(Lot lot) {
-			this.lot = lot;
-			
-		}
-		public BidBuilder amount(double amount) {
-			this.amount  = amount; 
-			return this;
-		}
-		public Bid build() {
-			
-			return new Bid(this);
-		}
-	}
+
 	
 	public void setAmount(double amount) {
 		this.amount = amount;
@@ -75,8 +53,8 @@ public class Bid implements IStorable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	@ManyToOne(
-			//cascade = CascadeType.ALL,
-		    fetch = FetchType.EAGER
+			cascade = CascadeType.PERSIST,
+		    fetch = FetchType.LAZY
 		)
 	@JoinColumn(name = "lot_id", nullable=false)
 	private Lot lot;
@@ -157,7 +135,26 @@ public class Bid implements IStorable {
 		}
 	}
 
- 
+	public static class BidBuilder{
+		@Id
+		@GeneratedValue(strategy = GenerationType.AUTO)
+		private Long id;
+		private Lot lot;
+		private double amount;
+		
+		public BidBuilder(Lot lot) {
+			this.lot = lot;
+			
+		}
+		public BidBuilder amount(double amount) {
+			this.amount  = amount; 
+			return this;
+		}
+		public Bid build() {
+			
+			return new Bid(this);
+		}
+	}
 
  
 //	public static class BidComp implements Comparator<Bid>{

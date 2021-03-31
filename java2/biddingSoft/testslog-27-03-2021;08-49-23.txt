@@ -1,5 +1,0 @@
-08:49:23.744 [main] INFO  c.p.b.unitTests.LotsUnitTests - Starting LotsUnitTests using Java 11.0.10 on DESKTOP-AEM1CBO with PID 7152 (started by nuche in C:\Users\nuche\DocumentsLocal\StuProj\java2\biddingSoft)
-08:49:23.747 [main] DEBUG c.p.b.unitTests.LotsUnitTests - Running with Spring Boot v2.4.3, Spring v5.3.4
-08:49:23.748 [main] INFO  c.p.b.unitTests.LotsUnitTests - No active profile set, falling back to default profiles: default
-08:49:27.687 [main] INFO  c.p.b.unitTests.LotsUnitTests - Started LotsUnitTests in 4.194 seconds (JVM running for 5.093)
-08:49:27.928 [main] INFO  c.p.b.unitTests.LotsUnitTests - [31mLot [id=462, user=com.project.biddingSoft.domain.User@5c82474d, bidList=[], title=null, startingBid=0.0, biddingIncrement=0.0, reservePrice=0.0, startTime=2021-03-27T08:49:27.792178800Z, endTime=2021-03-29T01:39:08Z, triggerDuration=null, autoExtendDuration=null, extendedEndtime=2021-03-29T01:39:08Z, description=rdmWpwaSdXcYHHVtAeVP][0m

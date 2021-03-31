@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Copy element &apos;Lot.java&apos; to &apos;biddingSoft/src/main/java/com.project.biddingSoft.domain&apos;&#x0D;&#x0A;- Original project: &apos;biddingSoft&apos;&#x0D;&#x0A;- Destination element: &apos;biddingSoft/src/main/java/com.project.biddingSoft.domain&apos;&#x0D;&#x0A;- Original element: &apos;com.project.biddingSoft.domain.Lot.java&apos;" description="Copy compilation unit" destination="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.project.biddingSoft.domain" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.project.biddingSoft.domain{Lot.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1616591578568" units="1" version="1.0"/>
-</session>

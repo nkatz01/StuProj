@@ -1,8 +1,0 @@
-12:08:17.526 [main] INFO  c.p.b.unitTests.LotsUnitTests - Starting LotsUnitTests using Java 11.0.10 on DESKTOP-AEM1CBO with PID 22348 (started by nuche in C:\Users\nuche\DocumentsLocal\StuProj\java2\biddingSoft)
-12:08:17.530 [main] DEBUG c.p.b.unitTests.LotsUnitTests - Running with Spring Boot v2.4.3, Spring v5.3.4
-12:08:17.533 [main] INFO  c.p.b.unitTests.LotsUnitTests - No active profile set, falling back to default profiles: default
-12:08:20.691 [main] INFO  com.project.biddingSoft.domain.Lot - [31mcom.project.biddingSoft.domain.Bid@6f921e32[0m
-12:08:20.909 [main] INFO  com.project.biddingSoft.domain.Lot - [31mcom.project.biddingSoft.domain.Bid@77e1dacd[0m
-12:08:23.113 [main] INFO  c.p.b.unitTests.LotsUnitTests - Started LotsUnitTests in 5.983 seconds (JVM running for 7.129)
-12:08:23.245 [main] INFO  com.project.biddingSoft.domain.Lot - [31mcom.project.biddingSoft.domain.Bid@58ca1cad[0m
-12:08:23.445 [main] INFO  com.project.biddingSoft.domain.Lot - [31mcom.project.biddingSoft.domain.Bid@5c438795[0m
