@@ -7,8 +7,6 @@ package com.project.biddingSoft.domain;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,20 +17,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IUserRepo;
-import com.project.biddingSoft.service.LotService;
  /**
  * @author nuchem
  *
@@ -93,6 +85,13 @@ public class User implements IStorable {
 	   
 	)
 	List<Lot> lotList; 
+ 
+ 	public Lot getLot(int id) throws IndexOutOfBoundsException{
+ 		Lot lot =null;
+			 lot = lotList.get(id);		
+ 		return lot;
+ 		
+ 	}
  	public boolean addLotToList(Lot lot) {//handle exception
  		return !lotList.contains(lot) && lotList.add(lot);
  		}

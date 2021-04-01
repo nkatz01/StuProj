@@ -5,11 +5,6 @@ package com.project.biddingSoft.dao;
 
 import java.util.Optional;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.project.biddingSoft.domain.Bid;
@@ -31,7 +26,7 @@ public interface IStorable {
 
 	public boolean saveToRepo();
 
-	public Iterable<? extends IStorable> findAll();
+	public Iterable<? extends IStorable> findAll();//change to static?
 
 	public Optional<? extends IStorable> find();
 

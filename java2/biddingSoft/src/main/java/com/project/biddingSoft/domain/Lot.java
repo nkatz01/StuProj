@@ -7,7 +7,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -60,13 +59,20 @@ public class Lot implements IStorable {
 			    orphanRemoval = true
 			)
 	private  List<Bid> bidList ;
-	 @Value("${Lot.title}") 
+//	@Basic
+//	@OneToOne(cascade = CascadeType.ALL)//orphanRemoval=true
+//	@JoinColumn(name = "highest_bid_id", referencedColumnName = "id")
+//	private Bid highestBid;  
+//	 private void setHighestBid(Bid highestBid) {
+//		this.highestBid = highestBid;
+//	}
+
+	@Value("${Lot.title}") 
 	private  String title;
 	@Value("${Lot.description}") 
 	@Column(name = "description")
 	private String description;
-	@Value("${Lot.startingBid}")
-	private  double startingBid = 0.0;
+
 	@ManyToOne(cascade = CascadeType.PERSIST, 
 			fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id", nullable = false )
@@ -74,6 +80,8 @@ public class Lot implements IStorable {
 	@Value("${Lot.biddingIncrement}")
 	private  double biddingIncrement;
 	private  double reservePrice = 0.0;
+	@Value("${Lot.startingPrice}")
+	private double startingPrice;
 	@Basic
 	private  Instant startTime = Instant.now();
 	@Basic
@@ -112,7 +120,7 @@ public class Lot implements IStorable {
 //		  this.bidList =  new ArrayList<Bid>();
 //		   addBid(this, new Bid(this,this.startingBid));
 
-		   this.bidList =  new ArrayList<Bid>(Arrays.asList(new Bid(this,this.startingBid) ));
+		   this.bidList =  new ArrayList<Bid>();//remove
 		   //user.addLotToList(this);
 		
 	}
@@ -126,25 +134,28 @@ public class Lot implements IStorable {
 		this.bidList =  new ArrayList<Bid>(lotBuilder.bidList) ;
 		this.title = lotBuilder.title;
 		this.description =lotBuilder.description;
-		this.startingBid = lotBuilder.startingBid;
+		this.startingPrice = lotBuilder.startingPrice;
 		this.reservePrice = lotBuilder.reservePrice;
 		this.biddingIncrement = lotBuilder.biddingIncrement;
 		this.triggerDuration = lotBuilder.triggerDuration;
 		this.autoExtendDuration = lotBuilder.autoExtendDuration;
-		
+		//this.highestBid = lotBuilder.highestBid; 
 		this.id = lotBuilder.id;		
 		this.endTime = lotBuilder.endTime;
 		 
 		this.extendedEndtime = lotBuilder.extendedEndtime;
 		
 		//this.bidList.add(new Bid(this,this.startingBid));
-		  addBid(this, new Bid(this,this.startingBid));
+		 
 		  user.addLotToList(this);
 	}
 	
 	public static boolean addBid(Lot lot, Bid bid) {
 	// logger.info(ANSI_RED + bid + ANSI_RESET);
-		return lot.getBidList().add(bid);//handle exception
+	boolean	succeeded = lot.getBidList().add(bid);//handle exception
+//	if (lot.getHighestBid().equals(bid))
+//		lot.setHighestBid(bid);
+	return succeeded;
 		 
 		 
 	}
@@ -183,8 +194,8 @@ public class Lot implements IStorable {
 //		this(new ArrayList<Bid>(), new User("defualt"));
 //	}
 
-	public double getStartingBid() {
-		return startingBid;
+	public double getStartingPrice() {
+		return startingPrice;
 	}
 	
 	public Instant getExtendedEndTime() {
@@ -215,9 +226,8 @@ public class Lot implements IStorable {
 	public Instant getEndTime() {
 		return endTime;
 	}
- 
 	//@JsonProperty(value = "bidList")
-	public List<Bid> getBidList() {
+	private List<Bid> getBidList() {
 		return bidList;
 	} 
 	//@JsonProperty(value = "user")
@@ -231,8 +241,8 @@ public class Lot implements IStorable {
 	
 	@Override
 	public String toString() {
-		return "Lot [id=" + id + ", user=" + user + ", bidList=" + bidList + ", title=" + title + ", startingBid="
-				+ startingBid + ", biddingIncrement=" + biddingIncrement + ", reservePrice=" + reservePrice
+		return "Lot [id=" + id + ", user=" + user + ", bidList=" + bidList + ", title=" + title + ", startingPrice="
+				+ startingPrice + ", biddingIncrement=" + biddingIncrement + ", reservePrice=" + reservePrice
 				+ ", startTime=" + startTime + ", endTime=" + endTime + ", triggerDuration=" + triggerDuration
 				+ ", autoExtendDuration=" + autoExtendDuration + ", extendedEndtime=" + extendedEndtime
 				+ ", description=" + description + "]";
@@ -300,7 +310,7 @@ public class Lot implements IStorable {
 		private User user;
 		private String title;
 		private String description;
-		private double startingBid;
+		private double startingPrice;
 		private double biddingIncrement;
 		private double reservePrice;
 		private Duration triggerDuration;
@@ -308,15 +318,18 @@ public class Lot implements IStorable {
 		private Instant extendedEndtime;
 		private  List<Bid> bidList ;
 		private Instant endTime;
-
+		//private Bid highestBid;
 		public LotBuilder description(String description) {
 			this.description = description;
 			return this;
 		}
 		
-		public Instant getEndTime() {
-			return endTime;
-		}
+		
+		
+//		public LotBuilder highestBid(Bid highestBid) {
+//			this.highestBid = highestBid; 
+//			return this;
+//		}
 
 		public LotBuilder(ArrayList<Bid> bidList) {
 			this.bidList =  new ArrayList<Bid>(bidList) ;
@@ -357,8 +370,8 @@ public class Lot implements IStorable {
 			return this;
 		}
 
-		public LotBuilder startingBid(double startingBid) {
-			this.startingBid = startingBid;
+		public LotBuilder startingPrice(double startingPrice) {
+			this.startingPrice = startingPrice;
 			return this;
 		}
 
@@ -385,7 +398,7 @@ public class Lot implements IStorable {
 		temp = Double.doubleToLongBits(reservePrice);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
-		temp = Double.doubleToLongBits(startingBid);
+		temp = Double.doubleToLongBits(startingPrice);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
@@ -441,7 +454,7 @@ public class Lot implements IStorable {
 				return false;
 		} else if (!startTime.equals(other.startTime))
 			return false;
-		if (Double.doubleToLongBits(startingBid) != Double.doubleToLongBits(other.startingBid))
+		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
 			return false;
 		if (title == null) {
 			if (other.title != null)

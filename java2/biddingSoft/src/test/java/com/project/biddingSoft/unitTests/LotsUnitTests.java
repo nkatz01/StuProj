@@ -8,6 +8,8 @@ import static org.hamcrest.Matchers.not;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,45 +101,36 @@ class LotsUnitTests    {
 	}
  
 
-	@Test
-	void createLot_highestBidEquals_startingBid() throws Exception {
-		Lot lot =  testLotService.getMeSimpleLot();
-		
-		 assertThat(lot.getHighestBid().getAmount(), equalTo(lot.getStartingBid()));
-	}
-	@Test
-	void createLot_canAddBidWithEmptyConstructor_Toit() throws Exception {
-		Lot lot =  testLotService.getMeSimpleLot();
-		assertThat(lot.getBidList().size(), equalTo(1));//startingBid counts as if the first bid
-		Bid bid = new Bid();
-		Lot.addBid( lot, bid);
-		assertThat(lot.getBidList().size(), equalTo(2));
-	}
+
+	
 	@Test
 	void createLot_canAddBidWithLot_Toit() throws Exception {
 		Lot lot =  testLotService.getMeSimpleLot();
-		assertThat(lot.getBidList().size(), equalTo(1));
-		Bid bid = new Bid(lot, 50.0);
+		Bid bid = testBidService.getOneIncrBid();
 		Lot.addBid( lot, bid);
-		assertThat(lot.getBidList().size(), equalTo(2));
+		assertThat(lot.getHighestBid(), equalTo(bid));
+		
 	}
 
 	@Test
 	void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception{
 		Lot lot =  testLotService.getMeSimpleLot();
-		Bid bid = new Bid(lot, 5.0);
-		 
+		Bid bid = testBidService.getOneIncrBid();		 
 		Lot.addBid(lot, bid);
-		lot.saveToRepo();
+		lot.getUser().saveToRepo();
+		System.out.println(lot.getId());
+		System.out.println(lot.getUser().getLot(1));
 	 	 assertThat(true, equalTo(bid.find().isPresent()));
+
 	 	
 	}
 	
 	@Test 
 	void deleteBid_leavesLotInDtbs(){
 		Lot lot =  testLotService.getMeSimpleLot();
+		Bid bid = testBidService.getOneIncrBid();	
+		Lot.addBid(lot, bid);
 		lot.saveToRepo();
-		Bid bid = lot.getHighestBid();
 		lot.getHighestBid().delete();
 	 	 assertThat(Optional.empty(), equalTo(bid.find()));
 		 assertThat(true, equalTo(lot.find().isPresent()));
@@ -145,31 +138,37 @@ class LotsUnitTests    {
 	@Test 
 	void deleteLot_leavesUserInDtbs(){
 		Lot lot =  testLotService.getMeSimpleLot();	
+		Bid bid = testBidService.getOneIncrBid();	
+		Lot.addBid(lot, bid);
 		lot.saveToRepo();
 	 	User user = lot.getUser();
 		lot.delete();
 	  assertThat(true, equalTo(user.find().isPresent()));
 
 	}
-	
+	@Transactional
 	@Test 
 	void deleteLot_removesAllRelatedBids(){
 		Lot lot =  testLotService.getMeSimpleLot();	
+		Bid bid = testBidService.getOneIncrBid();	
+		Lot.addBid(lot, bid);
 		lot.saveToRepo();
-	 	Bid bid = lot.getHighestBid();
 	 	assertThat(true, equalTo(bid.find().isPresent()));
 		lot.delete();
 		assertThat(true, equalTo(bid.find().isEmpty()));
 	}
-	
+	@Transactional
 	@Test 
 	void deleteUser_removesAllRelatedLots(){
 		Lot lot =  testLotService.getMeSimpleLot();	
+		Bid bid = testBidService.getOneIncrBid();	
+		Lot.addBid(lot, bid);
 		User user = lot.getUser();
-		user.saveToRepo();
+		user.saveToRepo();	
 		assertThat(true, equalTo(lot.find().isPresent()));
 		user.delete();
 	  	assertThat(true, equalTo(lot.find().isEmpty()));
+	  	assertThat(true, equalTo(bid.find().isEmpty())); //should work?!
 
 	}
 	@Test
@@ -180,10 +179,11 @@ class LotsUnitTests    {
 
 	@Test
 	void placeOneBidIncr_bumpsHighestBidUp_byOne() throws Exception {
-		Bid prevHighestBid = lot.getHighestBid();
+		Bid prevHighestBid = testBidService.getOneIncrBid();	
+		Lot.addBid(lot, prevHighestBid);
 		lot.placeBid(testBidService.getOneIncrBid());
-		System.out.println(lot.getTriggerDuration() +" "+ lot.getAutoExtendDuration());  
-		assertThat(lot.getHighestBid().getAmount(), equalTo(testBidService.bumpUpOne(prevHighestBid)));
+		//System.out.println(lot.getTriggerDuration() +" "+ lot.getAutoExtendDuration());  
+		assertThat(lot.getHighestBid().getAmount(), equalTo(testBidService.getOneincr()));
 	}
 //
 //	@Test

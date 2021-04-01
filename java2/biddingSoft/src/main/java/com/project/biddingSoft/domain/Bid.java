@@ -40,7 +40,7 @@ public class Bid implements IStorable {
 	}
 
 	
-	public void setAmount(double amount) {
+	public void setAmount(double amount) {//delete
 		this.amount = amount;
 	}
 	public Bid(BidBuilder bidBuilder) {

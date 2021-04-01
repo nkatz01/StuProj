@@ -9,14 +9,16 @@ import com.project.biddingSoft.domain.Bid;
 public class TestBidService {
 	
 	private static final  double ONEINCR = 5.0;
+	public static double getOneincr() {
+		return ONEINCR;
+	}
 	@Autowired
 	TestLotService testLotService;
 	public Bid getOneIncrBid() {
 		return new Bid.BidBuilder(testLotService.getMeSimpleLot()).amount(ONEINCR).build();
 	}
-		public double bumpUpOne(Bid bid) {
-		 bid.setAmount(bid.getAmount()+ ONEINCR);
-		 return bid.getAmount();
+		public double bumpUpOne(Bid bid) { 
+		 return bid.getAmount() + ONEINCR;
 	}
 	
 	}
