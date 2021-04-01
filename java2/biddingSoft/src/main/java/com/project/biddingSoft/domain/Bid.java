@@ -101,11 +101,7 @@ public class Bid implements IStorable {
 	//Persistence handling
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
-		try {
 			 iBidRepo.save(this);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
 		return true;
 	}
 
@@ -118,26 +114,18 @@ public class Bid implements IStorable {
 	@Override
 	public Optional<? extends IStorable> find() {
 		Optional<Bid> bid = null;
-		try {
 			bid = iBidRepo.findById(id);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
 		return bid;
 	}
 
 	@Override
 	public void delete() throws IllegalArgumentException {
-		try {
 			iBidRepo.deleteById(this.id);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
 	}
 
 	public static class BidBuilder{
-		@Id
-		@GeneratedValue(strategy = GenerationType.AUTO)
+//		@Id
+//		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
 		private Lot lot;
 		private double amount;

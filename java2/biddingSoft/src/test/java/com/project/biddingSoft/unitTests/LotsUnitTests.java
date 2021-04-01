@@ -114,12 +114,11 @@ class LotsUnitTests    {
 
 	@Test
 	void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception{
-		Lot lot =  testLotService.getMeSimpleLot();
+		//Lot lot =  testLotService.getMeSimpleLot();
 		Bid bid = testBidService.getOneIncrBid();		 
-		Lot.addBid(lot, bid);
-		lot.getUser().saveToRepo();
+		Lot.addBid(bid.getLot(), bid);
+		bid.getLot().saveToRepo();
 		System.out.println(lot.getId());
-		System.out.println(lot.getUser().getLot(1));
 	 	 assertThat(true, equalTo(bid.find().isPresent()));
 
 	 	

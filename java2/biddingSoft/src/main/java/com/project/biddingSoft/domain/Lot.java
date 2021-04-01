@@ -44,6 +44,7 @@ import com.project.biddingSoft.dao.IStorable;
 @Entity
 @Component
 @Inheritance(strategy = InheritanceType.JOINED)
+//@Transactional
 public class Lot implements IStorable {
 	
 
@@ -75,7 +76,7 @@ public class Lot implements IStorable {
 
 	@ManyToOne(cascade = CascadeType.PERSIST, 
 			fetch = FetchType.LAZY)
-	@JoinColumn(name="user_id", nullable = false )
+	@JoinColumn(name="user_id", nullable = false )//, referencedColumnName = "id"
 	private  User user;
 	@Value("${Lot.biddingIncrement}")
 	private  double biddingIncrement;
@@ -247,14 +248,10 @@ public class Lot implements IStorable {
 				+ ", autoExtendDuration=" + autoExtendDuration + ", extendedEndtime=" + extendedEndtime
 				+ ", description=" + description + "]";
 	}
-
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
-		try {
-			iLotRepo.save(this);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
+		Thread.dumpStack();
+		iLotRepo.save(this);
 		return true;
 	}
 
@@ -275,25 +272,17 @@ public class Lot implements IStorable {
 	@Override
 	public Optional<? extends IStorable> find() throws IllegalArgumentException {
 		Optional<Lot> lot = null;
-		try {
 			lot = iLotRepo.findById(this.id);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
 		return lot;
 	}
 
 	@Override
 	public void delete() throws IllegalArgumentException {
-		try {
 			iLotRepo.deleteById(this.id);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
 	}
 
 	
-	
+ 
 	public static class LotBuilder {
 //		public Instant getExtendedEndtime() {
 //			return extendedEndtime;
@@ -303,8 +292,8 @@ public class Lot implements IStorable {
 //			this.extendedEndtime = extendedEndtime;
 //		}
 
-		@Id
-		@GeneratedValue(strategy = GenerationType.AUTO)
+//		@Id
+//		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
 		
 		private User user;
@@ -381,96 +370,96 @@ public class Lot implements IStorable {
 		}
 
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
-		result = prime * result + ((bidList == null) ? 0 : bidList.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(biddingIncrement);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
-		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		temp = Double.doubleToLongBits(reservePrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
-		temp = Double.doubleToLongBits(startingPrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Lot other = (Lot) obj;
-		if (autoExtendDuration == null) {
-			if (other.autoExtendDuration != null)
-				return false;
-		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
-			return false;
-		if (bidList == null) {
-			if (other.bidList != null)
-				return false;
-		} else if (!bidList.equals(other.bidList))
-			return false;
-		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (endTime == null) {
-			if (other.endTime != null)
-				return false;
-		} else if (!endTime.equals(other.endTime))
-			return false;
-		if (extendedEndtime == null) {
-			if (other.extendedEndtime != null)
-				return false;
-		} else if (!extendedEndtime.equals(other.extendedEndtime))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
-			return false;
-		if (startTime == null) {
-			if (other.startTime != null)
-				return false;
-		} else if (!startTime.equals(other.startTime))
-			return false;
-		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
-			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
-			return false;
-		if (triggerDuration == null) {
-			if (other.triggerDuration != null)
-				return false;
-		} else if (!triggerDuration.equals(other.triggerDuration))
-			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.equals(other.user))
-			return false;
-		return true;
-	} 
+//	
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = 1;
+//		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
+//		result = prime * result + ((bidList == null) ? 0 : bidList.hashCode());
+//		long temp;
+//		temp = Double.doubleToLongBits(biddingIncrement);
+//		result = prime * result + (int) (temp ^ (temp >>> 32));
+//		result = prime * result + ((description == null) ? 0 : description.hashCode());
+//		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+//		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
+//		result = prime * result + ((id == null) ? 0 : id.hashCode());
+//		temp = Double.doubleToLongBits(reservePrice);
+//		result = prime * result + (int) (temp ^ (temp >>> 32));
+//		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+//		temp = Double.doubleToLongBits(startingPrice);
+//		result = prime * result + (int) (temp ^ (temp >>> 32));
+//		result = prime * result + ((title == null) ? 0 : title.hashCode());
+//		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
+//		result = prime * result + ((user == null) ? 0 : user.hashCode());
+//		return result;
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null)
+//			return false;
+//		if (getClass() != obj.getClass())
+//			return false;
+//		Lot other = (Lot) obj;
+//		if (autoExtendDuration == null) {
+//			if (other.autoExtendDuration != null)
+//				return false;
+//		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
+//			return false;
+//		if (bidList == null) {
+//			if (other.bidList != null)
+//				return false;
+//		} else if (!bidList.equals(other.bidList))
+//			return false;
+//		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
+//			return false;
+//		if (description == null) {
+//			if (other.description != null)
+//				return false;
+//		} else if (!description.equals(other.description))
+//			return false;
+//		if (endTime == null) {
+//			if (other.endTime != null)
+//				return false;
+//		} else if (!endTime.equals(other.endTime))
+//			return false;
+//		if (extendedEndtime == null) {
+//			if (other.extendedEndtime != null)
+//				return false;
+//		} else if (!extendedEndtime.equals(other.extendedEndtime))
+//			return false;
+//		if (id == null) {
+//			if (other.id != null)
+//				return false;
+//		} else if (!id.equals(other.id))
+//			return false;
+//		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
+//			return false;
+//		if (startTime == null) {
+//			if (other.startTime != null)
+//				return false;
+//		} else if (!startTime.equals(other.startTime))
+//			return false;
+//		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
+//			return false;
+//		if (title == null) {
+//			if (other.title != null)
+//				return false;
+//		} else if (!title.equals(other.title))
+//			return false;
+//		if (triggerDuration == null) {
+//			if (other.triggerDuration != null)
+//				return false;
+//		} else if (!triggerDuration.equals(other.triggerDuration))
+//			return false;
+//		if (user == null) {
+//			if (other.user != null)
+//				return false;
+//		} else if (!user.equals(other.user))
+//			return false;
+//		return true;
+//	} 
 }
