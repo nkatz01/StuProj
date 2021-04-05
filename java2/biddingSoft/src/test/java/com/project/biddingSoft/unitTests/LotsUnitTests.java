@@ -180,6 +180,7 @@ public class LotsUnitTests    {
 	assertThat(FieldUtils.readField(wiredLot,"autoExtendDuration",true)).isNotNull(); 
  	assertThat(FieldUtils.readField(wiredLot,"iLotRepo",true)).isNotNull();
  	assertThat(FieldUtils.readField(wiredLot,"clock",true)).isNotNull();
+ 	assertThat(FieldUtils.readField(wiredLot,"bidSoftExcepFactory",true)).isNotNull();
 		
 	}
 	@Test
@@ -202,21 +203,22 @@ public class LotsUnitTests    {
 	public void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException{
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeLotWithTriggerDuration());
 		assertThat(FieldUtils.readField(bid.getLot(),"clock",true)).isNotNull();
+		assertThat(FieldUtils.readField(wiredLot,"bidSoftExcepFactory",true)).isNotNull();
 		
 	}
 
-	@Test
-	void placeOneBid_afterEndTime_ThrowsException() throws Exception {
-		Lot lot = testLotService.getMeLotWithTriggerDuration(); 
-		Bid bid = testBidService.getOneIncrBid(lot);
-		Instant endTime = bid.getLot().getEndTime();
-		FieldUtils.writeDeclaredField(bid.getLot(),"clock",true)
-		Exception exception = assertThrows(Exception.class, () -> {
-			lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
-		});
-		String expectedMessage = "Bid rejected - Lot expired";
-		assertThat(exception.getMessage(), equalTo(expectedMessage));
-	}
+//	@Test
+//	void placeOneBid_equalOrAfterEndTime_ThrowsException() throws Exception {
+//		Lot lot = testLotService.getMeLotWithTriggerDuration(); 
+//		Bid bid = testBidService.getOneIncrBid(lot);
+//		Instant endTime = lot.getEndTime();
+//		FieldUtils.writeDeclaredField(bid.getLot(),"clock", Clock.fixed(endTime,ZoneId.of("UTC")), true);
+//		Exception exception = assertThrows(Exception.class, () -> {
+//			lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
+//		});
+//		String expectedMessage = "Bid rejected - Lot expired";
+//		assertThat(exception.getMessage(), equalTo(expectedMessage));
+//	}
 //
 //	@Test
 //	void placeBid_thatIsBelowAutoBid_kicksHighestBidUp_byOne() throws Exception {

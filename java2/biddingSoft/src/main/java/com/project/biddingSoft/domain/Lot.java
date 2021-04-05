@@ -34,11 +34,13 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
+import com.project.biddingSoft.service.ExceptionsCreateor;
 
  
 /**
@@ -50,7 +52,17 @@ import com.project.biddingSoft.dao.IStorable;
 @Inheritance(strategy = InheritanceType.JOINED)
 //@Transactional
 public class Lot implements IStorable {
+	@Autowired
+	@Qualifier("BiddingSoftExceptionsFactory")
+	@Transient
+	ExceptionsCreateor bidSoftExcepFactory; 
 	
+//	@Autowired
+//	public void setBidSoftExcepFactory(ExceptionsCreateor bidSoftExcepFactory) {
+//		this.bidSoftExcepFactory = bidSoftExcepFactory;
+//	}
+
+
 
 	//Instance variables
 	@Id
@@ -161,7 +173,7 @@ public class Lot implements IStorable {
 //	}
  	@Transient
 	private Clock clock ; 
-	public boolean placeBid(Bid bid)   LotHasEndedException {
+	public boolean placeBid(Bid bid) throws DateTimeException, ArithmeticException, NullPointerException ,ExceptionsCreateor.LotHasEndedException {
 		boolean success;
 		boolean beforeExtEndTime; 
 
@@ -175,9 +187,8 @@ public class Lot implements IStorable {
 		beforeExtEndTime = now.compareTo(extendedEndtime) < 1 ; 
 		if (beforeExtEndTime && getHighestBid().getAmount() <= bid.getAmount() )
 			success = bidList.add(bid) ;
-		else 
-			throw new LotHasEndedException();
-		return success;
+		else
+			throw  bidSoftExcepFactory.new LotHasEndedException();
 	
 	    
 
