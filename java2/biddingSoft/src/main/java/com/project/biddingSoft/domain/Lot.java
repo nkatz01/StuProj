@@ -4,8 +4,10 @@
 package com.project.biddingSoft.domain;
 
 import java.time.Clock;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
+
  
 /**
  * @author nuchem
@@ -73,7 +77,9 @@ public class Lot implements IStorable {
 	@Value("${Lot.description}") 
 	@Column(name = "description")
 	private String description;
-
+	@Transient 
+	@Value("${Lot.timeZone}")
+	private  ZoneId ZONE ; 
 	@ManyToOne(cascade = CascadeType.PERSIST, 
 			fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id", nullable = false )//, referencedColumnName = "id"
@@ -85,24 +91,20 @@ public class Lot implements IStorable {
 	private double startingPrice;
 	@Basic
 	private  Instant startTime = Instant.now();
-	@Basic
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
+	public Instant getEndTime() {
+		return endTime;
+	}
+
+
+
 	@Basic
-	@Value("#{T(java.time.Duration).parse('${spring.redis.triggerDuration}')}")
+	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
 	private  Duration triggerDuration;
-	public Duration getTriggerDuration() {
-		return triggerDuration;
-	}
+
 	
-	  @Value("#{T(java.time.Duration).parse('${spring.redis.autoExtendDuration}')}")
+	  @Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
 	private  Duration autoExtendDuration  ;
-	
-
-	public Duration getAutoExtendDuration() {
-		return autoExtendDuration;
-	}
-
-
 	private Instant extendedEndtime = endTime;
 //	@OneToOne(cascade = CascadeType.ALL, 
 //			fetch = FetchType.LAZY)
@@ -117,18 +119,9 @@ public class Lot implements IStorable {
 	//Constructors
 	//@JsonCreator
 	public Lot() {  
-
-//		  this.bidList =  new ArrayList<Bid>();
-//		   addBid(this, new Bid(this,this.startingBid));
-
 		   this.bidList =  new ArrayList<Bid>();//remove
-		   //user.addLotToList(this);
-		
 	}
-//	@PostConstruct
-//	private void postConstruct() {
-//	setAutoExtendDuration();
-//	}
+
 
 	public Lot(LotBuilder lotBuilder) {
 		this.user = lotBuilder.user;
@@ -140,44 +133,60 @@ public class Lot implements IStorable {
 		this.biddingIncrement = lotBuilder.biddingIncrement;
 		this.triggerDuration = lotBuilder.triggerDuration;
 		this.autoExtendDuration = lotBuilder.autoExtendDuration;
+		this.ZONE = lotBuilder.ZONE;
+		clock = Clock.system(this.ZONE);
 		//this.highestBid = lotBuilder.highestBid; 
 		this.id = lotBuilder.id;		
 		this.endTime = lotBuilder.endTime;
-		 
 		this.extendedEndtime = lotBuilder.extendedEndtime;
-		
-		//this.bidList.add(new Bid(this,this.startingBid));
-		 
 		  user.addLotToList(this);
 	}
+	@PostConstruct//is only called after defautl constructor
+	public void postConstruct() {
+		clock = Clock.system(ZONE); 
+		
+	}
 	
-	public static boolean addBid(Lot lot, Bid bid) {
-	// logger.info(ANSI_RED + bid + ANSI_RESET);
+	public static boolean addBid(Lot lot, Bid bid) throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
 	boolean	succeeded = lot.getBidList().add(bid);//handle exception
-//	if (lot.getHighestBid().equals(bid))
-//		lot.setHighestBid(bid);
 	return succeeded;
 		 
 		 
 	}
 	
 	
-	public boolean placeBid(Bid bid) throws Exception {
+	
+//	public boolean placeBid(Bid bid) {
+//		return placeBid(bid, Clock.system(ZONE));
+//	}
+ 	@Transient
+	private Clock clock ; 
+	public boolean placeBid(Bid bid)   LotHasEndedException {
 		boolean success;
 		boolean beforeExtEndTime; 
-		Instant now = Instant.now(Clock.systemDefaultZone()) ;
-		try {
+
+		 //System.out.println(  ANSI_RED +System.currentTimeMillis() + ANSI_RESET );
+
+		Instant now = Instant.now(clock) ;
+//		System.out.println(endTime.toString());
+//		System.out.println(extendedEndtime.toString());
 		Objects.requireNonNull(bid); 
 		
 		beforeExtEndTime = now.compareTo(extendedEndtime) < 1 ; 
-	   success = beforeExtEndTime && getHighestBid().getAmount() <= bid.getAmount() ? bidList.add(bid) : false ;
-		}
-		catch(Exception e) {
-			throw e;
-		}
-		
-		extendedEndtime =  now.compareTo(extendedEndtime.plus(autoExtendDuration)) <1 ? extendedEndtime.plus(autoExtendDuration) : extendedEndtime;
+		if (beforeExtEndTime && getHighestBid().getAmount() <= bid.getAmount() )
+			success = bidList.add(bid) ;
+		else 
+			throw new LotHasEndedException();
+		return success;
+	
+	    
+
+		//System.out.println(endTime.toString());
+
+	   	extendedEndtime =  now.compareTo(extendedEndtime.plus(autoExtendDuration)) <1 ? extendedEndtime.plus(autoExtendDuration) : extendedEndtime;
 		endTime = extendedEndtime;
+//		System.out.println(extendedEndtime.toString());
+
 		return success; 
 	}
 
@@ -195,22 +204,14 @@ public class Lot implements IStorable {
 //		this(new ArrayList<Bid>(), new User("defualt"));
 //	}
 
-	public double getStartingPrice() {
-		return startingPrice;
-	}
 	
-	public Instant getExtendedEndTime() {
-		return extendedEndtime;
-	}
+	
 
 	public Bid getHighestBid() {
 		return  bidList.stream().max(Comparator.comparing(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
 	}
 
-	@Override
-	public Long getId() {
-		return id;
-	}
+
 
 	@Override
 	public void setId(Long id) {
@@ -220,25 +221,14 @@ public class Lot implements IStorable {
 		public void setUser(User user) {
 			this.user = user;
 		}
-	public Instant getStartTime() {
-		return startTime;
-	}
 
-	public Instant getEndTime() {
-		return endTime;
-	}
 	//@JsonProperty(value = "bidList")
 	private List<Bid> getBidList() {
 		return bidList;
 	} 
 	//@JsonProperty(value = "user")
-	public User getUser() {
-		return user;
-	}
 
-	public String getDescription() {
-		return description;
-	}
+	
 	
 	@Override
 	public String toString() {
@@ -250,7 +240,7 @@ public class Lot implements IStorable {
 	}
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
-		Thread.dumpStack();
+		//Thread.dumpStack();
 		iLotRepo.save(this);
 		return true;
 	}
@@ -263,6 +253,8 @@ public class Lot implements IStorable {
 	@Transient
 	@Autowired
 	private static ILotRepo iLotRepo;
+
+	
 
 	@Autowired
 	public void setILotRepo(ILotRepo ilotrepo) {
@@ -284,18 +276,12 @@ public class Lot implements IStorable {
 	
  
 	public static class LotBuilder {
-//		public Instant getExtendedEndtime() {
-//			return extendedEndtime;
-//		}
-//
-//		public void setExtendedEndtime(Instant extendedEndtime) {
-//			this.extendedEndtime = extendedEndtime;
-//		}
+
 
 //		@Id
 //		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
-		
+		private ZoneId ZONE; 
 		private User user;
 		private String title;
 		private String description;
@@ -312,7 +298,10 @@ public class Lot implements IStorable {
 			this.description = description;
 			return this;
 		}
-		
+		public LotBuilder timeZone(ZoneId ZONE) {
+			this.ZONE = ZONE ;
+			return this;
+		}
 		
 		
 //		public LotBuilder highestBid(Bid highestBid) {
@@ -370,96 +359,5 @@ public class Lot implements IStorable {
 		}
 
 	}
-//	
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = 1;
-//		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
-//		result = prime * result + ((bidList == null) ? 0 : bidList.hashCode());
-//		long temp;
-//		temp = Double.doubleToLongBits(biddingIncrement);
-//		result = prime * result + (int) (temp ^ (temp >>> 32));
-//		result = prime * result + ((description == null) ? 0 : description.hashCode());
-//		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
-//		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
-//		result = prime * result + ((id == null) ? 0 : id.hashCode());
-//		temp = Double.doubleToLongBits(reservePrice);
-//		result = prime * result + (int) (temp ^ (temp >>> 32));
-//		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
-//		temp = Double.doubleToLongBits(startingPrice);
-//		result = prime * result + (int) (temp ^ (temp >>> 32));
-//		result = prime * result + ((title == null) ? 0 : title.hashCode());
-//		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
-//		result = prime * result + ((user == null) ? 0 : user.hashCode());
-//		return result;
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (obj == null)
-//			return false;
-//		if (getClass() != obj.getClass())
-//			return false;
-//		Lot other = (Lot) obj;
-//		if (autoExtendDuration == null) {
-//			if (other.autoExtendDuration != null)
-//				return false;
-//		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
-//			return false;
-//		if (bidList == null) {
-//			if (other.bidList != null)
-//				return false;
-//		} else if (!bidList.equals(other.bidList))
-//			return false;
-//		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
-//			return false;
-//		if (description == null) {
-//			if (other.description != null)
-//				return false;
-//		} else if (!description.equals(other.description))
-//			return false;
-//		if (endTime == null) {
-//			if (other.endTime != null)
-//				return false;
-//		} else if (!endTime.equals(other.endTime))
-//			return false;
-//		if (extendedEndtime == null) {
-//			if (other.extendedEndtime != null)
-//				return false;
-//		} else if (!extendedEndtime.equals(other.extendedEndtime))
-//			return false;
-//		if (id == null) {
-//			if (other.id != null)
-//				return false;
-//		} else if (!id.equals(other.id))
-//			return false;
-//		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
-//			return false;
-//		if (startTime == null) {
-//			if (other.startTime != null)
-//				return false;
-//		} else if (!startTime.equals(other.startTime))
-//			return false;
-//		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
-//			return false;
-//		if (title == null) {
-//			if (other.title != null)
-//				return false;
-//		} else if (!title.equals(other.title))
-//			return false;
-//		if (triggerDuration == null) {
-//			if (other.triggerDuration != null)
-//				return false;
-//		} else if (!triggerDuration.equals(other.triggerDuration))
-//			return false;
-//		if (user == null) {
-//			if (other.user != null)
-//				return false;
-//		} else if (!user.equals(other.user))
-//			return false;
-//		return true;
-//	} 
+
 }

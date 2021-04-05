@@ -20,7 +20,6 @@ import com.project.biddingSoft.domain.User;
 		@JsonSubTypes.Type(value = Bid.class, name = "bid") })
 public interface IStorable {
 
-	public Long getId();
 
 	public void setId(Long id);
 

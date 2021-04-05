@@ -87,10 +87,7 @@ public class Bid implements IStorable {
 	
 
 
-	@Override
-	public Long getId() {
-		return id;
-	}
+	
 	
 
 	@Override

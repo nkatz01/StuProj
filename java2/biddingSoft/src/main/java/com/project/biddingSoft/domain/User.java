@@ -114,10 +114,7 @@ public class User implements IStorable {
 	private Long id;
 	private String address; 
 	private char[] password; 
-	@Override
-	public Long getId() {
-		return id;
-	}
+	
 	@Override
 	public void setId(Long id) {
 		this.id = id;

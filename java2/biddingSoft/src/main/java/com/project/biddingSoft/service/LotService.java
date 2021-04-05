@@ -3,7 +3,6 @@ package com.project.biddingSoft.service;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,4 +15,6 @@ public class LotService {
 
 		return Instant.ofEpochSecond(random);
 	}
+	
+
 }

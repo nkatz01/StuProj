@@ -2,6 +2,7 @@ package com.project.biddingSoft.testServices;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,9 @@ public class TestLotService {
 				.user( testUserService.getMeSimpleUser())
 				 .description(TestUserService.genRandString(20, false))
 				.endTime(LotService.between(Instant.now().plus(Duration.ofDays(1)), Instant.now().plus(Duration.ofDays(2)) ))
-				.triggerDuration(Duration.ofMinutes(2000))
-				.autoExtendDuration(Duration.ofMinutes(5000))
+				.triggerDuration(Duration.ofMinutes(2))
+				.autoExtendDuration(Duration.ofMinutes(5))
+				.timeZone(ZoneId.of("UTC"))
 				.build();
 	}
 	
