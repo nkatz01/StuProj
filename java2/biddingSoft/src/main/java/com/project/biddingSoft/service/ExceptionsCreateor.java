@@ -27,24 +27,38 @@ public    class ExceptionsCreateor {
   
   public class BiddingSoftExceptions extends RuntimeException{
   
+	  private   String throwableMsg ;
 	private BiddingSoftExceptions(String errorMessage, Throwable err) {
 		super(errorMessage, err);
+		throwableMsg = errorMessage;
+
 	}
 	
+	public String getId() {
+		return getMessage();
+	}
+	public   String getMsg() {
+		return throwableMsg;
+	}
 	
 	private BiddingSoftExceptions(int id, Throwable err) {
 		
 		super(String.valueOf(id), err);
 	}
   }
-//  public class LotHasEndedException extends BiddingSoftException {
-//		
-//		
-//	public LotHasEndedException(String errorMessage, Throwable err) {
-//		super(errorMessage, err);
-//	}
-//
-//}
+  public class BidTooLow extends BiddingSoftExceptions {
+		private static final String throwableMsg = "bid amount less or equal to ";
+		private static final int id = 2;
+		
+		public BidTooLow(double newBidAmount, double highestBidAmount) {
+			super(id, new Throwable(String.format(throwableMsg + "current highest bid: %.2f <= %.2f",newBidAmount, highestBidAmount)));
+		}
+		public BidTooLow(double amount) {
+			super(id, new Throwable(String.format(throwableMsg + "startingPrice= %.2f",amount)));
+		}
+		
+
+	}
   
   
 }

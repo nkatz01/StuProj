@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,11 +37,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.service.ExceptionsCreateor;
-
- 
+import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 /**
  * @author nuchem
  *
@@ -53,29 +52,23 @@ import com.project.biddingSoft.service.ExceptionsCreateor;
 //@Transactional
 public class Lot implements IStorable {
 	@Autowired
-	@Qualifier("BiddingSoftExceptionsFactory")
 	@Transient
-	ExceptionsCreateor bidSoftExcepFactory; 
-	
-//	@Autowired
-//	public void setBidSoftExcepFactory(ExceptionsCreateor bidSoftExcepFactory) {
-//		this.bidSoftExcepFactory = bidSoftExcepFactory;
-//	}
+	private static ExceptionsCreateor bidSoftExcepFactory;
 
+	@Autowired
+	@Qualifier("BiddingSoftExceptionsFactory")
+	public void setBidSoftExcepFactory(ExceptionsCreateor bidSoftExcepFactory) {
+		Lot.bidSoftExcepFactory = bidSoftExcepFactory;
+	}
 
-
-	//Instance variables
+	// Instance variables
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	//  @ElementCollection(targetClass=Lot.class)
-	 @OneToMany(
-			 fetch = FetchType.LAZY,
-			    mappedBy = "lot",//variable in bid class - that links bid to a lot
-			     cascade = CascadeType.ALL,
-			    orphanRemoval = true
-			)
-	private  List<Bid> bidList ;
+	// @ElementCollection(targetClass=Lot.class)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // variable in bid class - that links bid to a lot
+			cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Bid> bidList;
 //	@Basic
 //	@OneToOne(cascade = CascadeType.ALL)//orphanRemoval=true
 //	@JoinColumn(name = "highest_bid_id", referencedColumnName = "id")
@@ -84,62 +77,58 @@ public class Lot implements IStorable {
 //		this.highestBid = highestBid;
 //	}
 
-	@Value("${Lot.title}") 
-	private  String title;
-	@Value("${Lot.description}") 
+	@Value("${Lot.title}")
+	private String title;
+	@Value("${Lot.description}")
 	@Column(name = "description")
 	private String description;
-	@Transient 
+	@Transient
 	@Value("${Lot.timeZone}")
-	private  ZoneId ZONE ; 
-	@ManyToOne(cascade = CascadeType.PERSIST, 
-			fetch = FetchType.LAZY)
-	@JoinColumn(name="user_id", nullable = false )//, referencedColumnName = "id"
-	private  User user;
+	private ZoneId ZONE;
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false) // , referencedColumnName = "id"
+	private User user;
 	@Value("${Lot.biddingIncrement}")
-	private  double biddingIncrement;
-	private  double reservePrice = 0.0;
+	private double biddingIncrement;
+	private double reservePrice = 0.0;
 	@Value("${Lot.startingPrice}")
 	private double startingPrice;
-	@Basic
-	private  Instant startTime = Instant.now();
+	// @Basic
+	private Instant startTime = Instant.now();
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
+
 	public Instant getEndTime() {
 		return endTime;
 	}
 
-
-
-	@Basic
+	// @Basic
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
-	private  Duration triggerDuration;
+	private Duration triggerDuration;
 
-	
-	  @Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
-	private  Duration autoExtendDuration  ;
+	@Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
+	private Duration autoExtendDuration;
 	private Instant extendedEndtime = endTime;
 //	@OneToOne(cascade = CascadeType.ALL, 
 //			fetch = FetchType.LAZY)
 //	@JoinColumn(name="highstBid_id", nullable=false)
 // 	private Bid highestBid; 
-	
-	//Static variables
+
+	// Static variables
 	public static final String ANSI_RED = "\u001B[31m";
 	public static final String ANSI_RESET = "\u001B[0m";
 	private static final Logger logger = LoggerFactory.getLogger(Lot.class);
-	
-	//Constructors
-	//@JsonCreator
-	public Lot() {  
-		   this.bidList =  new ArrayList<Bid>();//remove
-	}
 
+	// Constructors
+	// @JsonCreator
+	public Lot() {
+		this.bidList = new ArrayList<Bid>();// remove
+	}
 
 	public Lot(LotBuilder lotBuilder) {
 		this.user = lotBuilder.user;
-		this.bidList =  new ArrayList<Bid>(lotBuilder.bidList) ;
+		this.bidList = new ArrayList<Bid>(lotBuilder.bidList);
 		this.title = lotBuilder.title;
-		this.description =lotBuilder.description;
+		this.description = lotBuilder.description;
 		this.startingPrice = lotBuilder.startingPrice;
 		this.reservePrice = lotBuilder.reservePrice;
 		this.biddingIncrement = lotBuilder.biddingIncrement;
@@ -147,59 +136,85 @@ public class Lot implements IStorable {
 		this.autoExtendDuration = lotBuilder.autoExtendDuration;
 		this.ZONE = lotBuilder.ZONE;
 		clock = Clock.system(this.ZONE);
-		//this.highestBid = lotBuilder.highestBid; 
-		this.id = lotBuilder.id;		
+		// this.highestBid = lotBuilder.highestBid;
+		this.id = lotBuilder.id;
 		this.endTime = lotBuilder.endTime;
 		this.extendedEndtime = lotBuilder.extendedEndtime;
-		  user.addLotToList(this);
+		user.addLotToList(this);
 	}
-	@PostConstruct//is only called after defautl constructor
+
+	@PostConstruct // is only called after defautl constructor
 	public void postConstruct() {
-		clock = Clock.system(ZONE); 
-		
+		clock = Clock.system(ZONE);
+
 	}
-	
-	public static boolean addBid(Lot lot, Bid bid) throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
-	boolean	succeeded = lot.getBidList().add(bid);//handle exception
-	return succeeded;
-		 
-		 
+
+	 
+	public  static boolean addBid(Lot lot, Bid bid)
+			throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
+		boolean succeeded = lot.placeBid(bid);// handle exception
+		return succeeded;
+
 	}
-	
-	
-	
+
 //	public boolean placeBid(Bid bid) {
 //		return placeBid(bid, Clock.system(ZONE));
 //	}
- 	@Transient
-	private Clock clock ; 
-	public boolean placeBid(Bid bid) throws DateTimeException, ArithmeticException, NullPointerException ,ExceptionsCreateor.LotHasEndedException {
+	@Transient
+	private Clock clock;
+
+	
+	private boolean placeBid(Bid bid)
+			throws DateTimeException, ArithmeticException, NullPointerException, ExceptionsCreateor.BidTooLow {
 		boolean success;
-		boolean beforeExtEndTime; 
-
-		 //System.out.println(  ANSI_RED +System.currentTimeMillis() + ANSI_RESET );
-
-		Instant now = Instant.now(clock) ;
+		Instant now = Instant.now(clock);
 //		System.out.println(endTime.toString());
 //		System.out.println(extendedEndtime.toString());
-		Objects.requireNonNull(bid); 
-		
-		beforeExtEndTime = now.compareTo(extendedEndtime) < 1 ; 
-		if (beforeExtEndTime && getHighestBid().getAmount() <= bid.getAmount() )
-			success = bidList.add(bid) ;
+		Objects.requireNonNull(bid);
+		//System.out.println(hasLotExpired(now));
+		//if(getBidList().size()<1 && bid.getAmount()<)
+			
+		if (!hasLotExpired(now) && bidHighEnough(bid))
+			success = bidList.add(bid);
 		else
-			throw  bidSoftExcepFactory.new LotHasEndedException();
-	
-	    
+			throw bidSoftExcepFactory.new LotHasEndedException();
 
-		//System.out.println(endTime.toString());
+		if (isInTriggerPeriod(now))
+			// System.out.println(endTime.toString());
+			endTime = extendedEndtime = extendedEndtime.plus(autoExtendDuration);
 
-	   	extendedEndtime =  now.compareTo(extendedEndtime.plus(autoExtendDuration)) <1 ? extendedEndtime.plus(autoExtendDuration) : extendedEndtime;
-		endTime = extendedEndtime;
 //		System.out.println(extendedEndtime.toString());
 
-		return success; 
+		return success;
 	}
+	
+	
+
+	public boolean isInTriggerPeriod(Instant now) {
+		return now.compareTo(extendedEndtime) < 0 && now.compareTo(extendedEndtime.minus(triggerDuration)) >= 0;
+	}
+
+	public boolean hasLotExpired(Instant now) {
+		return now.compareTo(extendedEndtime) >= 0;
+	}
+
+	public boolean bidHighEnough(Bid bid) throws ExceptionsCreateor.BidTooLow {
+		boolean isHihger = false;
+		try {
+			isHihger = getHighestBid().getAmount() + biddingIncrement >= bid.getAmount() ;
+		} catch (NoSuchElementException e) {//if, first bid, then checks for starting price
+			if(bid.getAmount()< (startingPrice + biddingIncrement))
+			throw bidSoftExcepFactory.new BidTooLow(startingPrice + biddingIncrement);
+			else 
+				isHihger = true;
+		}
+		if (!isHihger)
+			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), getHighestBid().getAmount() + biddingIncrement);
+		return true;
+
+	}
+	
+	
 
 //	public Lot(List<Bid> bidList, User user) {
 //		
@@ -215,32 +230,25 @@ public class Lot implements IStorable {
 //		this(new ArrayList<Bid>(), new User("defualt"));
 //	}
 
-	
-	
-
 	public Bid getHighestBid() {
-		return  bidList.stream().max(Comparator.comparing(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
+		return bidList.stream().max(Comparator.comparing(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
 	}
-
-
 
 	@Override
 	public void setId(Long id) {
-		this.id = id;		
+		this.id = id;
 	}
- 
-		public void setUser(User user) {
-			this.user = user;
-		}
 
-	//@JsonProperty(value = "bidList")
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	// @JsonProperty(value = "bidList")
 	private List<Bid> getBidList() {
 		return bidList;
-	} 
-	//@JsonProperty(value = "user")
+	}
+	// @JsonProperty(value = "user")
 
-	
-	
 	@Override
 	public String toString() {
 		return "Lot [id=" + id + ", user=" + user + ", bidList=" + bidList + ", title=" + title + ", startingPrice="
@@ -249,9 +257,10 @@ public class Lot implements IStorable {
 				+ ", autoExtendDuration=" + autoExtendDuration + ", extendedEndtime=" + extendedEndtime
 				+ ", description=" + description + "]";
 	}
+
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
-		//Thread.dumpStack();
+		// Thread.dumpStack();
 		iLotRepo.save(this);
 		return true;
 	}
@@ -265,8 +274,6 @@ public class Lot implements IStorable {
 	@Autowired
 	private static ILotRepo iLotRepo;
 
-	
-
 	@Autowired
 	public void setILotRepo(ILotRepo ilotrepo) {
 		iLotRepo = ilotrepo;
@@ -275,24 +282,21 @@ public class Lot implements IStorable {
 	@Override
 	public Optional<? extends IStorable> find() throws IllegalArgumentException {
 		Optional<Lot> lot = null;
-			lot = iLotRepo.findById(this.id);
+		lot = iLotRepo.findById(this.id);
 		return lot;
 	}
 
 	@Override
 	public void delete() throws IllegalArgumentException {
-			iLotRepo.deleteById(this.id);
+		iLotRepo.deleteById(this.id);
 	}
 
-	
- 
 	public static class LotBuilder {
-
 
 //		@Id
 //		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
-		private ZoneId ZONE; 
+		private ZoneId ZONE;
 		private User user;
 		private String title;
 		private String description;
@@ -302,26 +306,27 @@ public class Lot implements IStorable {
 		private Duration triggerDuration;
 		private Duration autoExtendDuration;
 		private Instant extendedEndtime;
-		private  List<Bid> bidList ;
+		private List<Bid> bidList;
 		private Instant endTime;
-		//private Bid highestBid;
+
+		// private Bid highestBid;
 		public LotBuilder description(String description) {
 			this.description = description;
 			return this;
 		}
+
 		public LotBuilder timeZone(ZoneId ZONE) {
-			this.ZONE = ZONE ;
+			this.ZONE = ZONE;
 			return this;
 		}
-		
-		
+
 //		public LotBuilder highestBid(Bid highestBid) {
 //			this.highestBid = highestBid; 
 //			return this;
 //		}
 
 		public LotBuilder(ArrayList<Bid> bidList) {
-			this.bidList =  new ArrayList<Bid>(bidList) ;
+			this.bidList = new ArrayList<Bid>(bidList);
 		}
 
 		public LotBuilder reservePrice(double reservePrice) {

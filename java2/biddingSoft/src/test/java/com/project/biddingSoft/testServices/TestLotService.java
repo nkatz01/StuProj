@@ -16,22 +16,23 @@ public class TestLotService {
 	  
 	@Autowired
 	TestUserService testUserService;
+//	public   Lot getMeSimpleLot() {
+//		return new Lot.LotBuilder(new ArrayList<Bid>())
+//				.user( testUserService.getMeSimpleUser())
+//				 //.description(TestUserService.genRandString(20, false))
+//				.endTime(LotService.between(Instant.now().plus(Duration.ofDays(1)), Instant.now().plus(Duration.ofDays(2)) ))
+//				.timeZone(ZoneId.systemDefault())
+//				.build();
+//	}
+	
 	public   Lot getMeSimpleLot() {
 		return new Lot.LotBuilder(new ArrayList<Bid>())
 				.user( testUserService.getMeSimpleUser())
-				 //.description(TestUserService.genRandString(20, false))
-				.endTime(LotService.between(Instant.now().plus(Duration.ofDays(1)), Instant.now().plus(Duration.ofDays(2)) ))
-				.build();
-	}
-	
-	public   Lot getMeLotWithTriggerDuration() {
-		return new Lot.LotBuilder(new ArrayList<Bid>())
-				.user( testUserService.getMeSimpleUser())
-				 .description(TestUserService.genRandString(20, false))
+				.description(TestUserService.genRandString(20, false))
 				.endTime(LotService.between(Instant.now().plus(Duration.ofDays(1)), Instant.now().plus(Duration.ofDays(2)) ))
 				.triggerDuration(Duration.ofMinutes(2))
 				.autoExtendDuration(Duration.ofMinutes(5))
-				.timeZone(ZoneId.of("UTC"))
+				.timeZone(ZoneId.systemDefault())
 				.build();
 	}
 	

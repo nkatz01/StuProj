@@ -37,3 +37,13 @@ public void whenParameterCat_thenOnlyCatsFed() {
 //			
 //				 
 //	 }
+
+@DisplayName("given order with two line items, when persist, then order is saved")
+
+		return  Optional.of(this.lotList.stream().filter(l -> l.equals(lot)).findFirst()).orElse(  Optional.empty() );
+
+		return  this.lotList.stream().filter(l -> l.equals(lot)).findFirst().or(() -> Optional.empty());
+
+	private  ZoneId ZONE = ZoneId.of(System.getProperty("user.timezone")) ; 
+	// 	System.out.println(Instant.now(Clock.system(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(+10)))));
+//	 System.out.println(Instant.now(Clock. system(ZoneId.ofOffset("Europe/London", ZoneOffset.ofHours(+2)))));

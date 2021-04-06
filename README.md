@@ -2,13 +2,13 @@
 
 Please ignore AutoBiddingSoftware folder!
 
-source code in: java/biddingSoft/src/
+source code in: java2/biddingSoft/src/
 
 log files: one level up^
 
-application poroperties: StuProj/java/biddingSoft/src/main/resources/
+application poroperties: StuProj/java2/biddingSoft/src/main/resources/
 
-test properties: StuProj/java/biddingSoft/src/test/resources/
+test properties: StuProj/java2/biddingSoft/src/test/resources/
 
 biddingSfotDesignV1
 https://docs.google.com/document/d/1rS10Y5J3YXOE5hW5t6rcgTs38T9ZcUXddyq41qRgN4U/edit?usp=sharing
