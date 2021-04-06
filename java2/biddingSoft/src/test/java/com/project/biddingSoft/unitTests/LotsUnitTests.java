@@ -14,10 +14,14 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,6 +34,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 
@@ -46,6 +51,7 @@ import com.project.biddingSoft.testServices.TestUserService;
 @SpringBootTest
 //@RunWith(SpringRunner.class)
 @RunWith(JUnitPlatform.class)
+@TestInstance(Lifecycle.PER_CLASS)
 public class LotsUnitTests    {
 
 	 
@@ -68,7 +74,7 @@ public class LotsUnitTests    {
 //	@Qualifier("BiddingSoftExceptionsFactory")
 //	ExceptionsCreateor bidSoftExcepFactory; 
 	@Autowired
-	EntityManager entityManager; 
+	private EntityManagerFactory entityManagerFactory;
 	@Test
 	public void contextLoads() throws Exception {
 		assertThat(servletInitializer).isNotNull();
@@ -76,10 +82,19 @@ public class LotsUnitTests    {
 	}
 	
 	@BeforeAll
+	
 	public void removeAllTables() {
-		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0; drop table if exists bid; drop table if exists lot; drop table if exists user;	SET FOREIGN_KEY_CHECKS = 1")
-		.executeUpdate();
-		
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		entityManager.getTransaction().begin();
+		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
+		entityManager.createNativeQuery("TRUNCATE TABLE bid; ").executeUpdate();
+		entityManager.createNativeQuery("TRUNCATE TABLE lot; ").executeUpdate();
+		entityManager.createNativeQuery("TRUNCATE TABLE user;").executeUpdate();
+		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1; ").executeUpdate();
+	
+		entityManager.flush();
+		entityManager.getTransaction().commit();
+
 	}
 	@Test
 	public void test_app_is_up() throws IOException {
