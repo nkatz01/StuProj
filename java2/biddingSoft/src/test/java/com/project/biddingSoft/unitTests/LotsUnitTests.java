@@ -154,7 +154,7 @@ public class LotsUnitTests    {
 	@Test
 	public void createLot_canAddBidWithLot_Toit() throws Exception {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
-		bid.getLot().addBid( bid);
+		bid.getLot().placeBid( bid);
 		assertTrue(bid.getLot().contains(bid));
 	
 		
@@ -163,7 +163,7 @@ public class LotsUnitTests    {
 	@Test
 	public void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception{
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());		 
-		bid.getLot().addBid(bid);
+		bid.getLot().placeBid(bid);
 		bid.getLot().saveToRepo();
 	 	 assertThat(true, equalTo(bid.find().isPresent()));
 
@@ -174,7 +174,7 @@ public class LotsUnitTests    {
 	public	void deleteBid_leavesLotInDtbs(){
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());	
 		Lot lot = bid.getLot();
-		lot.addBid(bid);
+		lot.placeBid(bid);
 		lot.saveToRepo();
 		bid.delete();
 	 	 assertThat(Optional.empty(), equalTo(bid.find()));
@@ -184,7 +184,7 @@ public class LotsUnitTests    {
 	public	void deleteLot_leavesUserInDtbs() throws IllegalAccessException{
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());	
 		Lot lot = bid.getLot();
-		lot.addBid(bid);
+		lot.placeBid(bid);
 		lot.saveToRepo();
 	 	User user = (User)FieldUtils.readField(lot,"user",true);
 	 	lot.delete();
@@ -196,7 +196,7 @@ public class LotsUnitTests    {
 	public	void deleteLot_removesAllRelatedBids(){
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
-		lot.addBid(bid);
+		lot.placeBid(bid);
 		lot.saveToRepo();
 	 	assertThat(true, equalTo(bid.find().isPresent()));
 		lot.delete();
@@ -207,7 +207,7 @@ public class LotsUnitTests    {
 	public	void deleteUser_removesAllRelatedLots() throws IllegalAccessException{
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
-		lot.addBid(bid);
+		lot.placeBid(bid);
 		User user = (User)FieldUtils.readField(lot,"user",true);
 		user.saveToRepo();	
 		assertThat(true, equalTo(lot.find().isPresent()));
@@ -253,7 +253,7 @@ public class LotsUnitTests    {
 		Instant endTime = lot.getEndTime();
 		FieldUtils.writeDeclaredField(lot,"clock", Clock.fixed(endTime,ZoneId.systemDefault()), true);
 		ExceptionsCreateor.LotHasEndedException exception = assertThrows(ExceptionsCreateor.LotHasEndedException.class, () -> {
-			lot.addBid(testBidService.getOneIncrBid(lot));
+			lot.placeBid(testBidService.getOneIncrBid(lot));
 		});
 		String expectedExcepId = "1";
 		assertThat(exception.getId(), equalTo(expectedExcepId));
@@ -266,19 +266,30 @@ public class LotsUnitTests    {
 		Lot lot = testLotService.getMeSimpleLot(); 
 		Instant endTime = lot.getEndTime();
 		FieldUtils.writeDeclaredField(lot,"clock", Clock.fixed(endTime.minus(Duration.ofSeconds(119)),ZoneId.systemDefault()), true);
-		lot.addBid(testBidService.getOneIncrBid(lot));
-		assertThat(lot.getEndTime().compareTo(endTime.plus(Duration.ofMinutes(2))) == 0);
+		lot.placeBid(testBidService.getOneIncrBid(lot));
+		assertTrue(lot.getEndTime().compareTo(endTime.plus(Duration.ofMinutes(5))) == 0);
 
 	}
+	@Test
+	public	void placeBidBefore_triggerDuration_EndTimeIsNotExtended() throws IllegalAccessException
+	{
+		Lot lot = testLotService.getMeSimpleLot(); 
+		Instant endTime = lot.getEndTime();
+		FieldUtils.writeDeclaredField(lot,"clock", Clock.fixed(endTime.minus(Duration.ofSeconds(121)),ZoneId.systemDefault()), true);
+		lot.placeBid(testBidService.getOneIncrBid(lot));
+		assertTrue(lot.getEndTime().compareTo(endTime) == 0);
+
+	}
+
 	@Test
 	public void placeBid_higherThanCurrentHighestBid_changesLeadingBidder()  {
 		Lot lot = testLotService.getMeSimpleLot();
 		Bid bid1 = testBidService.getOneIncrBid(lot);
-		User bidder1 = lot.addBid(bid1).get().getLeadingBidder();
+		User bidder1 = lot.placeBid(bid1).get().getLeadingBidder();
 		assertTrue(bidder1.equals(lot.getLeadingBidder()));
 		Bid bid2 = testBidService.getOneIncrBid(lot);
 
-		User bidder2 = lot.addBid(bid2).get().getLeadingBidder();
+		User bidder2 = lot.placeBid(bid2).get().getLeadingBidder();
 		assertTrue(!bidder1.equals(bidder2));
 		assertTrue(lot.getLeadingBidder().equals(bidder2));
 	}
@@ -286,9 +297,8 @@ public class LotsUnitTests    {
 	public void placeOneBidIncr_bumpsHighestBidUp_byOneIncr() throws Exception {
 		Bid prevHighestBid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = prevHighestBid.getLot();
-		lot.addBid(prevHighestBid);
-		lot.addBid(testBidService.getOneIncrBid(lot));
-		//System.out.println(lot.getTriggerDuration() +" "+ lot.getAutoExtendDuration());  
+		lot.placeBid(prevHighestBid);
+		lot.placeBid(testBidService.getOneIncrBid(lot));
 		assertThat(lot.getHighestBid(), equalTo( testBidService.bumpUpOne(prevHighestBid)));
 	}
 
@@ -296,8 +306,8 @@ public class LotsUnitTests    {
 	public void BidThatIsOver_orEqualTo_oneIncrMoreThanPrevBid_becomesPendingAutoBid(){
 		Lot lot = testLotService.getMeSimpleLot();
 		Bid bid1 = testBidService.getOneIncrBid(lot);
-		Bid bid2 = testBidService.getTwoIncrBid(lot);
-		lot.addBid(bid1).get().addBid(bid2);
+		Bid bid2 = testBidService.getBidBumpedUpByTwoIncr(lot, bid1);//bid2 is bumped up by two increments relative to bid1
+		lot.placeBid(bid1).get().placeBid(bid2);
 		assertTrue(lot.getPendingAutoBid().getAmount()== bid2.getAmount());
 	}
 //
@@ -348,19 +358,7 @@ public class LotsUnitTests    {
 //		assertThat(exception.getMessage(), equalTo(expectedMessage));
 //	}
 //
-//	@Test
-//	void triggerDurationPeriodOnLot_andPushTimeToEnd_endsLot
-//	{
-//		Lot lot = testLotService.getMeSimpleLot());
-//		lot.beginTriggerDuration();
-//		lot.setTimeToEnd();
-//		Exception exception = assertThrows(Exception.class, () -> {
-//			lot.placeBid(Bid.giveDependencies(TestBidComponents.oneIncr().build()));
-//		});
-//		String expectedMessage = "Bid rejected - Lot expired";
-//		assertThat(exception.getMessage(), equalTo(expectedMessage));
-//	}
-//
+
 
 
 }

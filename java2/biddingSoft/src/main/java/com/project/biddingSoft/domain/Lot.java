@@ -92,6 +92,9 @@ public class Lot implements IStorable {
 	private User user;
 	@Value("${Lot.biddingIncrement}")
 	private double biddingIncrement;
+	public double getBiddingIncrement() {
+		return biddingIncrement;
+	}
 	private double reservePrice = 0.0;
 	@Value("${Lot.startingPrice}")
 	private double startingPrice;
@@ -189,16 +192,31 @@ public class Lot implements IStorable {
 //
 //	}
 	
-	public   Optional<Lot> addBid(Bid bid)
+	public   Optional<Lot> placeBid(Bid bid)
 			throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
 		
-		boolean succeeded = placeBid(bid);// handle exception
+		
+		boolean succeeded = addBid(bid);// handle exception
 		 if (succeeded) {
-			 if (bid.getAmount()>=getHighestBid() + biddingIncrement)
+			 if(pendingAutoBid==null) {
+			 
+			 highestBid +=  biddingIncrement;
+			 if (bid.getAmount()>getHighestBid() )
+			 {
+				 pendingAutoBid.setAmount(((int)bid.getAmount()/ biddingIncrement) * biddingIncrement);
 				 pendingAutoBid = bid;
-			 highestBid = highestBid + biddingIncrement;
-			 bidList.add(bid);
+			 }
 			 leadingBidder = bid.getBidder();
+			 }
+			 else {
+				 if (bid.getAmount()<pendingAutoBid.getAmount())
+					 highestBid+= bid.getAmount() + biddingIncrement;
+				 else if (bid.getAmount()==pendingAutoBid.getAmount()) {
+					 highestBid+= bid.getAmount();
+					 pendingAutoBid =null;
+					
+				 }
+			 }
 			
 		 }
 		return succeeded ? Optional.of(this)  : Optional.empty();
@@ -212,7 +230,7 @@ public class Lot implements IStorable {
 	private Clock clock;
 
 	
-	private boolean placeBid(Bid bid)
+	private boolean addBid(Bid bid)
 			throws DateTimeException, ArithmeticException, NullPointerException, ExceptionsCreateor.BidTooLow {
 		boolean success;
 		Instant now = Instant.now(clock);
@@ -248,8 +266,8 @@ public class Lot implements IStorable {
 
 	public boolean bidHighEnough(Bid bid) throws ExceptionsCreateor.BidTooLow {
 		boolean isHihger = false;
-		if (getHighestBid() > 0.0)
-			isHihger = getHighestBid() + biddingIncrement >= bid.getAmount();
+		if (getHighestBid() > 0.0)//there are bid/s already placed
+			isHihger =  bid.getAmount()  >= getHighestBid() + biddingIncrement;
 		else {// no bids placed yet
 			if (bid.getAmount() < (startingPrice + biddingIncrement))
 				throw bidSoftExcepFactory.new BidTooLow(startingPrice + biddingIncrement);
@@ -263,7 +281,7 @@ public class Lot implements IStorable {
 
 	}
 	
-	
+
 
 //	public Lot(List<Bid> bidList, User user) {
 //		

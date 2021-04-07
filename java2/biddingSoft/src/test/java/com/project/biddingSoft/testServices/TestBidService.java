@@ -28,7 +28,7 @@ public class TestBidService {
 	public Optional<Lot> placeSuccessfulOneIncrBid(){
 		Bid bid = getOneIncrBid();
 		
-			return bid.getLot().addBid(bid);
+			return bid.getLot().placeBid(bid);
 		
 	}
 //	public Optional<Lot> placeSuccessfulOneIncrBid(Lot lot){
@@ -37,10 +37,13 @@ public class TestBidService {
 //		
 //	}
 	public Bid getOneIncrBid(Lot lot) {
-		return new Bid.BidBuilder(lot).amount(ONEINCR).bidder(testUserService.getMeSimpleBidder()).build();
+		return new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid()).bidder(testUserService.getMeSimpleBidder()).build();
 	}
-	public Bid getTwoIncrBid(Lot lot) {
-		return new Bid.BidBuilder(lot).amount(TWOINCR).bidder(testUserService.getMeSimpleBidder()).build();
+	public Bid getBidBumpedUpByTwoIncr(Lot lot, Bid bid) {
+		return new Bid.BidBuilder(lot).amount((lot.getBiddingIncrement() * 2) + bid.getAmount()).bidder(testUserService.getMeSimpleBidder()).build();
+	}
+	public Bid getArbitraryAmountBid(Lot lot, double amount) {
+		return new Bid.BidBuilder(lot).amount(amount + lot.getHighestBid()).bidder(testUserService.getMeSimpleBidder()).build();
 	}
 		public double bumpUpOne(Bid bid) { 
 		 return bid.getAmount() + ONEINCR;
