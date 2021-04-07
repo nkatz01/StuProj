@@ -47,3 +47,14 @@ public void whenParameterCat_thenOnlyCatsFed() {
 	private  ZoneId ZONE = ZoneId.of(System.getProperty("user.timezone")) ; 
 	// 	System.out.println(Instant.now(Clock.system(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(+10)))));
 //	 System.out.println(Instant.now(Clock. system(ZoneId.ofOffset("Europe/London", ZoneOffset.ofHours(+2)))));
+
+@Test
+public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceExceptionExceptionIsThrown() {
+    Person person = new Person(1L, "firstname", "lastname");
+
+    assertThatExceptionOfType(PersistenceException.class).isThrownBy(() -> {
+        personInsertRepository.insertWithQuery(PERSON);
+        personInsertRepository.insertWithQuery(PERSON);
+    });
+}
+

@@ -15,6 +15,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,15 @@ import com.project.biddingSoft.dao.IStorable;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Component
 public class Bid implements IStorable {
-	
+	@ManyToOne(cascade = CascadeType.PERSIST,
+			 fetch = FetchType.LAZY)//orphanRemoval=true
+	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
+	private User bidder;
+	public User getBidder() {
+		return bidder;
+	}
+
+
 	public Bid() {
 
 		
@@ -47,6 +56,7 @@ public class Bid implements IStorable {
 		this.id = bidBuilder.id;
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
+		this.bidder = bidBuilder.bidder;
 	}
 	//instance variables
 	@Id
@@ -69,9 +79,10 @@ public class Bid implements IStorable {
 		return amount;
 	}
 	
-	public Bid(Lot lot, double amount) {
+	public Bid(Lot lot, double amount, User bidder) {
 		this.lot = lot;
 		this.amount = amount;
+		this.bidder = bidder; 
 	}
 
 	//setters, getters
@@ -126,13 +137,17 @@ public class Bid implements IStorable {
 		private Long id;
 		private Lot lot;
 		private double amount;
-		
+		private User bidder;
 		public BidBuilder(Lot lot) {
 			this.lot = lot;
 			
 		}
 		public BidBuilder amount(double amount) {
 			this.amount  = amount; 
+			return this;
+		}
+		public BidBuilder bidder(User bidder) {
+			this.bidder = bidder; 
 			return this;
 		}
 		public Bid build() {

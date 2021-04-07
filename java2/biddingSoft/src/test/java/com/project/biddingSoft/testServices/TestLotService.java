@@ -33,6 +33,7 @@ public class TestLotService {
 				.triggerDuration(Duration.ofMinutes(2))
 				.autoExtendDuration(Duration.ofMinutes(5))
 				.timeZone(ZoneId.systemDefault())
+				.biddingIncrement(5.0)
 				.build();
 	}
 	

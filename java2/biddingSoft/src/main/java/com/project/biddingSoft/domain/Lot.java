@@ -28,6 +28,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
@@ -60,7 +61,8 @@ public class Lot implements IStorable {
 	public void setBidSoftExcepFactory(ExceptionsCreateor bidSoftExcepFactory) {
 		Lot.bidSoftExcepFactory = bidSoftExcepFactory;
 	}
-
+//	@Transient
+//	private static final  double ONEINCR = 5.0;
 	// Instance variables
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -72,7 +74,7 @@ public class Lot implements IStorable {
 //	@Basic
 //	@OneToOne(cascade = CascadeType.ALL)//orphanRemoval=true
 //	@JoinColumn(name = "highest_bid_id", referencedColumnName = "id")
-//	private Bid highestBid;  
+	private double highestBid;  
 //	 private void setHighestBid(Bid highestBid) {
 //		this.highestBid = highestBid;
 //	}
@@ -96,9 +98,30 @@ public class Lot implements IStorable {
 	// @Basic
 	private Instant startTime = Instant.now();
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
+	@OneToOne(cascade = CascadeType.ALL)//orphanRemoval=true
+	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
+	private User leadingBidder;
+	public User getLeadingBidder() {
+		return leadingBidder;
+	}
+	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy="lot")//, orphanRemoval=true
+	@JoinColumn(name = "autoBid_bid_id")
+	private Bid pendingAutoBid; 
+	
+
+	public Bid getPendingAutoBid() {
+		return pendingAutoBid;
+	}
 
 	public Instant getEndTime() {
 		return endTime;
+	}
+	public Bid getBid(Bid bid) {
+		return bidList.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
+	}
+	public Bid getBid(int id) {
+		return bidList.get(id);
 	}
 
 	// @Basic
@@ -149,11 +172,36 @@ public class Lot implements IStorable {
 
 	}
 
-	 
-	public  static boolean addBid(Lot lot, Bid bid)
+
+//	public  static Optional<Lot> addBid(Lot lot, Bid bid)
+//			throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
+//		
+//		boolean succeeded = lot.placeBid(bid);// handle exception
+//		 if (succeeded) {
+//			 if (bid.getAmount()>=lot.getHighestBid() + lot.biddingIncrement)
+//				 lot.pendingAutoBid = bid;
+//			 lot.highestBid = lot.highestBid + lot.biddingIncrement;
+//			 lot.bidList.add(bid);
+//			 lot.leadingBidder = bid.getBidder();
+//			
+//		 }
+//		return succeeded ? Optional.of(lot)  : Optional.empty();
+//
+//	}
+	
+	public   Optional<Lot> addBid(Bid bid)
 			throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
-		boolean succeeded = lot.placeBid(bid);// handle exception
-		return succeeded;
+		
+		boolean succeeded = placeBid(bid);// handle exception
+		 if (succeeded) {
+			 if (bid.getAmount()>=getHighestBid() + biddingIncrement)
+				 pendingAutoBid = bid;
+			 highestBid = highestBid + biddingIncrement;
+			 bidList.add(bid);
+			 leadingBidder = bid.getBidder();
+			
+		 }
+		return succeeded ? Optional.of(this)  : Optional.empty();
 
 	}
 
@@ -200,16 +248,17 @@ public class Lot implements IStorable {
 
 	public boolean bidHighEnough(Bid bid) throws ExceptionsCreateor.BidTooLow {
 		boolean isHihger = false;
-		try {
-			isHihger = getHighestBid().getAmount() + biddingIncrement >= bid.getAmount() ;
-		} catch (NoSuchElementException e) {//if, first bid, then checks for starting price
-			if(bid.getAmount()< (startingPrice + biddingIncrement))
-			throw bidSoftExcepFactory.new BidTooLow(startingPrice + biddingIncrement);
-			else 
+		if (getHighestBid() > 0.0)
+			isHihger = getHighestBid() + biddingIncrement >= bid.getAmount();
+		else {// no bids placed yet
+			if (bid.getAmount() < (startingPrice + biddingIncrement))
+				throw bidSoftExcepFactory.new BidTooLow(startingPrice + biddingIncrement);
+
+			else
 				isHihger = true;
 		}
 		if (!isHihger)
-			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), getHighestBid().getAmount() + biddingIncrement);
+			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), getHighestBid() + biddingIncrement);
 		return true;
 
 	}
@@ -226,12 +275,11 @@ public class Lot implements IStorable {
 //		this(new ArrayList<Bid>(), user);
 //	}
 //	
-//	public Lot() {
-//		this(new ArrayList<Bid>(), new User("defualt"));
-//	}
 
-	public Bid getHighestBid() {
-		return bidList.stream().max(Comparator.comparing(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
+
+	public double getHighestBid() {
+		 return highestBid;
+//			 bidList.stream().max(Comparator.comparingDouble(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
 	}
 
 	@Override
@@ -244,8 +292,11 @@ public class Lot implements IStorable {
 	}
 
 	// @JsonProperty(value = "bidList")
-	private List<Bid> getBidList() {
-		return bidList;
+//	private List<Bid> getBidList() {
+//		return bidList;
+//	}
+	public boolean contains(Bid bid) {
+		return bidList.contains(bid);
 	}
 	// @JsonProperty(value = "user")
 
