@@ -25,6 +25,7 @@ public    class ExceptionsCreateor {
 
 }
   
+  
   public class BiddingSoftExceptions extends RuntimeException{
   
 	  private   String throwableMsg ;
@@ -60,5 +61,14 @@ public    class ExceptionsCreateor {
 
 	}
   
+  public class AutobidNotSet extends BiddingSoftExceptions {
+	  private static final String throwableMsg = "this lot has no active autobud in place at the moment";
+	  private static final int id = 3;
+	  
+	  public AutobidNotSet() {
+		  super(id, new Throwable(throwableMsg));
+	  }
+	  
+  }
   
 }

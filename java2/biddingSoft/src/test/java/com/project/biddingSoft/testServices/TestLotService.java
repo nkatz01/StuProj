@@ -36,6 +36,18 @@ public class TestLotService {
 				.biddingIncrement(5.0)
 				.build();
 	}
+	public   Lot getMeLotWithSrtingPrice(double startingPrice) {
+		return new Lot.LotBuilder(new ArrayList<Bid>())
+				.user( testUserService.getMeSimpleUser())
+				.description(TestUserService.genRandString(20, false))
+				.endTime(LotService.between(Instant.now().plus(Duration.ofDays(1)), Instant.now().plus(Duration.ofDays(2)) ))
+				.triggerDuration(Duration.ofMinutes(2))
+				.autoExtendDuration(Duration.ofMinutes(5))
+				.timeZone(ZoneId.systemDefault())
+				.biddingIncrement(5.0)
+				.startingPrice(startingPrice)
+				.build();
+	}
 	
 	
 	
