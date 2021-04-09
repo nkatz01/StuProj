@@ -49,8 +49,8 @@ public class User implements IStorable  {
 	public User(UserBuilder userBuilder) {
 	this.id =	 userBuilder.id;
 	this.username =	 userBuilder.username;
-	this.lotsCreatedList =	 userBuilder.lotsCreatedList;//fix
-	this.bidsList =	userBuilder.bidsList;//fix
+	this.lotsCreatedList =	new ArrayList<Lot>( userBuilder.lotsCreatedList); 
+	this.bidsList = 	new ArrayList<Bid>( userBuilder.bidsList);
 	}
  
 
@@ -101,6 +101,7 @@ public class User implements IStorable  {
  	 @JsonCreator
 	public User() {
 		 this.bidsList = new ArrayList<Bid>();
+		 this.lotsCreatedList = new ArrayList<Lot>();
 
 	}
 	public boolean containsLot(Lot lot) {
