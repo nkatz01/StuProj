@@ -3,6 +3,7 @@
  */
 package com.project.biddingSoft.domain;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.IStorable;
 
@@ -36,27 +39,28 @@ import com.project.biddingSoft.dao.IStorable;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Component
 public class Bid implements IStorable {
-	@ManyToOne(cascade = CascadeType.PERSIST,
-			 fetch = FetchType.LAZY)//orphanRemoval=true
+	 
+	@ManyToOne(cascade = CascadeType.PERSIST
+			,fetch = FetchType.LAZY
+			 )//orphanRemoval=true
 	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
+	@JsonProperty(value = "bidder")
+//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User bidder;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	 
 	@ManyToOne(
-			cascade = CascadeType.PERSIST,
-		    fetch = FetchType.LAZY
+			cascade = CascadeType.PERSIST
+			,fetch = FetchType.EAGER//in order for jackson to work
+			
 		)
-	@JoinColumn(name = "lot_id", nullable=false)
+	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable=false)
+	 @JsonProperty(value = "lot")
 	private Lot lot;
-	public void setLot(Lot lot) {
-		this.lot = lot;
-	}
-
-
-		//static variables
-		@Transient
+	//static variables
+	@Transient
 	@Autowired
 	private static IBidRepo iBidRepo;
 	
@@ -82,6 +86,7 @@ public class Bid implements IStorable {
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
 		this.bidder = bidBuilder.bidder;
+		this.bidder.addBidToList(this);
 	}
 	//instance variables
 	
@@ -99,6 +104,7 @@ public class Bid implements IStorable {
 		this.lot = lot;
 		this.amount = amount;
 		this.bidder = bidder; 
+		this.bidder.addBidToList(this);
 	}
 
 	//setters, getters
@@ -139,8 +145,11 @@ public class Bid implements IStorable {
 	}
 
 	@Override
-	public void delete() throws IllegalArgumentException {
+	public void delete() {
+		//lot.remove(lot.getBid(this));
 			iBidRepo.deleteById(this.id);
+		
+			  System.out.println(iBidRepo.findById(this.id).isPresent());
 	}
 
 	public static class BidBuilder{

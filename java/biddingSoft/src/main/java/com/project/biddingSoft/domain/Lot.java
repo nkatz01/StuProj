@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
@@ -85,7 +86,9 @@ public class Lot implements IStorable {
 //	 private void setHighestBid(Bid highestBid) {
 //		this.highestBid = highestBid;
 //	}
-
+//	public void remove(Bid bid) {
+//		this.bidList = new ArrayList<Bid>(	bidList.stream().filter(b -> !b.equals(bid)).collect(Collectors.toList() ));
+//	}
 	@Value("${Lot.title}")
 	private String title;
 	@Value("${Lot.description}")
@@ -112,7 +115,7 @@ public class Lot implements IStorable {
 	@JoinColumn(name = "autoBid_bid_id")
 	private Bid pendingAutoBid;
 
-	@JsonIgnore
+	@JsonIgnore //otherwise causes curl recursion error
 	public Bid getPendingAutoBid() {
 		if (pendingAutoBid != null)
 			return pendingAutoBid;

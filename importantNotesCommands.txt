@@ -61,3 +61,10 @@ delete FROM biddingsoft.hibernate_sequence where next_val = 8565;
 SET SQL_SAFE_UPDATES = 1;
 
 eclipse.exe -clean -clearPersistedState
+
+git reset --hard HEAD
+git pull
+
+git reset --hard HEAD
+git clean -f -d
+git pull

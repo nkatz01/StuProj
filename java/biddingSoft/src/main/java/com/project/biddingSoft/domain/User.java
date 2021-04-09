@@ -3,7 +3,8 @@
  */
 package com.project.biddingSoft.domain;
 
- import java.util.ArrayList;
+ import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IUserRepo;
  /**
@@ -33,10 +36,9 @@ import com.project.biddingSoft.dao.IUserRepo;
  *
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Component
 //@Transactional
-public class User implements IStorable {
+public class User implements IStorable  {
 	
 	
 
@@ -47,18 +49,21 @@ public class User implements IStorable {
 	public User(UserBuilder userBuilder) {
 	this.id =	 userBuilder.id;
 	this.username =	 userBuilder.username;
-	this.lotsCreatedList =	 userBuilder.lotsCreatedList;
-	this.bidsList =	new ArrayList<Bid>( userBuilder.bidsList);
+	this.lotsCreatedList =	 userBuilder.lotsCreatedList;//fix
+	this.bidsList =	userBuilder.bidsList;//fix
 	}
-	 
- @JsonCreator
+ 
+
 	public User(Long id, String username,  List<Lot> lotsCreatedList ) {//String address, char[] password,
 		this.id = id;
 		this.username = username;
 //		this.address = address;
 //		this.password = password; 
  		this.lotsCreatedList = new ArrayList<Lot>(  lotsCreatedList );
+ 		this.bidsList = new ArrayList<Bid>(  bidsList );
 	}
+ 
+  @JsonProperty("lotsCreatedList")
  @OneToMany(
 		 fetch = FetchType.LAZY,
 	    mappedBy = "user",//variable in Lot class - links a lot with a given user
@@ -68,6 +73,7 @@ public class User implements IStorable {
 	)
 	List<Lot> lotsCreatedList; 
  
+ @JsonProperty("bidsList")//causes recursion in curl request
  @OneToMany(
 		 fetch = FetchType.LAZY,
 	    mappedBy = "bidder",//variable in Bid class - links a Bid with a given user
@@ -88,9 +94,13 @@ public class User implements IStorable {
  	public boolean addLotToList(Lot lot) {//handle exception
  		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(lot);
  		}
-  
+ 	
+	public boolean addBidToList(Bid bid) {//handle exception
+ 		return !bidsList.contains(bid) && bidsList.add(bid);
+ 		}
+ 	 @JsonCreator
 	public User() {
-		this.bidsList = new ArrayList<Bid>();
+		 this.bidsList = new ArrayList<Bid>();
 
 	}
 	public boolean containsLot(Lot lot) {
@@ -141,14 +151,14 @@ public class User implements IStorable {
 	}
 
 	@Override
-	public Optional<? extends IStorable> find() throws IllegalArgumentException {
+	public Optional<? extends IStorable> find()  {
 		Optional<User> user = null;
 		user =	iUserRepo.findById(this.id);
 		  return user;
 	}
 
 	@Override
-	public void delete() throws IllegalArgumentException {
+	public void delete()  {
 			iUserRepo.deleteById(this.id);
 		
 	}

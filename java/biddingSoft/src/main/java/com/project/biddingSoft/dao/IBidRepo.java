@@ -18,4 +18,6 @@ import com.project.biddingSoft.domain.Lot;
 //@NoRepositoryBean
 @Repository
 public interface IBidRepo extends  CrudRepository<Bid, Long> {
+	
+	
 }

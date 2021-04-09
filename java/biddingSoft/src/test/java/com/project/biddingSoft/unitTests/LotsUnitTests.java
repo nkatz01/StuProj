@@ -150,7 +150,8 @@ public class LotsUnitTests {
 		assertThat(true, equalTo(bid.find().isPresent()));
 
 	}
-
+	@Transactional//because lots are loaded eagurly together with bids, bids won't get deleted. 
+	//I guess the reason is because of the reference to lot maintained within bid's FK column named  lot_id
 	@Test
 	public void deleteBid_leavesLotInDtbs() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
@@ -158,8 +159,8 @@ public class LotsUnitTests {
 		lot.placeBid(bid);
 		lot.saveToRepo();
 		bid.delete();
-		assertThat(Optional.empty(), equalTo(bid.find()));
 		assertThat(true, equalTo(lot.find().isPresent()));
+		assertThat(bid.find().isEmpty(), equalTo(true));
 	}
 
 	@Test
