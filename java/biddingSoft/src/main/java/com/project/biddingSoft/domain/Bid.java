@@ -21,6 +21,8 @@ import javax.persistence.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.IStorable;
 
@@ -38,17 +40,40 @@ public class Bid implements IStorable {
 			 fetch = FetchType.LAZY)//orphanRemoval=true
 	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
 	private User bidder;
-	public User getBidder() {
-		return bidder;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	 
+	@ManyToOne(
+			cascade = CascadeType.PERSIST,
+		    fetch = FetchType.LAZY
+		)
+	@JoinColumn(name = "lot_id", nullable=false)
+	private Lot lot;
+	public void setLot(Lot lot) {
+		this.lot = lot;
 	}
 
 
+		//static variables
+		@Transient
+	@Autowired
+	private static IBidRepo iBidRepo;
+	
+	private double amount; 
+	
+	
+	
+	@JsonCreator
 	public Bid() {
 
 		
 	}
 
 	
+	public User getBidder() {
+		return bidder;
+	}
 	 void setAmount(double amount) {//delete
 		this.amount = amount;
 	}
@@ -59,21 +84,12 @@ public class Bid implements IStorable {
 		this.bidder = bidBuilder.bidder;
 	}
 	//instance variables
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	@ManyToOne(
-			cascade = CascadeType.PERSIST,
-		    fetch = FetchType.LAZY
-		)
-	@JoinColumn(name = "lot_id", nullable=false)
-	private Lot lot;
-	//static variables
-		@Transient
-	@Autowired
-	private static IBidRepo iBidRepo;
-	private double amount; 
 	
+	
+	@Override
+	public void setId(Long id) {
+		this.id = id;
+	}
 	 
 	public double getAmount() {
 		return amount;
@@ -86,10 +102,6 @@ public class Bid implements IStorable {
 	}
 
 	//setters, getters
-	@Autowired
-	public void setIRepo(IBidRepo ibidRepo) {
-		 iBidRepo = ibidRepo;
-	}
 	
 	public Lot getLot() {
 		return lot;
@@ -100,11 +112,11 @@ public class Bid implements IStorable {
 
 	
 	
-
-	@Override
-	public void setId(Long id) {
-		this.id = id;
+	@Autowired
+	public void setIRepo(IBidRepo ibidRepo) {
+		iBidRepo = ibidRepo;
 	}
+
 
 	//Persistence handling
 	@Override
@@ -154,6 +166,55 @@ public class Bid implements IStorable {
 			
 			return new Bid(this);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "Bid [bidder=" + bidder + ", id=" + id + ", lot=" + lot + ", amount=" + amount + "]";
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(amount);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((bidder == null) ? 0 : bidder.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((lot == null) ? 0 : lot.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Bid other = (Bid) obj;
+		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
+			return false;
+		if (bidder == null) {
+			if (other.bidder != null)
+				return false;
+		} else if (!bidder.equals(other.bidder))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (lot == null) {
+			if (other.lot != null)
+				return false;
+		} else if (!lot.equals(other.lot))
+			return false;
+		return true;
 	}
 
  
