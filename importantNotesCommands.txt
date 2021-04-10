@@ -68,3 +68,5 @@ git pull
 git reset --hard HEAD
 git clean -f -d
 git pull
+
+curl -o out.json http://www.example.com/index.html

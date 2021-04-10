@@ -15,8 +15,8 @@ import com.project.biddingSoft.domain.User;
  * @author nuche
  *
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = Lot.class)
-@JsonSubTypes({ @JsonSubTypes.Type(value = User.class, name = "user"),
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = User.class)
+@JsonSubTypes({ @JsonSubTypes.Type(value = Lot.class, name = "lot"),
 		@JsonSubTypes.Type(value = Bid.class, name = "bid") })
 public interface IStorable {
 

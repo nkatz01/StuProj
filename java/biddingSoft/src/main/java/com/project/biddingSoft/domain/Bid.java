@@ -22,10 +22,13 @@ import javax.persistence.Transient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.IStorable;
 
@@ -35,17 +38,21 @@ import com.project.biddingSoft.dao.IStorable;
  * @author nuchem
  *
  */
+//@JsonIdentityInfo(
+//		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+//		  property = "id")
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Component
-public class Bid implements IStorable {
+public class Bid implements IStorable{
 	 
 	@ManyToOne(cascade = CascadeType.PERSIST
 			,fetch = FetchType.LAZY
 			 )//orphanRemoval=true
 	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
 	@JsonProperty(value = "bidder")
-//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@JsonBackReference(value="bidOnUser")
+	//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User bidder;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -56,6 +63,7 @@ public class Bid implements IStorable {
 			,fetch = FetchType.EAGER//in order for jackson to work
 			
 		)
+	@JsonBackReference(value="bidOnLot")
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable=false)
 	 @JsonProperty(value = "lot")
 	private Lot lot;

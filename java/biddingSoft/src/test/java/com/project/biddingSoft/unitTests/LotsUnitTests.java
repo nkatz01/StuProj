@@ -286,7 +286,7 @@ public class LotsUnitTests {
 
 	@Test
 	public void bidBelowStartingPrice_isRefused() {
-		Lot lot = testLotService.getMeLotWithSrtingPrice(7.0);
+		Lot lot = testLotService.getMeLotWithStrtingPrice(7.0);
 		ExceptionsCreateor.BidTooLow exception = assertThrows(ExceptionsCreateor.BidTooLow.class, () -> {
 			lot.placeBid(testBidService.getOneIncrBid(lot));
 		});
@@ -296,7 +296,7 @@ public class LotsUnitTests {
 
 	@Test
 	public void bidEqualToStartingPrice_isAccepted() {
-		Lot lot = testLotService.getMeLotWithSrtingPrice(5.0);
+		Lot lot = testLotService.getMeLotWithStrtingPrice(5.0);
 		assertTrue(lot.placeBid(testBidService.getOneIncrBid(lot)).isPresent());
 	}
 
@@ -390,6 +390,11 @@ public class LotsUnitTests {
 		assertThat(newBid.getBidder(), equalTo(lot.getLeadingBidder()));
 		assertThat(lot.getPendingAutoBid(), equalTo(newBid));
 
+	}
+	
+	@Test
+	void checkThatAfterBidIsCreated_BidderGetsAssociation_withBid_onTheirObject() {
+		
 	}
 
 }

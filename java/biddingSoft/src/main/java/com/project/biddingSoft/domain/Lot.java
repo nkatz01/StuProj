@@ -3,6 +3,7 @@
  */
 package com.project.biddingSoft.domain;
 
+import java.io.Serializable;
 import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Duration;
@@ -39,9 +40,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.annotations.VisibleForTesting;
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
@@ -52,11 +57,13 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
  * @author nuchem
  *
  */
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+
 @Entity
 @Component
 @Inheritance(strategy = InheritanceType.JOINED)
 //@Transactional
-public class Lot implements IStorable {
+public class Lot implements IStorable  {
 	
 
 	@Autowired
@@ -76,12 +83,17 @@ public class Lot implements IStorable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	// @ElementCollection(targetClass=Lot.class)
+	@JsonManagedReference(value="bidOnLot")
+	@JsonProperty("bidList")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // variable in bid class - that links bid to a lot
 			cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bid> bidList;
-//	@Basic
-//	@OneToOne(cascade = CascadeType.ALL)//orphanRemoval=true
-//	@JoinColumn(name = "highest_bid_id", referencedColumnName = "id")
+	@JsonBackReference(value="lotOnUser")
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false) // , referencedColumnName = "id"
+	@JsonProperty("user")
+	private User user;
+	
 	private double highestBid;
 //	 private void setHighestBid(Bid highestBid) {
 //		this.highestBid = highestBid;
@@ -97,9 +109,6 @@ public class Lot implements IStorable {
 	@Transient
 	@Value("${Lot.timeZone}")
 	private ZoneId ZONE;
-	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false) // , referencedColumnName = "id"
-	private User user;
 	@Value("${Lot.biddingIncrement}")
 	private double biddingIncrement;
 	private double reservePrice = 0.0;
@@ -472,7 +481,7 @@ public class Lot implements IStorable {
 		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
-	}
+	} 
 
 	@Override
 	public boolean equals(Object obj) {

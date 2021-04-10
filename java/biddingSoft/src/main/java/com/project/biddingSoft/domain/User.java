@@ -27,14 +27,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IUserRepo;
  /**
  * @author nuchem
  *
  */
+//@JsonIdentityInfo(
+//		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+//		  property = "id")
 @Entity
 @Component
 //@Transactional
@@ -50,7 +56,7 @@ public class User implements IStorable  {
 	this.id =	 userBuilder.id;
 	this.username =	 userBuilder.username;
 	this.lotsCreatedList =	new ArrayList<Lot>( userBuilder.lotsCreatedList); 
-	this.bidsList = 	new ArrayList<Bid>( userBuilder.bidsList);
+	this.bidsBadeList = 	new ArrayList<Bid>( userBuilder.bidsBadeList);
 	}
  
 
@@ -60,20 +66,21 @@ public class User implements IStorable  {
 //		this.address = address;
 //		this.password = password; 
  		this.lotsCreatedList = new ArrayList<Lot>(  lotsCreatedList );
- 		this.bidsList = new ArrayList<Bid>(  bidsList );
+ 		this.bidsBadeList = new ArrayList<Bid>(  bidsBadeList );
 	}
  
-  @JsonProperty("lotsCreatedList")
+   @JsonProperty("lotsCreatedList")
+   @JsonManagedReference(value="lotOnUser")
  @OneToMany(
 		 fetch = FetchType.LAZY,
 	    mappedBy = "user",//variable in Lot class - links a lot with a given user
 	     cascade = CascadeType.ALL,
 	  orphanRemoval = true
 	   
-	)
+	) 
 	List<Lot> lotsCreatedList; 
- 
- @JsonProperty("bidsList")//causes recursion in curl request
+   @JsonManagedReference(value="bidOnUser")
+ @JsonProperty("bidsBadeList")//causes recursion in curl request
  @OneToMany(
 		 fetch = FetchType.LAZY,
 	    mappedBy = "bidder",//variable in Bid class - links a Bid with a given user
@@ -83,7 +90,7 @@ public class User implements IStorable  {
 	)
 // @JoinTable(name= "users_bids", joinColumns={@JoinColumn(referencedColumnName="id")}
 //		 , inverseJoinColumns={@JoinColumn(referencedColumnName="id")}) 
-	private List<Bid> bidsList; 
+	private List<Bid> bidsBadeList; 
  
  	public Lot getLot(int id) throws IndexOutOfBoundsException{
  		Lot lot =null;
@@ -96,11 +103,11 @@ public class User implements IStorable  {
  		}
  	
 	public boolean addBidToList(Bid bid) {//handle exception
- 		return !bidsList.contains(bid) && bidsList.add(bid);
+ 		return !bidsBadeList.contains(bid) && bidsBadeList.add(bid);
  		}
  	 @JsonCreator
 	public User() {
-		 this.bidsList = new ArrayList<Bid>();
+		 this.bidsBadeList = new ArrayList<Bid>();
 		 this.lotsCreatedList = new ArrayList<Lot>();
 
 	}
@@ -173,7 +180,7 @@ public class User implements IStorable  {
 //		private String address; 
 //		private char[] password; 
 		private List<Lot> lotsCreatedList;
-		private List<Bid> bidsList;
+		private List<Bid> bidsBadeList;
 		public UserBuilder(String username, String password ) {
 			this.username = username; 
 			//this.password = password.toCharArray();
@@ -183,12 +190,12 @@ public class User implements IStorable  {
 //			this.address = address;
 //			return this;
 //		}
-		public UserBuilder lotsCreated(List<Lot> lotsCreatedList) {
+		public UserBuilder lotsCreated(List<Lot> lotsCreatedList) {//fix
 			this.lotsCreatedList = lotsCreatedList;
 			return this;
 		}
-		public UserBuilder bidsCreated(List<Bid> bidsList) {
-			this.bidsList = bidsList;
+		public UserBuilder bidsCreated(List<Bid> bidsBadeList) {//fix
+			this.bidsBadeList = bidsBadeList;
 			return this;
 		}
 		
@@ -202,7 +209,7 @@ public class User implements IStorable  {
 
 	@Override
 	public String toString() {
-		return "User [lotsCreatedList=" + lotsCreatedList + ", bidsList=" + bidsList + ", id=" + id + ", username="
+		return "User [lotsCreatedList=" + lotsCreatedList + ", bidsBadeList=" + bidsBadeList + ", id=" + id + ", username="
 				+ username + "]";
 	}
 
@@ -210,7 +217,7 @@ public class User implements IStorable  {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((bidsList == null) ? 0 : bidsList.hashCode());
+		result = prime * result + ((bidsBadeList == null) ? 0 : bidsBadeList.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((lotsCreatedList == null) ? 0 : lotsCreatedList.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
@@ -226,10 +233,10 @@ public class User implements IStorable  {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (bidsList == null) {
-			if (other.bidsList != null)
+		if (bidsBadeList == null) {
+			if (other.bidsBadeList != null)
 				return false;
-		} else if (!bidsList.equals(other.bidsList))
+		} else if (!bidsBadeList.equals(other.bidsBadeList))
 			return false;
 		if (id == null) {
 			if (other.id != null)

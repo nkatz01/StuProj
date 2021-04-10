@@ -36,7 +36,7 @@ public class TestLotService {
 				.biddingIncrement(5.0)
 				.build();
 	}
-	public   Lot getMeLotWithSrtingPrice(double startingPrice) {
+	public   Lot getMeLotWithStrtingPrice(double startingPrice) {
 		return new Lot.LotBuilder(new ArrayList<Bid>())
 				.user( testUserService.getMeSimpleUser())
 				.description(TestUserService.genRandString(20, false))
