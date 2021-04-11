@@ -29,11 +29,15 @@ import com.project.biddingSoft.domain.Lot;
 public class DaoServiceImpl {
 	private static final Logger logger = LoggerFactory.getLogger(DaoServiceImpl.class);
 
+	// don't know how spring crud repositories work but this seems wrong, persist and delete are synchronised seperately so one can happen at the same time as another
+	// also not sure why you need to synchronise in the first place, I think spring objects should be thread safe
 	public synchronized boolean persistEntity(IStorable entity) throws IllegalArgumentException {
 
 		try {
 			entity.saveToRepo();
 		} catch (IllegalArgumentException e) {
+			// if its an error, should probably be logged as warn. Also slightly strange way of logging. I would expect it to say 	logger.warn("Error saving to repo ", e);
+			// I might be wrong about this but personally I would put this log message in the ServletInitializer so that you don't have to catch the same exception twice.
 			logger.info("Error is ", e);
 			throw e;
 		}

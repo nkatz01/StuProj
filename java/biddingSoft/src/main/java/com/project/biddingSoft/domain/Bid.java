@@ -138,6 +138,7 @@ public class Bid implements IStorable{
 
 
 	//Persistence handling
+	// IllegalArgumentException is unchecked, which means you don't need to add it to your signiture (If you wanted to have it somewhere, it should be on the interface javadoc)
 	@Override
 	public boolean saveToRepo() throws IllegalArgumentException {
 			 iBidRepo.save(this);

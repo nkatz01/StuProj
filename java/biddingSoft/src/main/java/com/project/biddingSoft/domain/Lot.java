@@ -220,7 +220,9 @@ public class Lot implements IStorable  {
 //	}
 
 	public Optional<Lot> placeBid(Bid bid) {
-		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
+//	Bid newBid = bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
+	bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
+		// add bid throws exceptions and returns boolean, should do one or the other (exceptions are nicer because they give detail)
 		boolean succeeded = addBid(bid);// handle exception
 		if (succeeded) {
 			if (pendingAutoBid == null) {
@@ -452,6 +454,9 @@ public class Lot implements IStorable  {
 		}
 
 	}
+
+	// don't need to implement yourself
+	// https://www.baeldung.com/java-equals-hashcode-contracts#implementation-helpers
 	@Override
 	public String toString() {
 		return "Lot [id=" + id + ", bidList=" + bidList + ", highestBid=" + highestBid + ", title=" + title
@@ -583,4 +588,8 @@ public class Lot implements IStorable  {
 		return true;
 	}
 
+
+	//https://immutables.github.io/
+	//https://projectlombok.org/
+//https://www.joda.org/joda-beans/
 }

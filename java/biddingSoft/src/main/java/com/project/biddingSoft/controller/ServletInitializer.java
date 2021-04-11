@@ -46,6 +46,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@RequestMapping(value = "/")
+	// rename?
 	public ResponseEntity<Object> hello() {
 
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
@@ -59,6 +60,8 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 			daoServiceImpl.persistEntity(entity);
 		} catch (IllegalArgumentException e) {
+			// wrong error code. illegal argument needs to be a 4xx error code
+			// also, what errors are you expecting?
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
 		}
 		return new ResponseEntity("Object updated successfully", HttpStatus.CREATED);
@@ -71,6 +74,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return daoServiceImpl.getAllRecordsForEnt(entity);
 	}
 
+	// rename endpoints to remove type of operation, and full words, eg getent ->  entity
 	@GetMapping(path = "/getent")
 	public ResponseEntity<? extends IStorable> getEntity(@RequestBody IStorable entity) {
 		Optional<? extends IStorable> results = daoServiceImpl.getEntity(entity);
@@ -94,6 +98,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@DeleteMapping(value = "/delallents")
+	// do you need an istorable here? could you just use the CrudRepository directly? It seems like you have an extra layer of indirection for no purpose
 	public ResponseEntity<String> deleteAllEntities(@RequestBody IStorable entity) {
 		ResponseEntity<String> response = null;
 		try {
