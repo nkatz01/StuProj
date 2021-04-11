@@ -65,7 +65,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 //@Transactional
 public class Lot implements IStorable  {
 	
-
+	
 	@Autowired
 	@Transient
 	private static ExceptionsCreateor bidSoftExcepFactory;
@@ -82,6 +82,10 @@ public class Lot implements IStorable  {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	public Long getId() {
+		return id;
+	}
+
 	// @ElementCollection(targetClass=Lot.class)
 	@JsonManagedReference(value="bidOnLot")
 	@JsonProperty("bidList")
@@ -94,6 +98,8 @@ public class Lot implements IStorable  {
 	@JsonProperty("user")
 	private User user;
 	
+	
+
 	private double highestBid;
 //	 private void setHighestBid(Bid highestBid) {
 //		this.highestBid = highestBid;
@@ -320,8 +326,12 @@ public class Lot implements IStorable  {
 		this.id = id;
 	}
 
-	public void setUser(User user) {
+	public void setUser(User user) {//remove
 		this.user = user;
+	}
+	
+	public User getUser() {
+		return user;
 	}
 
 

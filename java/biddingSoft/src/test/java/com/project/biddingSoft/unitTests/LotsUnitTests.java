@@ -6,20 +6,38 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,7 +53,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +65,7 @@ import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 import org.testcontainers.shaded.org.bouncycastle.util.test.TestFailedException;
 
+import com.project.biddingSoft.controller.HttpGetWithEntity;
 import com.project.biddingSoft.controller.ServletInitializer;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
@@ -51,6 +74,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
+
 
 import junit.framework.TestFailure;
 
@@ -74,7 +98,8 @@ public class LotsUnitTests {
 	@Autowired
 	TestUserService testUserService;
 	@Autowired
-	private MockMvc mvc;
+	@Qualifier("getTestRestTemplate")
+	RestTemplate restTemplate;
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
@@ -104,12 +129,12 @@ public class LotsUnitTests {
 
 	@Test
 	public void test_app_is_up() throws IOException {
-		RestTemplate restTemplate = new TestRestTemplate().getRestTemplate();
+	// RestTemplate restTemplate = new TestRestTemplate().getRestTemplate();
 		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8080/", String.class);
 		assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 		assertThat(response.getBody(), equalTo("Service running"));
 	}
-
+	
 	@Test
 	public void createLot_canBeSavedToDtbs() throws Exception {
 
@@ -391,7 +416,102 @@ public class LotsUnitTests {
 		assertThat(lot.getPendingAutoBid(), equalTo(newBid));
 
 	}
-	
+	@Test
+	public void testGetEnts_forUser() throws IOException , URISyntaxException {
+			Lot lot = testLotService.getMeSimpleLot();
+			lot.placeBid(testBidService.getOneIncrBid(lot));
+			lot.saveToRepo();
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/getent"));
+			StringEntity params = new StringEntity("{\"type\": \"user\", \"id\": "+ lot.getUser().getId() +"}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+//			System.out.println( EntityUtils.toString(response.getEntity()));
+		
+	}
+	@Test
+	public void testGetEnts_forBid() throws IOException , URISyntaxException {
+			Lot lot = testLotService.getMeSimpleLot();
+			Bid bid = testBidService.getOneIncrBid(lot);
+			lot.placeBid(bid);
+			lot.saveToRepo();
+		
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/getent"));
+			StringEntity params = new StringEntity("{\"type\": \"bid\", \"id\": "+ lot.getBid(bid).getId() +"}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		
+	}
+	@Test
+	public void testGetEnts_forLot() throws IOException , URISyntaxException {
+			Lot lot = testLotService.getMeSimpleLot();
+			Bid bid = testBidService.getOneIncrBid(lot);
+			lot.placeBid(bid);
+			lot.saveToRepo();
+		
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/getent"));
+			StringEntity params = new StringEntity("{\"type\": \"lot\", \"id\": "+ lot.getId() +"}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		
+	}
+	@Test
+	public void testGetAllEnts_forUsers() throws IOException , URISyntaxException {
+		Lot lot = testLotService.getMeSimpleLot();
+		Bid bid = testBidService.getOneIncrBid(lot);
+		lot.placeBid(bid);
+		lot.saveToRepo();
+		
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
+		StringEntity params = new StringEntity("{}");
+		request.addHeader("content-type",  "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		
+	}
+
+	@Test
+	public void testGetAllEnts_forBids() throws IOException , URISyntaxException {
+		Lot lot = testLotService.getMeSimpleLot();
+		Bid bid = testBidService.getOneIncrBid(lot);
+		lot.placeBid(bid);
+		lot.saveToRepo();
+		
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
+		StringEntity params = new StringEntity("{\"type\": \"bid\"}");
+		request.addHeader("content-type",  "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		
+	}
+	@Test
+	public void testGetAllEnts_forLots() throws IOException , URISyntaxException {
+			Lot lot = testLotService.getMeSimpleLot();
+			Bid bid = testBidService.getOneIncrBid(lot);
+			lot.placeBid(bid);
+			lot.saveToRepo();
+		
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
+			StringEntity params = new StringEntity("{\"type\": \"lot\"}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		
+	}
 	@Test
 	void checkThatAfterBidIsCreated_BidderGetsAssociation_withBid_onTheirObject() {
 		

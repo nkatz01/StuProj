@@ -20,6 +20,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.JoinColumn;
 
@@ -44,6 +45,7 @@ import com.project.biddingSoft.dao.IUserRepo;
 @Entity
 @Component
 //@Transactional
+//@Table(name = "user")
 public class User implements IStorable  {
 	
 	
@@ -129,6 +131,11 @@ public class User implements IStorable  {
 //	private String address; 
 //	private char[] password; 
 	
+	public Long getId() {
+		return id;
+	}
+
+
 	@Override
 	public void setId(Long id) {
 		this.id = id;

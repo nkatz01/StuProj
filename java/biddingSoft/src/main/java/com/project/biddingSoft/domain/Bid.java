@@ -58,6 +58,11 @@ public class Bid implements IStorable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	 
+	public Long getId() {
+		return id;
+	}
+
+
 	@ManyToOne(
 			cascade = CascadeType.PERSIST
 			,fetch = FetchType.EAGER//in order for jackson to work
@@ -157,7 +162,7 @@ public class Bid implements IStorable{
 		//lot.remove(lot.getBid(this));
 			iBidRepo.deleteById(this.id);
 		
-			  System.out.println(iBidRepo.findById(this.id).isPresent());
+			 
 	}
 
 	public static class BidBuilder{

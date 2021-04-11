@@ -58,3 +58,8 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
     });
 }
 
+//		EntityManager entityManager = entityManagerFactory.createEntityManager();
+//		Query query = entityManager.createQuery("SELECT u FROM user u INNER JOIN u.id l where l.user_id = u.id");
+//		Collection<User> users = query.getResultList();
+		//assertTrue(users.size()>0);
+		//Long id = users.stream().findFirst().get().getId();
