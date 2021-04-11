@@ -465,10 +465,7 @@ public class LotsUnitTests {
 	}
 	@Test
 	public void testGetAllEnts_forUsers() throws IOException , URISyntaxException {
-		Lot lot = testLotService.getMeSimpleLot();
-		Bid bid = testBidService.getOneIncrBid(lot);
-		lot.placeBid(bid);
-		lot.saveToRepo();
+	
 		
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
@@ -482,10 +479,7 @@ public class LotsUnitTests {
 
 	@Test
 	public void testGetAllEnts_forBids() throws IOException , URISyntaxException {
-		Lot lot = testLotService.getMeSimpleLot();
-		Bid bid = testBidService.getOneIncrBid(lot);
-		lot.placeBid(bid);
-		lot.saveToRepo();
+	
 		
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
@@ -498,10 +492,7 @@ public class LotsUnitTests {
 	}
 	@Test
 	public void testGetAllEnts_forLots() throws IOException , URISyntaxException {
-			Lot lot = testLotService.getMeSimpleLot();
-			Bid bid = testBidService.getOneIncrBid(lot);
-			lot.placeBid(bid);
-			lot.saveToRepo();
+
 		
 			HttpClient httpClient = HttpClientBuilder.create().build();
 			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
