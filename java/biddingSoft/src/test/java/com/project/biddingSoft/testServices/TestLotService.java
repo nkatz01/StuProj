@@ -4,12 +4,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.LotService;
 @Component
 public class TestLotService {
@@ -49,11 +51,16 @@ public class TestLotService {
 				.build();
 	}
 	
+	public User lotsUser(Lot lot) {
+		return lot.getUser();
+	}
 	
+	public User lotsUser(Optional<Lot> lot)
+	{
+		return lot.get().getUser();
+	}
 	
-	
-	
-	
+	 
 	
 	
 	

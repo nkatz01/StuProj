@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.project.biddingSoft.domain.User;
 @Repository
 public interface IUserRepo extends  CrudRepository<User, Long> {
+	 
 
 }

@@ -63,3 +63,5 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
 //		Collection<User> users = query.getResultList();
 		//assertTrue(users.size()>0);
 		//Long id = users.stream().findFirst().get().getId();
+		
+		SELECT user.id FROM biddingsoft.user join biddingsoft.lot  on lot.user_id = user.id ;

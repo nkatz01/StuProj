@@ -6,6 +6,7 @@ package com.project.biddingSoft.domain;
  import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
@@ -46,7 +47,7 @@ import com.project.biddingSoft.dao.IUserRepo;
 @Component
 //@Transactional
 //@Table(name = "user")
-public class User implements IStorable  {
+public class User implements  IStorable  {
 	
 	
 
@@ -113,28 +114,29 @@ public class User implements IStorable  {
 		 this.lotsCreatedList = new ArrayList<Lot>();
 
 	}
-	public boolean containsLot(Lot lot) {
+	public boolean createdLotscontainsLot(Lot lot) {
 		return this.lotsCreatedList.contains(lot);
 		
 	}
 	public String getUsername() {
 		return username;
 	}
-
+//	public Bid getLot(Lot lot) {
+//		return bidList.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
+//	}
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
+	@JsonProperty("id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 //	private String address; 
 //	private char[] password; 
-	
+	@Override
 	public Long getId() {
 		return id;
 	}
-
 
 	@Override
 	public void setId(Long id) {
@@ -145,38 +147,7 @@ public class User implements IStorable  {
 	@Column(name = "username")
 	String username;
 
-	@Override
-	public boolean saveToRepo() throws IllegalArgumentException {
-			iUserRepo.save(this);
-		return true;
-	}
-
-	@Override
-	public Iterable<User> findAll() {
-		return iUserRepo.findAll();
-	}
-
-	@Transient
-	@Autowired
-	private static IUserRepo iUserRepo;
-
-	@Autowired
-	public void setIUserRepo(IUserRepo iuserRepo) {
-		 iUserRepo = iuserRepo;
-	}
-
-	@Override
-	public Optional<? extends IStorable> find()  {
-		Optional<User> user = null;
-		user =	iUserRepo.findById(this.id);
-		  return user;
-	}
-
-	@Override
-	public void delete()  {
-			iUserRepo.deleteById(this.id);
-		
-	}
+	
 
 	public static class UserBuilder{
 //		@Id

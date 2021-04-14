@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.User;
 
 @Component
 public class TestBidService {
@@ -45,6 +46,15 @@ public class TestBidService {
 //		return lot.addBid(bid);
 //		
 //	}
+	public Lot bidsLot(Bid bid) {
+		return bid.getLot();
+	}
+	public User bidsUser(Bid bid) {
+		return bid.getLot().getUser();
+	}
+	public User bidsBidder(Bid bid) {
+		return bid.getBidder();
+	}
 	public Bid getOneIncrBid(Lot lot) {
 		return new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid())
 				.bidder(testUserService.getMeSimpleBidder()).build();

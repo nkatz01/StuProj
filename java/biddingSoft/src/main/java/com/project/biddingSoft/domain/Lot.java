@@ -46,6 +46,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.annotations.VisibleForTesting;
 import com.project.biddingSoft.dao.ILotRepo;
@@ -62,7 +63,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 @Entity
 @Component
 @Inheritance(strategy = InheritanceType.JOINED)
-//@Transactional
+
 public class Lot implements IStorable  {
 	
 	
@@ -79,12 +80,11 @@ public class Lot implements IStorable  {
 //	@Transient
 //	private static final  double ONEINCR = 5.0;
 	// Instance variables
+	@JsonProperty("id")
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	public Long getId() {
-		return id;
-	}
+	
 
 	// @ElementCollection(targetClass=Lot.class)
 	@JsonManagedReference(value="bidOnLot")
@@ -93,7 +93,7 @@ public class Lot implements IStorable  {
 			cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bid> bidList;
 	@JsonBackReference(value="lotOnUser")
-	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false) // , referencedColumnName = "id"
 	@JsonProperty("user")
 	private User user;
@@ -123,10 +123,10 @@ public class Lot implements IStorable  {
 	// @Basic
 	private Instant startTime = Instant.now();
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
-	@OneToOne(cascade = CascadeType.ALL) // orphanRemoval=true
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) // orphanRemoval=true
 	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
 	private User leadingBidder;
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "lot") // , orphanRemoval=true
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "lot", fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
 	@JoinColumn(name = "autoBid_bid_id")
 	private Bid pendingAutoBid;
 
@@ -325,6 +325,10 @@ public class Lot implements IStorable  {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	@Override
+	public Long getId() {
+		return id;
+	}
 
 	public void setUser(User user) {//remove
 		this.user = user;
@@ -342,37 +346,6 @@ public class Lot implements IStorable  {
 
 
 
-	@Override
-	public boolean saveToRepo() {
-		iLotRepo.save(this);
-		return true;
-	}
-
-	@Override
-	public Iterable<Lot> findAll() {
-		return iLotRepo.findAll();
-	}
-
-	@Transient
-	@Autowired
-	private static ILotRepo iLotRepo;
-
-	@Autowired
-	public void setILotRepo(ILotRepo ilotrepo) {
-		iLotRepo = ilotrepo;
-	}
-
-	@Override
-	public Optional<? extends IStorable> find() {
-		Optional<Lot> lot = null;
-		lot = iLotRepo.findById(this.id);
-		return lot;
-	}
-
-	@Override
-	public void delete() {
-		iLotRepo.deleteById(this.id);
-	}
 
 	public static class LotBuilder {
 

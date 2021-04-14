@@ -44,9 +44,9 @@ import com.project.biddingSoft.dao.IStorable;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Component
-public class Bid implements IStorable{
+public class Bid implements IStorable {
 	 
-	@ManyToOne(cascade = CascadeType.PERSIST
+	@ManyToOne(cascade = CascadeType.REFRESH
 			,fetch = FetchType.LAZY
 			 )//orphanRemoval=true
 	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
@@ -58,14 +58,18 @@ public class Bid implements IStorable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	 
+	@Override
 	public Long getId() {
 		return id;
 	}
-
+	@Override
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	@ManyToOne(
-			cascade = CascadeType.PERSIST
-			,fetch = FetchType.EAGER//in order for jackson to work
+			cascade = CascadeType.REFRESH
+			,fetch = FetchType.LAZY//in order for jackson to work
 			
 		)
 	@JsonBackReference(value="bidOnLot")
@@ -73,10 +77,10 @@ public class Bid implements IStorable{
 	 @JsonProperty(value = "lot")
 	private Lot lot;
 	//static variables
-	@Transient
-	@Autowired
-	private static IBidRepo iBidRepo;
 	
+
+
+
 	private double amount; 
 	
 	
@@ -104,10 +108,6 @@ public class Bid implements IStorable{
 	//instance variables
 	
 	
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
 	 
 	public double getAmount() {
 		return amount;
@@ -131,39 +131,8 @@ public class Bid implements IStorable{
 
 	
 	
-	@Autowired
-	public void setIRepo(IBidRepo ibidRepo) {
-		iBidRepo = ibidRepo;
-	}
 
-
-	//Persistence handling
-	@Override
-	public boolean saveToRepo() throws IllegalArgumentException {
-			 iBidRepo.save(this);
-		return true;
-	}
-
-	@Override
-	public Iterable<Bid> findAll() {
-		return iBidRepo.findAll();
-	}
-
-
-	@Override
-	public Optional<? extends IStorable> find() {
-		Optional<Bid> bid = null;
-			bid = iBidRepo.findById(id);
-		return bid;
-	}
-
-	@Override
-	public void delete() {
-		//lot.remove(lot.getBid(this));
-			iBidRepo.deleteById(this.id);
-		
-			 
-	}
+	
 
 	public static class BidBuilder{
 //		@Id
