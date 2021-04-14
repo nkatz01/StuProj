@@ -44,6 +44,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -108,29 +109,41 @@ public class Lot implements IStorable  {
 //		this.bidList = new ArrayList<Bid>(	bidList.stream().filter(b -> !b.equals(bid)).collect(Collectors.toList() ));
 //	}
 	@Value("${Lot.title}")
+	 @JsonProperty("title")
 	private String title;
+	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
+	@JsonProperty("ZONE")
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
+	@JsonProperty("reservePrice")
 	private double biddingIncrement;
 	private double reservePrice = 0.0;
+	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
 	private double startingPrice;
-	// @Basic
+	@JsonProperty("startTime")
 	private Instant startTime = Instant.now();
+	@JsonProperty("endTime")
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) // orphanRemoval=true
+	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) //eager, as otherwise jackson has an issue
 	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
+	  @JsonProperty("leadingBidder")
 	private User leadingBidder;
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "lot", fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
-	@JoinColumn(name = "autoBid_bid_id")
+//	public void setLeadingBidder(User leadingBidder) {
+//		this.leadingBidder = leadingBidder;
+//	}
+ 	@OneToOne(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
+	@JoinColumn(name = "autoBid_id")
+	  @JsonProperty("pendingAutoBid")
 	private Bid pendingAutoBid;
 
-	@JsonIgnore //otherwise causes curl recursion error
+	 @JsonIgnore //otherwise jackson has an issue
 	public Bid getPendingAutoBid() {
 		if (pendingAutoBid != null)
 			return pendingAutoBid;

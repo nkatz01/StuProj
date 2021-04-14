@@ -66,7 +66,14 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
 
-	
+	@PostMapping(path="/update")
+	ResponseEntity<Object> updateNewEntity(@RequestBody IStorable entity){
+		String message ="";
+		if (entity instanceof User)
+		message =	userServiceImpl.updateEntity(entity);
+		
+		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
+	}
 
 	@PostMapping(path = "/addent")
 	ResponseEntity<Object> addNewEntity(@RequestBody IStorable entity) {
@@ -87,7 +94,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	}
 
-	@GetMapping(path = "/allents/{tableName}")
+	@GetMapping(path = "/allents/{tableName}" )
 	public @ResponseBody  ResponseEntity<Iterable<? extends IStorable>> getAllRecords(@PathVariable String tableName) {
 		Iterable<? extends IStorable> results;
 		if(tableName.equals("user")) 
@@ -97,7 +104,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		 else if (tableName.equals("bid"))
 			 results = bidServiceImpl.getAllRecordsForEnt();
 		 else
-			 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 		
 		return  ResponseEntity.ok(results);
 	}
@@ -114,12 +121,12 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		 else if (tableName.equals("bid"))
 			 results = bidServiceImpl.getEntity(id);
 		 else
-			 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			 return new ResponseEntity("Entity type doesn't exist",HttpStatus.BAD_REQUEST);
 		
 		if (results.isPresent())
 			return ResponseEntity.ok(results.get());
 		else
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity("Entity not found", HttpStatus.NOT_FOUND);
 	}
 	
 

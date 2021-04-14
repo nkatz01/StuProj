@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.User;
  
 /**
  * @author nuchem
@@ -30,5 +31,6 @@ public  String persistEntity( IStorable  iStorable) ;
 //
 //	public  boolean deleteEntity(Bid bid)  ;
 //
+	public String updateEntity(IStorable user);
 	public Optional<IStorable> getEntity(Long id) ;
 }

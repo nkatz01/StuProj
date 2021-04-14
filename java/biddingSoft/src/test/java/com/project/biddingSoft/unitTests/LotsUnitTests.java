@@ -77,7 +77,6 @@ import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
-import com.project.biddingSoft.testServices.HttpGetWithEntity;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;

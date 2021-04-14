@@ -1,0 +1,59 @@
+{
+    "type": "User",
+    "username": "QMlBBWR",
+    "lotsCreatedList": [
+        {
+            "type": "lot",
+            "@id": 1,
+            "highestBid": 5.0,
+            "biddingIncrement": 5.0,
+            "endTime": "2021-04-15T20:13:12.886318Z",
+            "id": 2,
+            "bidList": [
+                {
+                    "type": "bid",
+                    "id": 4,
+                    "amount": 5.0
+                }
+            ],
+            "leadingBidder": {
+                "type": "User$HibernateProxy$yR7kYbZG",
+                "username": "mfYqHGa",
+                "lotsCreatedList": [],
+                "bidsBadeList": [],
+                "id": 3
+            },
+            "pendingAutoBid": null
+        },
+        {
+            "type": "lot",
+            "@id": 2,
+            "highestBid": 0.0,
+            "biddingIncrement": 0.0,
+            "endTime": "2021-04-15T20:13:17.539010Z",
+            "id": 10,
+            "bidList": [],
+            "leadingBidder": null,
+            "pendingAutoBid": null
+        },
+        {
+            "type": "lot",
+            "@id": 3,
+            "highestBid": 0.0,
+            "biddingIncrement": 0.0,
+            "endTime": "2021-04-15T20:13:17.707352Z",
+            "id": 23,
+            "bidList": [
+                {
+                    "type": "bid",
+                    "id": 24,
+                    "amount": 0.0
+                }
+            ],
+            "leadingBidder": null,
+            "pendingAutoBid": null
+        }
+    ],
+    "bidsBadeList": [],
+    "id": 1
+}

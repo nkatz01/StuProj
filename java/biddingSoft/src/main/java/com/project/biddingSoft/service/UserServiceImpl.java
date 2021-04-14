@@ -64,6 +64,12 @@ public   class UserServiceImpl implements IService<User> {
 
 	}
 	@Override
+	public String updateEntity(User user) {
+		if(user.getId()!=null && iUserRepo.existsById(user.getId()))
+			iUserRepo.save(user);
+		return new StringBuilder().append(user.getClass().getName() + " "+ user.getId()).toString();
+	}
+	@Override
 	public Iterable<User> getAllRecordsForEnt() {
 
 		return iUserRepo.findAll();
