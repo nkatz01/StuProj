@@ -18,15 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
+import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 
 /**
@@ -43,14 +46,20 @@ public   class UserServiceImpl implements IService<User> {
 	}
 	 
 	
-	@Transient
 	@Autowired
 	private static IUserRepo iUserRepo;
+
 
 	@Autowired
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		 iUserRepo = iuserRepo;
 	}
+//	@Autowired
+//	private static IStorableRepo<Storable> iStorableRepo;
+//	@Autowired
+//	public void setIStorableRepo(IStorableRepo istorableRepo) {
+//		iStorableRepo = istorableRepo;
+//	}
 	@Override
  	public  String persistEntity(User user)  {
 
@@ -63,17 +72,21 @@ public   class UserServiceImpl implements IService<User> {
 		return stringBuilder.toString();
 
 	}
-	@Override
-	public String updateEntity(User user) {
-		if(user.getId()!=null && iUserRepo.existsById(user.getId()))
-			iUserRepo.save(user);
-		return new StringBuilder().append(user.getClass().getName() + " "+ user.getId()).toString();
-	}
-	@Override
-	public Iterable<User> getAllRecordsForEnt() {
-
-		return iUserRepo.findAll();
-	}
+//	@Override
+//	public String updateEntity(Storable user) {
+//		return IService.super.update(iStorableRepo, user);//(CrudRepository<IStorable, Long> )
+//	}
+//	@Override
+//	public String updateEntity(User user) {
+//		if(user.getId()!=null && iUserRepo.existsById(user.getId()))
+//			iUserRepo.save(user);
+//		return new StringBuilder().append(user.getClass().getName() + " "+ user.getId()).toString();
+//	}
+//	@Override
+//	public Iterable<User> getAllRecordsForEnt() {
+//
+//		return iUserRepo.findAll();
+//	}
 
 //	public  boolean deleteAllEntities(User user) {
 //		
@@ -91,9 +104,9 @@ public   class UserServiceImpl implements IService<User> {
 //
 //	}
 
-	@Override
-	public Optional<User> getEntity(Long id) {
-		return iUserRepo.findById(id);
-	}
+//	@Override
+//	public Optional<User> getEntity(Long id) {
+//		return iUserRepo.findById(id);
+//	}
 
 }

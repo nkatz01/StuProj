@@ -47,7 +47,7 @@ import com.project.biddingSoft.dao.IUserRepo;
 @Component
 //@Transactional
 //@Table(name = "user")
-public class User implements  IStorable  {
+public class User extends Storable implements  IStorable  {
 	
 	
 

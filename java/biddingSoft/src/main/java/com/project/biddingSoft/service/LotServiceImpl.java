@@ -13,11 +13,15 @@ import javax.persistence.Transient;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.lang.reflect.*;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.ZoneId;
 
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +32,8 @@ import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
-import java.lang.reflect.*;
 
 /**
  * @author nuchem
@@ -37,7 +41,8 @@ import java.lang.reflect.*;
  */
 @Service
 @Component
-public class LotServiceImpl implements IService<Lot> {
+@Qualifier("LotServiceImpl")
+public class LotServiceImpl implements IService<Lot> {//
 	private static final Logger logger = LoggerFactory.getLogger(LotServiceImpl.class);
 
 	@Transient
@@ -55,16 +60,7 @@ public class LotServiceImpl implements IService<Lot> {
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		iUserRepo = iuserRepo;
 	}
-	@Override
-	public String updateEntity(Lot lot) {
-		if(lot.getId()!=null && iLotRepo.existsById(lot.getId())) {
-			iLotRepo.findById(lot.getId());
-			Field[] fields = lot.getDeclaredFields();
-			for(Field field : lot)
-			iLotRepo.save(lot);
-		}
-		return new StringBuilder().append(lot.getClass().getName() + " "+ lot.getId()).toString();
-	}
+
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
 		if (!lot.getUser().createdLotscontainsLot(lot))
@@ -86,11 +82,13 @@ public class LotServiceImpl implements IService<Lot> {
 
 	}
 
-	@Override
-	public Iterable<Lot> getAllRecordsForEnt() {
 
-		return iLotRepo.findAll();
-	}
+
+//	@Override
+//	public Iterable<Lot> getAllRecordsForEnt() {
+//
+//		return iLotRepo.findAll();
+//	}
 
 //	public  boolean deleteAllEntities(Lot lot) {
 //		
@@ -107,10 +105,16 @@ public class LotServiceImpl implements IService<Lot> {
 //		return iLotRepo.findById(lot.getId()).isEmpty(); 
 //
 //	}
-	@Override
-	public Optional<Lot> getEntity(Long id) {
-		return iLotRepo.findById(id);
-	}
+//	@Override
+//	public Optional<Lot> getEntity(Long id) {
+//		return iLotRepo.findById(id);
+//	}
+//	@Override
+//	public String updateEntity(Storable storable) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//	
 
 
 }

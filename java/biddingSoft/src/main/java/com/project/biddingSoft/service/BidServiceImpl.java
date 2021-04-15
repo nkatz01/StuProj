@@ -17,6 +17,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,9 @@ import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
+import com.project.biddingSoft.service.IService;
 
 /**
  * @author nuchem
@@ -35,6 +38,7 @@ import com.project.biddingSoft.domain.User;
  */
 @Service
 @Component
+@Qualifier("BidServiceImpl")
 public class BidServiceImpl implements IService<Bid> {
 	private static final Logger logger = LoggerFactory.getLogger(BidServiceImpl.class);
 
@@ -118,13 +122,15 @@ public class BidServiceImpl implements IService<Bid> {
 	//1. both, lot and user exist		//1. both lot and user exist
 	//2. both don't exist				//2. both dont' exist
 	//3. only user						//. only user
-	
- 	@Override
-	public Iterable<Bid> getAllRecordsForEnt() {
 
-		return iBidRepo.findAll();
-	}
+	
+	
+// 	@Override
+//	public Iterable<Bid> getAllRecordsForEnt() {
 //
+//		return iBidRepo.findAll();
+//	}
+
 //	public  boolean deleteAllEntities(Bid bid) {
 //		
 //			StreamSupport.stream(getAllRecordsForEnt(bid).spliterator(), false)
@@ -140,11 +146,9 @@ public class BidServiceImpl implements IService<Bid> {
 //		return iBidRepo.findById(bid.getId()).isEmpty(); 
 //
 //	}
-//
- 	@Override
-	public Optional<Bid> getEntity(Long id) {
-		return iBidRepo.findById(id);
-	}
+
+ 
+	
 
 
 }

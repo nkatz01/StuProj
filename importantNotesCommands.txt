@@ -2,14 +2,15 @@ netstat -ano |findstr 8080
 taskkill /F /pid 8300
 tskill typeyourPIDhere 
 
-in command line: mvnw spring-boot:run
+in command line: mvn spring-boot:run
 http://localhost:8080
 
 in eclipse Right click project - > Run As -> Maven Build: 
 (as goal) spring-boot:run
-
+run as maven build (as goal) eclipse:eclipse
 mvn dependency:tree
-
+mvn dependency:analyze -DignoreNonCompile
+mvn dependency:resolve -Dclassifier=javadoc
 sc.exe delete tomcat8
 
 ping localhost

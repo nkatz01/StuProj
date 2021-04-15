@@ -26,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
+import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.IStorable;
+import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.BidServiceImpl;
 import com.project.biddingSoft.service.IService;
@@ -55,7 +58,33 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	@Autowired
 	@Qualifier("getBidServiceImpl")
 	private IService<IStorable> bidServiceImpl; 
-
+	@Autowired
+	private static IStorableRepo<Storable> iStorableRepoUser;
+	@Autowired
+	@Qualifier("IUserRepo")
+	public void setIStorableRepoUser(IStorableRepo istorableRepo) {
+		iStorableRepoUser = istorableRepo;
+	}
+	@Autowired	
+	private static IStorableRepo<Storable> iStorableRepoLot;
+	@Autowired
+	@Qualifier("ILotRepo")
+	public void setIStorableLot(IStorableRepo istorableRepo) {
+		iStorableRepoLot = istorableRepo;
+	}
+	@Autowired
+	private static IStorableRepo<Storable> iStorableRepoBid;
+	@Autowired
+	@Qualifier("IBidRepo")
+	public void setIStorableBid(IStorableRepo istorableRepo) {
+		iStorableRepoBid = istorableRepo;
+	}
+	
+//	@Autowired
+//	@Qualifier("IUserRepo")
+//	private  IStorableRepo<Storable> iUserRepo;
+//	
+	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(BiddingSoftwareApplication.class);
@@ -68,12 +97,14 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@PutMapping(path="/update")
-	ResponseEntity<Object> updateNewEntity(@RequestBody IStorable entity){
+	ResponseEntity<Object> updateNewEntity(@RequestBody Storable entity){
 		String message ="";
 		if (entity instanceof User)
-		message =	userServiceImpl.updateEntity(entity);
-		if (entity instanceof Lot)
-			message =	lotServiceImpl.updateEntity(entity);
+		message =	userServiceImpl.update(iStorableRepoUser, entity);
+		else if (entity instanceof Lot)
+			message =	lotServiceImpl.update(iStorableRepoLot, entity);
+		else if (entity instanceof Bid)
+			message =	bidServiceImpl.update(iStorableRepoBid, entity);
 		else 
 			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 		
@@ -103,11 +134,11 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	public @ResponseBody  ResponseEntity<Iterable<? extends IStorable>> getAllRecords(@PathVariable String tableName) {
 		Iterable<? extends IStorable> results;
 		if(tableName.equals("user")) 
-			results =	 userServiceImpl.getAllRecordsForEnt();
+			results =	 userServiceImpl.getAllRecordsForEnt(iStorableRepoUser);
 		 else if (tableName.equals("lot"))
-			 results = lotServiceImpl.getAllRecordsForEnt();
+			 results = lotServiceImpl.getAllRecordsForEnt(iStorableRepoLot);
 		 else if (tableName.equals("bid"))
-			 results = bidServiceImpl.getAllRecordsForEnt();
+			 results = bidServiceImpl.getAllRecordsForEnt(iStorableRepoBid);
 		 else
 			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 		
@@ -118,13 +149,13 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	public @ResponseBody ResponseEntity<? extends IStorable> getEntity(@PathVariable    Long id, @PathVariable  String tableName) {
 		Optional<? extends IStorable> results;
 		if(tableName.equals("user")) 
-		{	System.out.println(true);
-			results =	 userServiceImpl.getEntity(id);
+		{
+			results =	 userServiceImpl.getEntity(iStorableRepoUser, id);
 		}
 		 else if (tableName.equals("lot"))
-			 results = lotServiceImpl.getEntity(id);
+			 results = lotServiceImpl.getEntity(iStorableRepoLot, id);
 		 else if (tableName.equals("bid"))
-			 results = bidServiceImpl.getEntity(id);
+			 results = bidServiceImpl.getEntity(iStorableRepoBid, id);
 		 else
 			 return new ResponseEntity("Entity type doesn't exist",HttpStatus.BAD_REQUEST);
 		

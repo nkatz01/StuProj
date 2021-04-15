@@ -65,7 +65,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 @Component
 @Inheritance(strategy = InheritanceType.JOINED)
 
-public class Lot implements IStorable  {
+public class Lot extends Storable implements IStorable  {
 	
 	
 	@Autowired

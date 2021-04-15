@@ -44,7 +44,7 @@ import com.project.biddingSoft.dao.IStorable;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Component
-public class Bid implements IStorable {
+public class Bid extends Storable implements IStorable {
 	 
 	@ManyToOne(cascade = CascadeType.REFRESH
 			,fetch = FetchType.LAZY
