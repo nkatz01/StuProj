@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -66,16 +67,20 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
 
-	@PostMapping(path="/update")
+	@PutMapping(path="/update")
 	ResponseEntity<Object> updateNewEntity(@RequestBody IStorable entity){
 		String message ="";
 		if (entity instanceof User)
 		message =	userServiceImpl.updateEntity(entity);
+		if (entity instanceof Lot)
+			message =	lotServiceImpl.updateEntity(entity);
+		else 
+			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 		
 		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
 	}
 
-	@PostMapping(path = "/addent")
+	@PostMapping(path = "/create")
 	ResponseEntity<Object> addNewEntity(@RequestBody IStorable entity) {
 		String message ="";
 		try {

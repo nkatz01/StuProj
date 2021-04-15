@@ -3,6 +3,7 @@
  */
 package com.project.biddingSoft.service;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
@@ -28,6 +29,7 @@ import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.User;
+import java.lang.reflect.*;
 
 /**
  * @author nuchem
@@ -53,7 +55,16 @@ public class LotServiceImpl implements IService<Lot> {
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		iUserRepo = iuserRepo;
 	}
-
+	@Override
+	public String updateEntity(Lot lot) {
+		if(lot.getId()!=null && iLotRepo.existsById(lot.getId())) {
+			iLotRepo.findById(lot.getId());
+			Field[] fields = lot.getDeclaredFields();
+			for(Field field : lot)
+			iLotRepo.save(lot);
+		}
+		return new StringBuilder().append(lot.getClass().getName() + " "+ lot.getId()).toString();
+	}
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
 		if (!lot.getUser().createdLotscontainsLot(lot))

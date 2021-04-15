@@ -212,8 +212,8 @@ public class LotsUnitTests {
 		assertTrue(iBidrepo.existsById(bid.getId()));
 		iBidrepo.delete(bid);
 
-		assertTrue(iLotRepo.existsById(lot.getId()));
-		assertTrue(iBidrepo.findById(bid.getId()).isEmpty());
+		 assertTrue(iLotRepo.existsById(lot.getId()));
+		 assertTrue(!iLotRepo.existsById(bid.getId()));
 	}
 
 	@Test
@@ -446,7 +446,7 @@ public class LotsUnitTests {
 	public void testPostEntity_forUser() throws IOException , URISyntaxException {
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/addent"));
+			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
 			StringEntity params = new StringEntity("{\"type\": \"user\"}");
 			request.addHeader("content-type",  "application/json");
 			request.setEntity(params);
@@ -458,7 +458,7 @@ public class LotsUnitTests {
 	public void testPostEntity_newLotWithExistingUser() throws IOException , URISyntaxException {
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/addent"));
+			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
 			StringEntity params = new StringEntity("{\"type\":\"lot\", \"user\":{\"id\": "+ wiredLot.getUser().getId() +" }}");
 			request.addHeader("content-type",  "application/json");
 			request.setEntity(params);
@@ -470,7 +470,7 @@ public class LotsUnitTests {
 	public void testPostEntity_newBidWithExistingUser_AndExistingBidder() throws IOException , URISyntaxException {
 			
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/addent"));
+			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
 			StringEntity params = new StringEntity("{\"type\":\"bid\", \"lot\": {\"type\":\"lot\",\"user\":{\"id\": "+ wiredLot.getUser().getId() +"}}, \"bidder\":{\"id\": "+ wiredLot.getLeadingBidder().getId() +"} }\r\n"
 					+ "");
 			request.addHeader("content-type",  "application/json");
