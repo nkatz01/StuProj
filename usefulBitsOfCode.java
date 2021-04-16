@@ -65,3 +65,6 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
 		//Long id = users.stream().findFirst().get().getId();
 		
 		SELECT user.id FROM biddingsoft.user join biddingsoft.lot  on lot.user_id = user.id ;
+		
+		
+		//spring.jpa.properties.hibernate.format_sql=true

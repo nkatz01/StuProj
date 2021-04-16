@@ -31,9 +31,15 @@ public interface IService<T extends IStorable> {
 
 	//public Iterable<T> getAllRecordsForEnt() ;
 //
-//	public  boolean deleteAllEntities(Bid bid) ;
+	public default  void deleteAllEntities(IStorableRepo<Storable> repo) {
+		repo.deleteAll();
+		
+	}
 //
-//	public  boolean deleteEntity(Bid bid)  ;
+public default void deleteEntity(IStorableRepo<Storable> repo, Long id) {
+	  repo.deleteById(id);
+	
+}  
 //
 //	 public  default String getAttributes(CrudRepository<IStorable, Long> repo, IStorable storable) {
 //			StringBuilder stringBuilder = new StringBuilder();
@@ -56,16 +62,8 @@ public interface IService<T extends IStorable> {
 	 }
 	 
 		
-		public default Optional<Storable> getEntity(IStorableRepo<Storable> repo, Long id) {
-			System.out.println(repo.count());
-			return repo.findById(id);
-		}
 		
-		
-		public default  Iterable<Storable> getAllRecordsForEnt(IStorableRepo<Storable> repo) {
-	
-			return repo.findAll();
-		}
+
 	 
 //		@Override
 //		public String updateEntity(Lot lot) throws IllegalAccessException {
@@ -87,5 +85,5 @@ public interface IService<T extends IStorable> {
 
 		
 //	//public String updateEntity(T  user) throws IllegalAccessException;
-	//public Optional<T> getEntity(Long id) ;
+
 }

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
@@ -63,7 +65,9 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 
 @Entity
 @Component
-@Inheritance(strategy = InheritanceType.JOINED)
+//@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorValue("Lot")
+@PrimaryKeyJoinColumn(name = "id")
 
 public class Lot extends Storable implements IStorable  {
 	
@@ -81,10 +85,10 @@ public class Lot extends Storable implements IStorable  {
 //	@Transient
 //	private static final  double ONEINCR = 5.0;
 	// Instance variables
-	@JsonProperty("id")
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+//	@JsonProperty("id")
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+//	private Long id;
 	
 
 	// @ElementCollection(targetClass=Lot.class)
@@ -93,9 +97,10 @@ public class Lot extends Storable implements IStorable  {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // variable in bid class - that links bid to a lot
 			cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bid> bidList;
+	
 	@JsonBackReference(value="lotOnUser")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false) // , referencedColumnName = "id"
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // 
 	@JsonProperty("user")
 	private User user;
 	
@@ -131,10 +136,11 @@ public class Lot extends Storable implements IStorable  {
 	@JsonProperty("endTime")
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
 	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) //eager, as otherwise jackson has an issue
-	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
-	  @JsonProperty("leadingBidder")
-	private User leadingBidder;
+	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY) //eager, as otherwise jackson has an issue
+	 @JsonBackReference(value="leadingLotsOnBidder")
+	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id", nullable = true)//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
+	  @JsonProperty(value = "leadingBidder")
+	 private User leadingBidder;
 //	public void setLeadingBidder(User leadingBidder) {
 //		this.leadingBidder = leadingBidder;
 //	}
@@ -334,14 +340,14 @@ public class Lot extends Storable implements IStorable  {
 //			 bidList.stream().max(Comparator.comparingDouble(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
 	}
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
-	@Override
-	public Long getId() {
-		return id;
-	}
+//	//@Override
+//	public void setId(Long id) {
+//		super.id = id;
+//	}
+//	//@Override
+//	public Long getId() {
+//		return super.id;
+//	}
 
 	public void setUser(User user) {//remove
 		this.user = user;

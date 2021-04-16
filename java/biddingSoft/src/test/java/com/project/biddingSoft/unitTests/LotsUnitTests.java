@@ -72,9 +72,11 @@ import org.testcontainers.shaded.org.bouncycastle.util.test.TestFailedException;
 import com.project.biddingSoft.controller.ServletInitializer;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
+import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.testServices.TestBidService;
@@ -114,8 +116,17 @@ public class LotsUnitTests {
 	private ILotRepo iLotRepo;
 	@Autowired 
 	private IBidRepo iBidrepo;
-	
-	
+	@Autowired
+	private static IStorableRepo<Storable> iStorableRepo;
+	@Autowired
+	@Qualifier("IStorableRepo")
+	public void setIStorable(IStorableRepo istorableRepo) {
+		iStorableRepo = istorableRepo;
+	}
+	@Test
+	public void testThatSuperRepo_canReturnSubclass_ofStorable() {
+		assertTrue(iStorableRepo.findById(wiredLot.getId()).isPresent());
+	}
 	@Test
 	public void contextLoads() throws Exception {
 		assertThat(servletInitializer).isNotNull();
@@ -145,7 +156,11 @@ public class LotsUnitTests {
 		
 		Bid bid = testBidService.getOneIncrBid(wiredLot);//for the purpose of endpoints' tests
 		wiredLot.placeBid(bid);
-		iUserRepo.save(wiredLot.getUser());
+		iUserRepo.save(bid.getBidder());
+		iUserRepo.save(wiredLot.getUser());//error bidder inside Bid and lot inside Bid are transient still
+		//iLotRepo.save(bid.getLot());
+		 
+		//iBidrepo.save(bid);
 	
 
 			

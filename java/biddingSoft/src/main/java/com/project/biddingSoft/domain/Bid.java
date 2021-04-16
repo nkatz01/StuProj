@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,30 +44,30 @@ import com.project.biddingSoft.dao.IStorable;
 //		  generator = ObjectIdGenerators.PropertyGenerator.class, 
 //		  property = "id")
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+//@Inheritance(strategy = InheritanceType.JOINED)
 @Component
+@PrimaryKeyJoinColumn(name = "id")
+@DiscriminatorValue("Bid")
 public class Bid extends Storable implements IStorable {
 	 
-	@ManyToOne(cascade = CascadeType.REFRESH
-			,fetch = FetchType.LAZY
-			 )//orphanRemoval=true
-	@JoinColumn(name = "bidder_userId", referencedColumnName = "id", nullable=false)
-	@JsonProperty(value = "bidder")
 	@JsonBackReference(value="bidOnUser")
+	@ManyToOne(cascade = CascadeType.REFRESH,fetch = FetchType.LAZY )//orphanRemoval=true
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable=false)
+	@JsonProperty(value = "bidder")
 	//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User bidder;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+//	private Long id;
 	 
-	@Override
-	public Long getId() {
-		return id;
-	}
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
+	//@Override
+//	public Long getId() {
+//		return super.id;
+//	}
+//	//@Override
+//	public void setId(Long id) {
+//		super.id = id;
+//	}
 
 	@ManyToOne(
 			cascade = CascadeType.REFRESH
@@ -145,6 +147,7 @@ public class Bid extends Storable implements IStorable {
 			this.lot = lot;
 			
 		}
+		
 		public BidBuilder amount(double amount) {
 			this.amount  = amount; 
 			return this;

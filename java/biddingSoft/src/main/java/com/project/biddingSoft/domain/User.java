@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -21,6 +22,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.JoinColumn;
@@ -45,8 +48,9 @@ import com.project.biddingSoft.dao.IUserRepo;
 //		  property = "id")
 @Entity
 @Component
-//@Transactional
-//@Table(name = "user")
+//@Inheritance(strategy = InheritanceType.JOINED)
+@PrimaryKeyJoinColumn(name = "id")
+@DiscriminatorValue("User")
 public class User extends Storable implements  IStorable  {
 	
 	
@@ -71,7 +75,12 @@ public class User extends Storable implements  IStorable  {
  		this.lotsCreatedList = new ArrayList<Lot>(  lotsCreatedList );
  		this.bidsBadeList = new ArrayList<Bid>(  bidsBadeList );
 	}
- 
+	@JsonManagedReference(value="leadingLotsOnBidder")
+	@JsonProperty("leadingLots")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "leadingBidder", // variable in bid class - that links bid to a lot
+			cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Lot> leadingLots;
+	
    @JsonProperty("lotsCreatedList")
    @JsonManagedReference(value="lotOnUser")
  @OneToMany(
@@ -82,6 +91,7 @@ public class User extends Storable implements  IStorable  {
 	   
 	) 
 	List<Lot> lotsCreatedList; 
+   
    @JsonManagedReference(value="bidOnUser")
  @JsonProperty("bidsBadeList")//causes recursion in curl request
  @OneToMany(
@@ -95,6 +105,8 @@ public class User extends Storable implements  IStorable  {
 //		 , inverseJoinColumns={@JoinColumn(referencedColumnName="id")}) 
 	private List<Bid> bidsBadeList; 
  
+ 
+   
  	public Lot getLot(int id) throws IndexOutOfBoundsException{
  		Lot lot =null;
 			 lot = lotsCreatedList.get(id);		
@@ -127,22 +139,21 @@ public class User extends Storable implements  IStorable  {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	@JsonProperty("id")
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-//	private String address; 
-//	private char[] password; 
-	@Override
-	public Long getId() {
-		return id;
-	}
+//	@JsonProperty("id")
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+//	private Long id;
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-
-	}
+//	//@Override
+//	public Long getId() {
+//		return super.id;
+//	}
+//
+//	//@Override
+//	public void setId(Long id) {
+//		super.id = id;
+//
+//	}
 
 	@Column(name = "username")
 	String username;

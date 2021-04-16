@@ -5,6 +5,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,13 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	public void setIStorableBid(IStorableRepo istorableRepo) {
 		iStorableRepoBid = istorableRepo;
 	}
-	
+	@Autowired
+	private static IStorableRepo<Storable> iStorableRepo;
+	@Autowired
+	@Qualifier("IStorableRepo")
+	public void setIStorable(IStorableRepo istorableRepo) {
+		iStorableRepo = istorableRepo;
+	}
 //	@Autowired
 //	@Qualifier("IUserRepo")
 //	private  IStorableRepo<Storable> iUserRepo;
@@ -130,34 +137,21 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	}
 
-	@GetMapping(path = "/allents/{tableName}" )
-	public @ResponseBody  ResponseEntity<Iterable<? extends IStorable>> getAllRecords(@PathVariable String tableName) {
-		Iterable<? extends IStorable> results;
-		if(tableName.equals("user")) 
-			results =	 userServiceImpl.getAllRecordsForEnt(iStorableRepoUser);
-		 else if (tableName.equals("lot"))
-			 results = lotServiceImpl.getAllRecordsForEnt(iStorableRepoLot);
-		 else if (tableName.equals("bid"))
-			 results = bidServiceImpl.getAllRecordsForEnt(iStorableRepoBid);
-		 else
-			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
+	@GetMapping(path = "/allents" )
+	public @ResponseBody  ResponseEntity<Iterable<? extends IStorable>> getAllRecords() {
+		Iterable<? extends IStorable> results = iStorableRepo.findAll();
+		
+		if ( StreamSupport.stream(results.spliterator() , false).count()>0)
 		
 		return  ResponseEntity.ok(results);
+		else 
+			return  new ResponseEntity("No entities found",HttpStatus.BAD_REQUEST);
 	}
 
-	@RequestMapping(path = "/getent/{tableName}/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<? extends IStorable> getEntity(@PathVariable    Long id, @PathVariable  String tableName) {
-		Optional<? extends IStorable> results;
-		if(tableName.equals("user")) 
-		{
-			results =	 userServiceImpl.getEntity(iStorableRepoUser, id);
-		}
-		 else if (tableName.equals("lot"))
-			 results = lotServiceImpl.getEntity(iStorableRepoLot, id);
-		 else if (tableName.equals("bid"))
-			 results = bidServiceImpl.getEntity(iStorableRepoBid, id);
-		 else
-			 return new ResponseEntity("Entity type doesn't exist",HttpStatus.BAD_REQUEST);
+
+	@RequestMapping(path = "/getent/{id}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<? extends IStorable> getEntity(@PathVariable    Long id) {
+		Optional<? extends IStorable> results = iStorableRepo.findByEntityId(id);
 		
 		if (results.isPresent())
 			return ResponseEntity.ok(results.get());
@@ -166,29 +160,28 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 	
 
-//	@DeleteMapping(value = "/delent")
-//	public ResponseEntity<String> deleteEntity(@RequestBody IStorable entity) {
-//		ResponseEntity<String> response = null;
-//		try {
-//			response = daoServiceImpl.deleteEntity(entity) == true
-//					? ResponseEntity.status(HttpStatus.OK).build()
-//					: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//		} catch (IllegalArgumentException e) {
-//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-//		}
-//		return response;
-//	}
-//
-//	@DeleteMapping(value = "/delallents")
-//	public ResponseEntity<String> deleteAllEntities(@RequestBody IStorable entity) {
-//		ResponseEntity<String> response = null;
-//		try {
-//			response = daoServiceImpl.deleteAllEntities(entity) == true ? ResponseEntity.status(HttpStatus.OK).build()
-//					: ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//		} catch (IllegalArgumentException e) {
-//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-//		}
-//		return response;
-//	}
+	@DeleteMapping(path = "/delent/{id}")//model catch/throw
+	public ResponseEntity<String> deleteEntity(@PathVariable Long id) {
+		ResponseEntity<String> response = null;
+		try {
+			
+			iStorableRepo.deleteById(id);
+			response = 	 new ResponseEntity("Entry successfully deleted", HttpStatus.OK);
+		} catch (Exception e) {
+			 
+			response = 	 new ResponseEntity("Entry not found - "+e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		return response;
+	}
+
+	@DeleteMapping(path = "/delents")
+	public ResponseEntity<String> deleteAllEntities() {
+		 
+		
+			iStorableRepo.deleteAll();
+			
+		
+		return new ResponseEntity("Entities successfully deleted", HttpStatus.OK);
+	}
 
 }
