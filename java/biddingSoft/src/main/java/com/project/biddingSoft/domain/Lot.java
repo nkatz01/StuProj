@@ -99,7 +99,7 @@ public class Lot extends Storable implements IStorable  {
 	private List<Bid> bidList;
 	
 	@JsonBackReference(value="lotOnUser")
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+	@ManyToOne( fetch = FetchType.LAZY)//cascade = CascadeType.REFRESH,
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // 
 	@JsonProperty("user")
 	private User user;
@@ -135,15 +135,19 @@ public class Lot extends Storable implements IStorable  {
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
+//	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
+//	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY) //eager, as otherwise jackson has an issue
+//	 @JsonBackReference(value="leadingLotsOnBidder")
+//	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id", nullable = true)//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
+//	  @JsonProperty(value = "leadingBidder")
+//	 private User leadingBidder;
 	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
-	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY) //eager, as otherwise jackson has an issue
-	 @JsonBackReference(value="leadingLotsOnBidder")
-	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id", nullable = true)//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
-	  @JsonProperty(value = "leadingBidder")
-	 private User leadingBidder;
-//	public void setLeadingBidder(User leadingBidder) {
-//		this.leadingBidder = leadingBidder;
-//	}
+	 @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) //eager, as otherwise jackson has an issue
+
+	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
+	  @JsonProperty("leadingBidder")
+	private User leadingBidder;
+
  	@OneToOne(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
 	@JoinColumn(name = "autoBid_id")
 	  @JsonProperty("pendingAutoBid")

@@ -5,8 +5,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.project.biddingSoft.dao.IStorableRepo;
+import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 
 @Component
@@ -24,6 +27,8 @@ public class TestBidService {
 	TestLotService testLotService;
 	@Autowired
 	TestUserService testUserService;
+	@Autowired 
+	IStorableRepo<Storable> iStorableRepo;
 
 	public Bid getOneIncrBid() {
 		return new Bid.BidBuilder(testLotService.getMeSimpleLot()).amount(ONEINCR)
@@ -56,6 +61,8 @@ public class TestBidService {
 		return bid.getBidder();
 	}
 	public Bid getOneIncrBid(Lot lot) {
+		//User bidder = testUserService.getMeSimpleBidder(); 
+		//iStorableRepo.save(bidder);
 		return new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid())
 				.bidder(testUserService.getMeSimpleBidder())	.build();
 	}

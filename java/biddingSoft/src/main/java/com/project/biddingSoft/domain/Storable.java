@@ -20,7 +20,7 @@ import com.project.biddingSoft.dao.IStorable;
 @Component
 public abstract class Storable implements IStorable {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.AUTO)
  protected Long id;
 	
 	public Long getId() {
@@ -28,7 +28,7 @@ public abstract class Storable implements IStorable {
 	}
 	//@Override
 	public void setId(Long id) {
-		id = id;
+		this.id = id;
 	}
 
 }

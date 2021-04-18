@@ -75,11 +75,11 @@ public class User extends Storable implements  IStorable  {
  		this.lotsCreatedList = new ArrayList<Lot>(  lotsCreatedList );
  		this.bidsBadeList = new ArrayList<Bid>(  bidsBadeList );
 	}
-	@JsonManagedReference(value="leadingLotsOnBidder")
-	@JsonProperty("leadingLots")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "leadingBidder", // variable in bid class - that links bid to a lot
-			cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Lot> leadingLots;
+//	@JsonManagedReference(value="leadingLotsOnBidder")
+//	@JsonProperty("leadingLots")
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "leadingBidder", // variable in bid class - that links bid to a lot
+//			cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Lot> leadingLots;
 	
    @JsonProperty("lotsCreatedList")
    @JsonManagedReference(value="lotOnUser")

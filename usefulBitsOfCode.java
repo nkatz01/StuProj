@@ -68,3 +68,8 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
 		
 		
 		//spring.jpa.properties.hibernate.format_sql=true
+		
+			//JSONObject json = new JSONObject(EntityUtils.toString(response.getEntity()));
+		//Lot lot =   new Gson().fromJson(EntityUtils.toString(response.getEntity()), Lot.class);
+		Lot lot = new ObjectMapper()
+				//.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

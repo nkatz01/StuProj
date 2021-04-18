@@ -155,7 +155,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		
 		if (results.isPresent())
 			return ResponseEntity.ok(results.get());
-		else
+		else 
 			return new ResponseEntity("Entity not found", HttpStatus.NOT_FOUND);
 	}
 	

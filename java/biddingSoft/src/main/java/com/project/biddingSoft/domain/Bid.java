@@ -51,8 +51,8 @@ import com.project.biddingSoft.dao.IStorable;
 public class Bid extends Storable implements IStorable {
 	 
 	@JsonBackReference(value="bidOnUser")
-	@ManyToOne(cascade = CascadeType.REFRESH,fetch = FetchType.LAZY )//orphanRemoval=true
-	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable=false)
+	@ManyToOne(fetch = FetchType.LAZY )//orphanRemoval=true cascade = CascadeType.REFRESH,
+	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable=false)
 	@JsonProperty(value = "bidder")
 	//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User bidder;
@@ -70,8 +70,8 @@ public class Bid extends Storable implements IStorable {
 //	}
 
 	@ManyToOne(
-			cascade = CascadeType.REFRESH
-			,fetch = FetchType.LAZY//in order for jackson to work
+			fetch = FetchType.LAZY//in order for jackson to work cascade = CascadeType.REFRESH
+			 
 			
 		)
 	@JsonBackReference(value="bidOnLot")
@@ -147,7 +147,6 @@ public class Bid extends Storable implements IStorable {
 			this.lot = lot;
 			
 		}
-		
 		public BidBuilder amount(double amount) {
 			this.amount  = amount; 
 			return this;
