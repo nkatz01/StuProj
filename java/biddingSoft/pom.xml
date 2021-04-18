@@ -158,6 +158,15 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.liferay</groupId>
+			<artifactId>org.apache.commons.fileupload</artifactId>
+			<version>1.2.2.LIFERAY-PATCHED-1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

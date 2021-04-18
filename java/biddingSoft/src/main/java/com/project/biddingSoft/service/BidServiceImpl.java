@@ -25,6 +25,7 @@ import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorable;
+import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
@@ -63,7 +64,20 @@ public class BidServiceImpl implements IService<Bid> {
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		iUserRepo = iuserRepo;
 	}	
-
+	@Autowired
+	private   IStorableRepo<Storable> iStorableRepo;
+	@Override
+	public String updateEntity(Storable bid){
+		String mesg = null;
+		try {
+			mesg = IService.super.update(iStorableRepo, bid);//(CrudRepository<IStorable, Long> )
+			
+		} catch (IllegalAccessException e) {
+			 mesg = "cannot access some fields";
+		}
+		return mesg; 
+	}
+	
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
 		 

@@ -94,8 +94,8 @@ public class Lot extends Storable implements IStorable  {
 	// @ElementCollection(targetClass=Lot.class)
 	@JsonManagedReference(value="bidOnLot")
 	@JsonProperty("bidList")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // variable in bid class - that links bid to a lot
-			cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // , orphanRemoval = truevariable in bid class - that links bid to a lot
+			cascade = CascadeType.ALL)
 	private List<Bid> bidList;
 	
 	@JsonBackReference(value="lotOnUser")
@@ -191,9 +191,9 @@ public class Lot extends Storable implements IStorable  {
 // 	private Bid highestBid; 
 
 	// Static variables
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_RESET = "\u001B[0m";
-	private static final Logger logger = LoggerFactory.getLogger(Lot.class);
+//	public static final String ANSI_RED = "\u001B[31m";
+//	public static final String ANSI_RESET = "\u001B[0m";
+//	private static final Logger logger = LoggerFactory.getLogger(Lot.class);
 
 	// Constructors
 	@JsonCreator

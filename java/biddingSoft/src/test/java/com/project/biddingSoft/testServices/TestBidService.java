@@ -27,8 +27,7 @@ public class TestBidService {
 	TestLotService testLotService;
 	@Autowired
 	TestUserService testUserService;
-	@Autowired 
-	IStorableRepo<Storable> iStorableRepo;
+
 
 	public Bid getOneIncrBid() {
 		return new Bid.BidBuilder(testLotService.getMeSimpleLot()).amount(ONEINCR)
@@ -61,8 +60,6 @@ public class TestBidService {
 		return bid.getBidder();
 	}
 	public Bid getOneIncrBid(Lot lot) {
-		//User bidder = testUserService.getMeSimpleBidder(); 
-		//iStorableRepo.save(bidder);
 		return new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid())
 				.bidder(testUserService.getMeSimpleBidder())	.build();
 	}

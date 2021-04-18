@@ -85,9 +85,9 @@ public class User extends Storable implements  IStorable  {
    @JsonManagedReference(value="lotOnUser")
  @OneToMany(
 		 fetch = FetchType.LAZY,
-	    mappedBy = "user",//variable in Lot class - links a lot with a given user
-	     cascade = CascadeType.ALL,
-	  orphanRemoval = true
+	    mappedBy = "user",// ,	  orphanRemoval = truevariable in Lot class - links a lot with a given user
+	     cascade = CascadeType.ALL
+	    
 	   
 	) 
 	List<Lot> lotsCreatedList; 
@@ -97,8 +97,8 @@ public class User extends Storable implements  IStorable  {
  @OneToMany(
 		 fetch = FetchType.LAZY,
 	    mappedBy = "bidder",//variable in Bid class - links a Bid with a given user
-	     cascade = CascadeType.ALL,
-	  orphanRemoval = true
+	     cascade = CascadeType.ALL
+	    // ,	  orphanRemoval = true
 	   
 	)
 // @JoinTable(name= "users_bids", joinColumns={@JoinColumn(referencedColumnName="id")}
@@ -107,7 +107,14 @@ public class User extends Storable implements  IStorable  {
  
  
    
- 	public Lot getLot(int id) throws IndexOutOfBoundsException{
+// 	public void setBidsBadeList(List<Bid> bidsBadeList) {
+// 		this.bidsBadeList.clear();
+// 		if (this.bidsBadeList!=null)
+//	this.bidsBadeList.addAll(bidsBadeList);
+//}
+
+
+	public Lot getLot(int id) throws IndexOutOfBoundsException{
  		Lot lot =null;
 			 lot = lotsCreatedList.get(id);		
  		return lot;
@@ -156,7 +163,7 @@ public class User extends Storable implements  IStorable  {
 //	}
 
 	@Column(name = "username")
-	String username;
+	private String username;
 
 	
 

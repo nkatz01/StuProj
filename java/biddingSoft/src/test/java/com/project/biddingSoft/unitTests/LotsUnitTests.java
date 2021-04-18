@@ -561,56 +561,29 @@ public class LotsUnitTests {
 		 assertEquals(wiredLot.getId(),lot.getId());		
 	}
 
-	@Test
-	 @Order(7)
-	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
-	
-		
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(200,response.getStatusLine().getStatusCode());
-		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
-	}
-	@Test
-	 @AfterAll
-	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
-	
-		assertTrue(iStorableRepo.count() >0 );
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
-		HttpResponse response = httpClient.execute(request);
-		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		assertTrue(iStorableRepo.count() == 0 );
- 	}
-//
 //	@Test
-//	public void testGetAllEnts_forBids() throws IOException , URISyntaxException {
+//	 @Order(7)
+//	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
 //	
 //		
 //		HttpClient httpClient = HttpClientBuilder.create().build();
-//		HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
-//		StringEntity params = new StringEntity("{\"type\": \"bid\"}");
-//		request.addHeader("content-type",  "application/json");
-//		request.setEntity(params);
+//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
 //		HttpResponse response = httpClient.execute(request);
-//		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		
+//		assertEquals(200,response.getStatusLine().getStatusCode());
+//		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
 //	}
 //	@Test
-//	public void testGetAllEnts_forLots() throws IOException , URISyntaxException {
-//
-//		
-//			HttpClient httpClient = HttpClientBuilder.create().build();
-//			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/allents"));
-//			StringEntity params = new StringEntity("{\"type\": \"lot\"}");
-//			request.addHeader("content-type",  "application/json");
-//			request.setEntity(params);
-//			HttpResponse response = httpClient.execute(request);
-//			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		
-//	}
-	
+//	 @AfterAll
+//	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
+//	
+//		assertTrue(iStorableRepo.count() >0 );
+//		HttpClient httpClient = HttpClientBuilder.create().build();
+//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
+//		HttpResponse response = httpClient.execute(request);
+//		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+//		assertTrue(iStorableRepo.count() == 0 );
+// 	}
+
 	
 	@Test
 	void checkThatAfterBidIsCreated_BidderGetsAssociation_withBid_onTheirObject() {

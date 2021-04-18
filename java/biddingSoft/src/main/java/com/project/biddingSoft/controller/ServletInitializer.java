@@ -102,21 +102,34 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
-
 	@PutMapping(path="/update")
-	ResponseEntity<Object> updateNewEntity(@RequestBody Storable entity){
+	ResponseEntity<Object> updateEntity(@RequestBody Storable entity) throws IllegalAccessException{
 		String message ="";
 		if (entity instanceof User)
 		message =	userServiceImpl.update(iStorableRepoUser, entity);
-		else if (entity instanceof Lot)
-			message =	lotServiceImpl.update(iStorableRepoLot, entity);
-		else if (entity instanceof Bid)
-			message =	bidServiceImpl.update(iStorableRepoBid, entity);
+	else if (entity instanceof Lot)
+		message =	lotServiceImpl.update(iStorableRepoLot, entity);
+	else if (entity instanceof Bid)
+		message =	bidServiceImpl.update(iStorableRepoBid, entity);
 		else 
 			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
-		
+		 
 		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
 	}
+//	@PutMapping(path="/update")
+//	ResponseEntity<Object> updateEntity(@RequestBody Storable entity){
+//		String message ="";
+//		if (entity instanceof User)
+//		message =	userServiceImpl.update(iStorableRepoUser, entity);
+//		else if (entity instanceof Lot)
+//			message =	lotServiceImpl.update(iStorableRepoLot, entity);
+//		else if (entity instanceof Bid)
+//			message =	bidServiceImpl.update(iStorableRepoBid, entity);
+//		else 
+//			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
+//		 
+//		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
+//	}
 
 	@PostMapping(path = "/create")
 	ResponseEntity<Object> addNewEntity(@RequestBody IStorable entity) {
