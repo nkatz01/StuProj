@@ -115,7 +115,14 @@ public class Lot extends Storable implements IStorable  {
 //	}
 	@Value("${Lot.title}")
 	 @JsonProperty("title")
-	private String title;
+	public String title;
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
@@ -127,10 +134,21 @@ public class Lot extends Storable implements IStorable  {
 	@Value("${Lot.biddingIncrement}")
 	@JsonProperty("reservePrice")
 	private double biddingIncrement;
+	public void setBiddingIncrement(double biddingIncrement) {
+		this.biddingIncrement = biddingIncrement;
+	}
+
 	private double reservePrice = 0.0;
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
 	private double startingPrice;
+	public double getStartingPrice() {
+		return startingPrice;
+	}
+	public void setStartingPrice(double startingPrice) {
+		this.startingPrice = startingPrice;
+	}
+
 	@JsonProperty("startTime")
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
@@ -191,9 +209,11 @@ public class Lot extends Storable implements IStorable  {
 // 	private Bid highestBid; 
 
 	// Static variables
-//	public static final String ANSI_RED = "\u001B[31m";
-//	public static final String ANSI_RESET = "\u001B[0m";
-//	private static final Logger logger = LoggerFactory.getLogger(Lot.class);
+	public static  String ANSI_RED = "\u001B[31m";
+	public static  String ANSI_RESET = "\u001B[0m";
+	private static  Logger logger = LoggerFactory.getLogger(Lot.class);
+	@Transient
+	private Clock clock;
 
 	// Constructors
 	@JsonCreator
@@ -282,8 +302,6 @@ public class Lot extends Storable implements IStorable  {
 //	public boolean placeBid(Bid bid) {
 //		return placeBid(bid, Clock.system(ZONE));
 //	}
-	@Transient
-	private Clock clock;
 
 	private boolean addBid(Bid bid) {
 		boolean success;

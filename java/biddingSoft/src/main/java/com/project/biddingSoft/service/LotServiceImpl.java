@@ -32,9 +32,13 @@ import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
+import com.project.biddingSoft.domain.BiddingSoftMapper;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.LotDTO;
 import com.project.biddingSoft.domain.Storable;
+import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
+import com.project.biddingSoft.domain.UserDTO;
 
 /**
  * @author nuchem
@@ -45,7 +49,8 @@ import com.project.biddingSoft.domain.User;
 @Qualifier("LotServiceImpl")
 public class LotServiceImpl implements IService<Lot> {//
 	private static final Logger logger = LoggerFactory.getLogger(LotServiceImpl.class);
-
+	@Autowired 
+	private BiddingSoftMapper lotMapper;
 	@Transient
 	@Autowired
 	private static ILotRepo iLotRepo;
@@ -63,17 +68,29 @@ public class LotServiceImpl implements IService<Lot> {//
 	}
 	@Autowired
 	private   IStorableRepo<Storable> iStorableRepo;
-	@Override
-	public String updateEntity(Storable lot){
-		String mesg = null;
+	public String updateEntity(StorableDTO lotDto){
+		String mesg = ""+ Lot.class.getName() +  " " + lotDto.getId();
 		try {
-			mesg = IService.super.update(iStorableRepo, lot);//(CrudRepository<IStorable, Long> )
+			Lot lot = iLotRepo.findById(lotDto.getId()).get();
+			lotMapper.updateLotFromDto((LotDTO)lotDto, lot);
+			iLotRepo.save(lot);
 			
-		} catch (IllegalAccessException e) {
-			 mesg = "cannot access some fields";
+		} catch (Exception e) {
+			 mesg = " could not be updated "+ lotDto.getId() +" "+ e.getMessage();
 		}
 		return mesg; 
 	}
+//	@Override
+//	public String updateEntity(Storable lot){
+//		String mesg = null;
+//		try {
+//			mesg = IService.super.update(iStorableRepo, lot);//(CrudRepository<IStorable, Long> )
+//			
+//		} catch (IllegalAccessException e) {
+//			 mesg = "cannot access some fields";
+//		}
+//		return mesg; 
+//	}
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
 		if (!lot.getUser().createdLotscontainsLot(lot))

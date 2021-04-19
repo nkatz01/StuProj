@@ -32,9 +32,13 @@ import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
+import com.project.biddingSoft.domain.BidDTO;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.LotDTO;
 import com.project.biddingSoft.domain.Storable;
+import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
+import com.project.biddingSoft.domain.UserDTO;
 import com.project.biddingSoft.service.BidServiceImpl;
 import com.project.biddingSoft.service.IService;
 import com.project.biddingSoft.service.LotServiceImpl;
@@ -103,18 +107,21 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
 	@PutMapping(path="/update")
-	ResponseEntity<Object> updateEntity(@RequestBody Storable entity) throws IllegalAccessException{
+	ResponseEntity<Object> updateEntity(@RequestBody StorableDTO entity) throws IllegalAccessException{
 		String message ="";
-		if (entity instanceof User)
-		message =	userServiceImpl.update(iStorableRepoUser, entity);
-	else if (entity instanceof Lot)
-		message =	lotServiceImpl.update(iStorableRepoLot, entity);
-	else if (entity instanceof Bid)
-		message =	bidServiceImpl.update(iStorableRepoBid, entity);
+		if (entity instanceof UserDTO) {
+ 		message =	userServiceImpl.updateEntity(entity);
+		}
+		else	 if (entity instanceof LotDTO)
+	{
+		message =	lotServiceImpl.updateEntity(entity);
+	}
+	else if (entity instanceof BidDTO)
+		message =	bidServiceImpl.updateEntity(entity);
 		else 
 			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 		 
-		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
+		return new ResponseEntity(message + "\n updated successfully", HttpStatus.CREATED);
 	}
 //	@PutMapping(path="/update")
 //	ResponseEntity<Object> updateEntity(@RequestBody Storable entity){

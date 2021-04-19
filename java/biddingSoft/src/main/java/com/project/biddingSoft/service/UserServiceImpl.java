@@ -31,7 +31,10 @@ import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
+import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
+import com.project.biddingSoft.domain.UserDTO;
+import com.project.biddingSoft.domain.BiddingSoftMapper;
 
 /**
  * @author nuchem
@@ -46,11 +49,12 @@ public   class UserServiceImpl implements IService<User> {
 	 public UserServiceImpl() {
 	}
 	 
-	
+	@Autowired
+	BiddingSoftMapper userMapper; 
 	@Autowired
 	private static IUserRepo iUserRepo;
 
-
+	
 	@Autowired
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		 iUserRepo = iuserRepo;
@@ -74,6 +78,17 @@ public   class UserServiceImpl implements IService<User> {
 
 	}
 	 
+	public String updateEntity(StorableDTO userDto){
+		String mesg = ""+ userDto.getId();
+		try {
+			User user = iUserRepo.findById(userDto.getId()).get();
+			iUserRepo.save(user);//(CrudRepository<IStorable, Long> )
+		} catch (Exception e) {
+			 mesg = " could not be updated " + e.getMessage();
+		}
+		return mesg; 
+	}
+	 
 //	public String updateEntity(User user){
 //		StringBuilder stringBuilder = new StringBuilder();
 //		if(user.getId()!=null && iUserRepo.existsById(user.getId())) {
@@ -95,17 +110,17 @@ public   class UserServiceImpl implements IService<User> {
 //			
 //		return stringBuilder.toString();
 //	}
-	@Override
-	public String updateEntity(Storable user){
-		String mesg = null;
-		try {
-			mesg = IService.super.update(iStorableRepo, user);//(CrudRepository<IStorable, Long> )
-			
-		} catch (IllegalAccessException e) {
-			 mesg = "cannot access some fields";
-		}
-		return mesg; 
-	}
+//	@Override
+//	public String updateEntity(Storable user){
+//		String mesg = null;
+//		try {
+//			mesg = IService.super.update(iStorableRepo, user);//(CrudRepository<IStorable, Long> )
+//			
+//		} catch (IllegalAccessException e) {
+//			 mesg = "cannot access some fields";
+//		}
+//		return mesg; 
+//	}
 //	@Override
 //	public String updateEntity(User user) {
 //		if(user.getId()!=null && iUserRepo.existsById(user.getId()))

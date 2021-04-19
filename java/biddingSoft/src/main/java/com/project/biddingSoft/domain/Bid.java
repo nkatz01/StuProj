@@ -82,7 +82,7 @@ public class Bid extends Storable implements IStorable {
 	
 
 
-
+@JsonProperty("amount")
 	private double amount; 
 	
 	
@@ -97,7 +97,7 @@ public class Bid extends Storable implements IStorable {
 	public User getBidder() {
 		return bidder;
 	}
-	 void setAmount(double amount) {//delete
+	public void setAmount(double amount) {//delete
 		this.amount = amount;
 	}
 	public Bid(BidBuilder bidBuilder) {

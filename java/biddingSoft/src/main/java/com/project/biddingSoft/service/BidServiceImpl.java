@@ -28,8 +28,12 @@ import com.project.biddingSoft.dao.IStorable;
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
+import com.project.biddingSoft.domain.BidDTO;
+import com.project.biddingSoft.domain.BiddingSoftMapper;
 import com.project.biddingSoft.domain.Lot;
+import com.project.biddingSoft.domain.LotDTO;
 import com.project.biddingSoft.domain.Storable;
+import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.IService;
 
@@ -66,17 +70,34 @@ public class BidServiceImpl implements IService<Bid> {
 	}	
 	@Autowired
 	private   IStorableRepo<Storable> iStorableRepo;
-	@Override
-	public String updateEntity(Storable bid){
-		String mesg = null;
+	@Autowired
+	private BiddingSoftMapper bidMapper; 
+	public String updateEntity(StorableDTO bidDto){
+		String mesg = ""+ Bid.class.getName() +  " " + bidDto.getId();
 		try {
-			mesg = IService.super.update(iStorableRepo, bid);//(CrudRepository<IStorable, Long> )
+			Bid bid = iBidRepo.findById(bidDto.getId()).get();
+			bidMapper.updateBidFromDto((BidDTO)bidDto, bid);
+			System.out.println(((BidDTO)bidDto).getAmount());
+			System.out.println(bid.getAmount());
+		//	bid.setAmount(((BidDTO)bidDto).getAmount());
+			iBidRepo.save(bid);
 			
-		} catch (IllegalAccessException e) {
-			 mesg = "cannot access some fields";
+		} catch (Exception e) {
+			 mesg = " could not be updated "+ bidDto.getId() +" "+ e.getMessage();
 		}
 		return mesg; 
 	}
+//	@Override
+//	public String updateEntity(Storable bid){
+//		String mesg = null;
+//		try {
+//			mesg = IService.super.update(iStorableRepo, bid);//(CrudRepository<IStorable, Long> )
+//			
+//		} catch (IllegalAccessException e) {
+//			 mesg = "cannot access some fields";
+//		}
+//		return mesg; 
+//	}
 	
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
