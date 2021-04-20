@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.ILotRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
@@ -61,10 +61,7 @@ public   class UserServiceImpl implements IService<User> {
 	}
 	@Autowired
 	private   IStorableRepo<Storable> iStorableRepo;
-//	@Autowired
-//	public void setIStorableRepo(IStorableRepo istorableRepo) {
-//		iStorableRepo = istorableRepo;
-//	}
+
 	@Override
  	public  String persistEntity(User user)  {
 
@@ -77,81 +74,20 @@ public   class UserServiceImpl implements IService<User> {
 		return stringBuilder.toString();
 
 	}
-	 
+	@Override 
 	public String updateEntity(StorableDTO userDto){
-		String mesg = ""+ userDto.getId();
+		String mesg = User.class.getName() + " "+ userDto.getId();
 		try {
 			User user = iUserRepo.findById(userDto.getId()).get();
-			iUserRepo.save(user);//(CrudRepository<IStorable, Long> )
+			userMapper.updateUserFromDto((UserDTO)userDto, user);
+			iUserRepo.save(user);
+			mesg += " successfully updated";
 		} catch (Exception e) {
-			 mesg = " could not be updated " + e.getMessage();
+			 mesg += " could not be updated: " + e.getMessage();
 		}
 		return mesg; 
 	}
 	 
-//	public String updateEntity(User user){
-//		StringBuilder stringBuilder = new StringBuilder();
-//		if(user.getId()!=null && iUserRepo.existsById(user.getId())) {
-//			User userFromRepo = iUserRepo.findById(user.getId()).get();
-//			Field[] fields = userFromRepo.getClass().getDeclaredFields();
-//			try {
-//				for(Field field : fields) {
-//					FieldUtils.writeDeclaredField(userFromRepo, field.getName(),FieldUtils.readField(user, field.getName().toString(), true), true);
-//				}
-//				iUserRepo.save(userFromRepo);
-//				stringBuilder.append(userFromRepo.getClass().getName() + " "+ userFromRepo.getId()).toString();
-//				
-//			} catch (Exception e) {
-//				stringBuilder.append("/n" + e.getMessage() +"/n");
-//			}
-//		}
-//		else 
-//			stringBuilder.append(user.getClass().getName() + " with "+ user.getId().toString() +" not found.");
-//			
-//		return stringBuilder.toString();
-//	}
-//	@Override
-//	public String updateEntity(Storable user){
-//		String mesg = null;
-//		try {
-//			mesg = IService.super.update(iStorableRepo, user);//(CrudRepository<IStorable, Long> )
-//			
-//		} catch (IllegalAccessException e) {
-//			 mesg = "cannot access some fields";
-//		}
-//		return mesg; 
-//	}
-//	@Override
-//	public String updateEntity(User user) {
-//		if(user.getId()!=null && iUserRepo.existsById(user.getId()))
-//			iUserRepo.save(user);
-//		return new StringBuilder().append(user.getClass().getName() + " "+ user.getId()).toString();
-//	}
-//	@Override
-//	public Iterable<User> getAllRecordsForEnt() {
-//
-//		return iUserRepo.findAll();
-//	}
 
-//	public  boolean deleteAllEntities(User user) {
-//		
-//			StreamSupport.stream(getAllRecordsForEnt(user).spliterator(), false)
-//					.forEach(u -> iUserRepo.delete(u));
-//	
-//		return getAllRecordsForEnt(user).iterator().hasNext() == false;
-//	}
-//
-//	public  boolean deleteEntity(User user)  {
-//		
-//		iUserRepo.delete(user);	
-//	
-//		return iUserRepo.findById(user.getId()).isEmpty(); 
-//
-//	}
-
-//	@Override
-//	public Optional<User> getEntity(Long id) {
-//		return iUserRepo.findById(id);
-//	}
 
 }

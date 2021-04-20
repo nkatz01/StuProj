@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.ILotRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
@@ -68,29 +68,20 @@ public class LotServiceImpl implements IService<Lot> {//
 	}
 	@Autowired
 	private   IStorableRepo<Storable> iStorableRepo;
+	@Override 
 	public String updateEntity(StorableDTO lotDto){
 		String mesg = ""+ Lot.class.getName() +  " " + lotDto.getId();
 		try {
 			Lot lot = iLotRepo.findById(lotDto.getId()).get();
 			lotMapper.updateLotFromDto((LotDTO)lotDto, lot);
 			iLotRepo.save(lot);
-			
+			mesg += " successfully updated";
 		} catch (Exception e) {
-			 mesg = " could not be updated "+ lotDto.getId() +" "+ e.getMessage();
+			 mesg += " could not be updated: " + e.getMessage();
 		}
 		return mesg; 
 	}
-//	@Override
-//	public String updateEntity(Storable lot){
-//		String mesg = null;
-//		try {
-//			mesg = IService.super.update(iStorableRepo, lot);//(CrudRepository<IStorable, Long> )
-//			
-//		} catch (IllegalAccessException e) {
-//			 mesg = "cannot access some fields";
-//		}
-//		return mesg; 
-//	}
+	@Override
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
 		if (!lot.getUser().createdLotscontainsLot(lot))
@@ -101,9 +92,7 @@ public class LotServiceImpl implements IService<Lot> {//
 			stringBuilder.append(lot.getUser().getClass().getName() + " " + lot.getUser().getId());
 
 		}
-//	 	System.out.println(lot.getId()!=null);
-//	 	System.out.println(iUserRepo.findById(lot.getUser().getId()).isPresent());
-		// lot.getUser().setId(iUserRepo.findById(lot.getUser().getId()).get().getId());
+
 		else {
 			iLotRepo.save(lot);
 		}
@@ -114,37 +103,7 @@ public class LotServiceImpl implements IService<Lot> {//
 
 
 
-//	@Override
-//	public Iterable<Lot> getAllRecordsForEnt() {
-//
-//		return iLotRepo.findAll();
-//	}
 
-//	public  boolean deleteAllEntities(Lot lot) {
-//		
-//			StreamSupport.stream(getAllRecordsForEnt(lot).spliterator(), false)
-//					.forEach(u -> iLotRepo.delete(u));
-//	
-//		return getAllRecordsForEnt(lot).iterator().hasNext() == false;
-//	}
-//
-//	public  boolean deleteEntity(Lot lot)  {
-//		
-//		iLotRepo.delete(lot);	
-//	
-//		return iLotRepo.findById(lot.getId()).isEmpty(); 
-//
-//	}
-//	@Override
-//	public Optional<Lot> getEntity(Long id) {
-//		return iLotRepo.findById(id);
-//	}
-//	@Override
-//	public String updateEntity(Storable storable) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//	
 
 
 }

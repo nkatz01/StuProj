@@ -28,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.IBidRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
@@ -56,46 +56,23 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	private static final Logger logger = LoggerFactory.getLogger(SpringBootServletInitializer.class);
 	@Autowired
 	@Qualifier("getUserServiceImpl")
-	private IService<IStorable>  userServiceImpl;
+	private IService<Storable> userServiceImpl;
 	@Autowired
 	@Qualifier("getLotServiceImpl")
-	private IService<IStorable> lotServiceImpl; 
+	private IService<Storable> lotServiceImpl;
 	@Autowired
 	@Qualifier("getBidServiceImpl")
-	private IService<IStorable> bidServiceImpl; 
-	@Autowired
-	private static IStorableRepo<Storable> iStorableRepoUser;
-	@Autowired
-	@Qualifier("IUserRepo")
-	public void setIStorableRepoUser(IStorableRepo istorableRepo) {
-		iStorableRepoUser = istorableRepo;
-	}
-	@Autowired	
-	private static IStorableRepo<Storable> iStorableRepoLot;
-	@Autowired
-	@Qualifier("ILotRepo")
-	public void setIStorableLot(IStorableRepo istorableRepo) {
-		iStorableRepoLot = istorableRepo;
-	}
-	@Autowired
-	private static IStorableRepo<Storable> iStorableRepoBid;
-	@Autowired
-	@Qualifier("IBidRepo")
-	public void setIStorableBid(IStorableRepo istorableRepo) {
-		iStorableRepoBid = istorableRepo;
-	}
+	private IService<Storable> bidServiceImpl;
+
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
+
 	@Autowired
 	@Qualifier("IStorableRepo")
 	public void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
-//	@Autowired
-//	@Qualifier("IUserRepo")
-//	private  IStorableRepo<Storable> iUserRepo;
-//	
-	
+
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(BiddingSoftwareApplication.class);
@@ -106,50 +83,34 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
-	@PutMapping(path="/update")
-	ResponseEntity<Object> updateEntity(@RequestBody StorableDTO entity) throws IllegalAccessException{
-		String message ="";
-		if (entity instanceof UserDTO) {
- 		message =	userServiceImpl.updateEntity(entity);
-		}
-		else	 if (entity instanceof LotDTO)
-	{
-		message =	lotServiceImpl.updateEntity(entity);
+
+	@PutMapping(path = "/update")
+	ResponseEntity<Object> updateEntity(@RequestBody StorableDTO entity) {
+		String message = "";
+		if (entity instanceof UserDTO)
+			message = userServiceImpl.updateEntity(entity);
+		else if (entity instanceof LotDTO)
+			message = lotServiceImpl.updateEntity(entity);
+		else if (entity instanceof BidDTO)
+			message = bidServiceImpl.updateEntity(entity);
+		else
+			return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
+
+		return new ResponseEntity(message, HttpStatus.OK);
 	}
-	else if (entity instanceof BidDTO)
-		message =	bidServiceImpl.updateEntity(entity);
-		else 
-			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
-		 
-		return new ResponseEntity(message + "\n updated successfully", HttpStatus.CREATED);
-	}
-//	@PutMapping(path="/update")
-//	ResponseEntity<Object> updateEntity(@RequestBody Storable entity){
-//		String message ="";
-//		if (entity instanceof User)
-//		message =	userServiceImpl.update(iStorableRepoUser, entity);
-//		else if (entity instanceof Lot)
-//			message =	lotServiceImpl.update(iStorableRepoLot, entity);
-//		else if (entity instanceof Bid)
-//			message =	bidServiceImpl.update(iStorableRepoBid, entity);
-//		else 
-//			 return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
-//		 
-//		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
-//	}
 
 	@PostMapping(path = "/create")
-	ResponseEntity<Object> addNewEntity(@RequestBody IStorable entity) {
-		String message ="";
+	ResponseEntity<Object> addNewEntity(@RequestBody Storable entity) {
+		String message = "";
 		try {
-			if(entity instanceof User)
-				message =	userServiceImpl.persistEntity(entity);
+			if (entity instanceof User)
+				message = userServiceImpl.persistEntity(entity);
 			else if (entity instanceof Lot)
-			message =	lotServiceImpl.persistEntity(entity);
+				message = lotServiceImpl.persistEntity(entity);
 			else {
-				message =	bidServiceImpl.persistEntity(entity);}
-				
-			//iService.persistEntity(entity);
+				message = bidServiceImpl.persistEntity(entity);
+			}
+
 		} catch (IllegalArgumentException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -157,50 +118,39 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	}
 
-	@GetMapping(path = "/allents" )
-	public @ResponseBody  ResponseEntity<Iterable<? extends IStorable>> getAllRecords() {
-		Iterable<? extends IStorable> results = iStorableRepo.findAll();
-		
-		if ( StreamSupport.stream(results.spliterator() , false).count()>0)
-		
-		return  ResponseEntity.ok(results);
-		else 
-			return  new ResponseEntity("No entities found",HttpStatus.BAD_REQUEST);
+	@GetMapping(path = "/allents")
+	public @ResponseBody ResponseEntity<Iterable<? extends Storable>> getAllRecords() {
+		Iterable<? extends Storable> results = iStorableRepo.findAll();
+		if (StreamSupport.stream(results.spliterator(), false).count() > 0)
+			return ResponseEntity.ok(results);
+		else
+			return new ResponseEntity("No entities found", HttpStatus.BAD_REQUEST);
 	}
-
 
 	@RequestMapping(path = "/getent/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<? extends IStorable> getEntity(@PathVariable    Long id) {
-		Optional<? extends IStorable> results = iStorableRepo.findByEntityId(id);
-		
+	public @ResponseBody ResponseEntity<? extends Storable> getEntity(@PathVariable Long id) {
+		Optional<? extends Storable> results = iStorableRepo.findByEntityId(id);
 		if (results.isPresent())
 			return ResponseEntity.ok(results.get());
-		else 
+		else
 			return new ResponseEntity("Entity not found", HttpStatus.NOT_FOUND);
 	}
-	
 
-	@DeleteMapping(path = "/delent/{id}")//model catch/throw
+	@DeleteMapping(path = "/delent/{id}") // model catch/throw
 	public ResponseEntity<String> deleteEntity(@PathVariable Long id) {
 		ResponseEntity<String> response = null;
 		try {
-			
 			iStorableRepo.deleteById(id);
-			response = 	 new ResponseEntity("Entry successfully deleted", HttpStatus.OK);
+			response = new ResponseEntity("Entity successfully deleted", HttpStatus.OK);
 		} catch (Exception e) {
-			 
-			response = 	 new ResponseEntity("Entry not found - "+e.getMessage(), HttpStatus.NOT_FOUND);
+			response = new ResponseEntity("Entity not found - " + e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		return response;
 	}
 
 	@DeleteMapping(path = "/delents")
 	public ResponseEntity<String> deleteAllEntities() {
-		 
-		
-			iStorableRepo.deleteAll();
-			
-		
+		iStorableRepo.deleteAll();
 		return new ResponseEntity("Entities successfully deleted", HttpStatus.OK);
 	}
 

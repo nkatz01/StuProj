@@ -12,13 +12,17 @@ import javax.persistence.MappedSuperclass;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.project.biddingSoft.dao.IStorable;
-//@MappedSuperclass
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = User.class)
+@JsonSubTypes({ @JsonSubTypes.Type(value = Lot.class, name = "lot"),
+		@JsonSubTypes.Type(value = Bid.class, name = "bid")  })
 @Inheritance(strategy = InheritanceType.JOINED) 
 @DiscriminatorColumn(name = "entity_type")
 @Entity
 @Component
-public abstract class Storable implements IStorable {
+public abstract class Storable  {//implements IStorable
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
  protected Long id;

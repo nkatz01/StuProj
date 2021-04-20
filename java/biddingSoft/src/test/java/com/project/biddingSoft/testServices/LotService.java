@@ -1,4 +1,4 @@
-package com.project.biddingSoft.service;
+package com.project.biddingSoft.testServices;
 
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;

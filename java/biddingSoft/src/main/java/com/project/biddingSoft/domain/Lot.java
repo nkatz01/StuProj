@@ -53,7 +53,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.annotations.VisibleForTesting;
 import com.project.biddingSoft.dao.ILotRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 
@@ -69,7 +69,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 @DiscriminatorValue("Lot")
 @PrimaryKeyJoinColumn(name = "id")
 
-public class Lot extends Storable implements IStorable  {
+public class Lot extends Storable   {//implements IStorable
 	
 	
 	@Autowired
@@ -132,13 +132,20 @@ public class Lot extends Storable implements IStorable  {
 	@JsonProperty("ZONE")
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
-	@JsonProperty("reservePrice")
+	@JsonProperty("biddingIncrement")
 	private double biddingIncrement;
 	public void setBiddingIncrement(double biddingIncrement) {
 		this.biddingIncrement = biddingIncrement;
 	}
-
+	@JsonProperty("reservePrice")
 	private double reservePrice = 0.0;
+	public double getReservePrice() {
+		return reservePrice;
+	}
+	public void setReservePrice(double reservePrice) {
+		this.reservePrice = reservePrice;
+	}
+
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
 	private double startingPrice;
@@ -246,28 +253,14 @@ public class Lot extends Storable implements IStorable  {
 
 	}
 
-//	public  static Optional<Lot> addBid(Lot lot, Bid bid)
-//			throws UnsupportedOperationException, ClassCastException, IllegalArgumentException, NullPointerException {
-//		
-//		boolean succeeded = lot.placeBid(bid);// handle exception
-//		 if (succeeded) {
-//			 if (bid.getAmount()>=lot.getHighestBid() + lot.biddingIncrement)
-//				 lot.pendingAutoBid = bid;
-//			 lot.highestBid = lot.highestBid + lot.biddingIncrement;
-//			 lot.bidList.add(bid);
-//			 lot.leadingBidder = bid.getBidder();
-//			
-//		 }
-//		return succeeded ? Optional.of(lot)  : Optional.empty();
-//
-//	}
+
 
 	public Optional<Lot> placeBid(Bid bid) {
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
-		boolean succeeded = addBid(bid);// handle exception
-		if (succeeded) {
+		try {
+		 addBid(bid);// handle exception
+			
 			if (pendingAutoBid == null) {
-
 				highestBid += biddingIncrement;
 				isOverHigestBid(bid);
 				leadingBidder = bid.getBidder();
@@ -283,12 +276,33 @@ public class Lot extends Storable implements IStorable  {
 					if (!isOverHigestBid(bid))
 						pendingAutoBid = null;
 				}
-
 			}
+		
 		}
+		catch (ExceptionsCreateor.LotHasEndedException e) {
+			throw e;
+		}
+		catch (ExceptionsCreateor.BidTooLow e) {
+			throw e;
+		}		
+		catch (Exception e) {
+			return Optional.empty();
+		}
+		
+		return Optional.of(this) ;
 
-		return succeeded ? Optional.of(this) : Optional.empty();
-
+	}
+	private void addBid(Bid bid) {
+		Instant now = Instant.now(clock);
+		Objects.requireNonNull(bid);
+		if (!hasLotExpired(now) && bidHighEnough(bid))
+			 bidList.add(bid);
+		else
+			throw bidSoftExcepFactory.new LotHasEndedException();
+		
+		if (isInTriggerPeriod(now))
+			endTime = extendedEndtime = extendedEndtime.plus(autoExtendDuration);
+		
 	}
 
 	private boolean isOverHigestBid(Bid bid) {
@@ -299,23 +313,8 @@ public class Lot extends Storable implements IStorable  {
 		return false;
 	}
 
-//	public boolean placeBid(Bid bid) {
-//		return placeBid(bid, Clock.system(ZONE));
-//	}
 
-	private boolean addBid(Bid bid) {
-		boolean success;
-		Instant now = Instant.now(clock);
-		Objects.requireNonNull(bid);
-		if (!hasLotExpired(now) && bidHighEnough(bid))
-			success = bidList.add(bid);
-		else
-			throw bidSoftExcepFactory.new LotHasEndedException();
 
-		if (isInTriggerPeriod(now))
-			endTime = extendedEndtime = extendedEndtime.plus(autoExtendDuration);
-		return success;
-	}
 
 	private boolean isInTriggerPeriod(Instant now) {
 		return now.compareTo(extendedEndtime) < 0 && now.compareTo(extendedEndtime.minus(triggerDuration)) >= 0;

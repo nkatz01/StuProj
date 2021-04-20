@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.User;
-import com.project.biddingSoft.service.LotService;
 @Component
 public class TestLotService {
 	  

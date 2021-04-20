@@ -30,8 +30,12 @@ new user
 
 
 {"type": "lotdto","id": "2", "biddingIncrement":"10.0"}
+{"type": "lotdto","id": "2", "user": {"id":"3"}}
 
-
-{"type": "user","id": "1", "username":"nuch"}
+{"type": "userdto","id": "1", "username":"nuch"}
 
 {"type": "lotdto","id": "2", "title":"not so attractive"}
+
+{"type": "biddto","id": "4", "amount": "11", "bidder": {"id":"1"} , "lot":{"type": "lot", "id":"2"} }
+{"type": "biddto","id": "4", "amount": "11"}
+{"type": "biddto","id": "4", "amount": "11", "bidder": {"id":"1"}, "lot": {"type":"lot","id":"2"}}

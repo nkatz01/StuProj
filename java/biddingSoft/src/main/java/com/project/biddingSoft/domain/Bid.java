@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 
 
 
@@ -48,7 +48,7 @@ import com.project.biddingSoft.dao.IStorable;
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("Bid")
-public class Bid extends Storable implements IStorable {
+public class Bid extends Storable {//implements IStorable 
 	 
 	@JsonBackReference(value="bidOnUser")
 	@ManyToOne(fetch = FetchType.LAZY )//orphanRemoval=true cascade = CascadeType.REFRESH,
@@ -69,6 +69,11 @@ public class Bid extends Storable implements IStorable {
 //		super.id = id;
 //	}
 
+	public void setBidder(User bidder) {
+		this.bidder = bidder;
+	}
+
+
 	@ManyToOne(
 			fetch = FetchType.LAZY//in order for jackson to work cascade = CascadeType.REFRESH
 			 
@@ -80,6 +85,11 @@ public class Bid extends Storable implements IStorable {
 	private Lot lot;
 	//static variables
 	
+
+
+public void setLot(Lot lot) {
+		this.lot = lot;
+	}
 
 
 @JsonProperty("amount")

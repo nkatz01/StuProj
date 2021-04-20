@@ -3,7 +3,7 @@ package com.project.biddingSoft.service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IUserRepo;
 
 @Configuration

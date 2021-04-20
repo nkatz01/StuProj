@@ -37,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IUserRepo;
  /**
  * @author nuchem
@@ -51,7 +51,7 @@ import com.project.biddingSoft.dao.IUserRepo;
 //@Inheritance(strategy = InheritanceType.JOINED)
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
-public class User extends Storable implements  IStorable  {
+public class User extends Storable   {//implements  IStorable
 	
 	
 

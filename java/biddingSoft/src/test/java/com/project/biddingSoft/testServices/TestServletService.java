@@ -2,7 +2,7 @@ package com.project.biddingSoft.testServices;
 
 import java.net.http.HttpResponse;
 
-import com.project.biddingSoft.dao.IStorable;
+
 
 public class TestServletService {
 //	public static <T> T retrieveResourceFromResponse(HttpResponse<IStorable> response, Class<T> clazz) 

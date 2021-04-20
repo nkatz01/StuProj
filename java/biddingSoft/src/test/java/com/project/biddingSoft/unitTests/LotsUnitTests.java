@@ -36,6 +36,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -461,32 +462,7 @@ public class LotsUnitTests {
 	
 //	//Test methods for endpoints
 	
-//	@Test
-//	public void testGetEnts_forBid() throws IOException , URISyntaxException {
-//			
-//		
-//			HttpClient httpClient = HttpClientBuilder.create().build();
-//			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/getent"));
-//			StringEntity params = new StringEntity("{\"type\": \"bid\", \"id\": "+ wiredLot.getBid(0).getId() +"}");
-//			request.addHeader("content-type",  "application/json");
-//			request.setEntity(params);
-//			HttpResponse response = httpClient.execute(request);
-//			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		
-//	}
-//	@Test
-//	public void testGetEnts_forLot() throws IOException , URISyntaxException {
-//			
-//		
-//			HttpClient httpClient = HttpClientBuilder.create().build();
-//			HttpGetWithEntity request = new HttpGetWithEntity(new URI("http://localhost:8080/getent"));
-//			StringEntity params = new StringEntity("{\"type\": \"lot\", \"id\": "+ wiredLot.getId() +"}");
-//			request.addHeader("content-type",  "application/json");
-//			request.setEntity(params);
-//			HttpResponse response = httpClient.execute(request);
-//			assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		
-//	}
+
 	@Test
 	public void testGetAllEnts() throws IOException , URISyntaxException, JSONException {
 	
@@ -560,34 +536,82 @@ public class LotsUnitTests {
 				.readValue(EntityUtils.toString(response.getEntity()), Lot.class);
 		 assertEquals(wiredLot.getId(),lot.getId());		
 	}
-
-//	@Test
-//	 @Order(7)
-//	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
-//	
-//		
-//		HttpClient httpClient = HttpClientBuilder.create().build();
-//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
-//		HttpResponse response = httpClient.execute(request);
-//		assertEquals(200,response.getStatusLine().getStatusCode());
-//		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
-//	}
-//	@Test
-//	 @AfterAll
-//	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
-//	
-//		assertTrue(iStorableRepo.count() >0 );
-//		HttpClient httpClient = HttpClientBuilder.create().build();
-//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
-//		HttpResponse response = httpClient.execute(request);
-//		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		assertTrue(iStorableRepo.count() == 0 );
-// 	}
-
-	
 	@Test
-	void checkThatAfterBidIsCreated_BidderGetsAssociation_withBid_onTheirObject() {
+	@Order(7)
+	public void testUpdateUser() throws IOException , URISyntaxException {
+			String username = iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername();
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+			StringEntity params = new StringEntity("{\"type\": \"userdto\",\"id\": "+ wiredLot.getUser().getId()+", \"username\":\"Jim\"}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertEquals(200, response.getStatusLine().getStatusCode());
+		assertNotEquals(username, iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername());
 		
 	}
+	@Test
+	@Order(7)
+	public void testUpdateLot() throws IOException , URISyntaxException {
+			User newUser = testUserService.getMeSimpleUser();
+			iUserRepo.save(newUser);
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+			StringEntity params = new StringEntity("{\"type\": \"lotdto\",\"id\": "+ wiredLot.getId()+", \"reservePrice\":\"50.0\", \"user\": {\"id\":"+ newUser.getId()+"}}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertEquals(200, response.getStatusLine().getStatusCode());
+			assertEquals(50.0, iLotRepo.findById(wiredLot.getId()).get().getReservePrice());
+			assertEquals(newUser.getId(), iLotRepo.findById(wiredLot.getId()).get().getUser().getId());
+		
+	}
+	@Test
+	@Order(8)
+	public void testUpdateBid() throws IOException , URISyntaxException {
+			Lot newLot = testLotService.getMeSimpleLot();
+			iUserRepo.save(newLot.getUser());
+			iLotRepo.save(newLot);
+			User newBidder = testUserService.getMeSimpleUser();
+			iUserRepo.save(newBidder);
+			
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+			StringEntity params = new StringEntity("{\"type\": \"biddto\",\"id\": "+ wiredLot.getBid(0).getId()+", \"amount\":\"20.0\", \"bidder\": {\"id\":"+ newBidder.getId()+"}, \"lot\": {\"type\":\"lot\",\"id\":"+ newLot.getId()+"}}");
+			request.addHeader("content-type",  "application/json");
+			request.setEntity(params);
+			HttpResponse response = httpClient.execute(request);
+			assertEquals(200, response.getStatusLine().getStatusCode());
+			assertEquals(newLot.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getLot().getId());
+			assertEquals(newBidder.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getBidder().getId());
+			assertEquals(20.0, iBidrepo.findById(wiredLot.getBid(0).getId()).get().getAmount());
+
+	}
+
+	@Test
+	 @Order(9)
+	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
+	
+		
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(200,response.getStatusLine().getStatusCode());
+		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
+	}
+	@Test
+	 @AfterAll
+	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
+	
+		assertTrue(iStorableRepo.count() >0 );
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
+		HttpResponse response = httpClient.execute(request);
+		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		assertTrue(iStorableRepo.count() == 0 );
+ 	}
+
+	
+
 
 }

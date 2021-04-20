@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
-import com.project.biddingSoft.dao.IStorable;
+
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
@@ -72,33 +72,20 @@ public class BidServiceImpl implements IService<Bid> {
 	private   IStorableRepo<Storable> iStorableRepo;
 	@Autowired
 	private BiddingSoftMapper bidMapper; 
+	@Override 
 	public String updateEntity(StorableDTO bidDto){
 		String mesg = ""+ Bid.class.getName() +  " " + bidDto.getId();
 		try {
 			Bid bid = iBidRepo.findById(bidDto.getId()).get();
 			bidMapper.updateBidFromDto((BidDTO)bidDto, bid);
-			System.out.println(((BidDTO)bidDto).getAmount());
-			System.out.println(bid.getAmount());
-		//	bid.setAmount(((BidDTO)bidDto).getAmount());
 			iBidRepo.save(bid);
-			
+			mesg += " successfully updated";
 		} catch (Exception e) {
-			 mesg = " could not be updated "+ bidDto.getId() +" "+ e.getMessage();
+			 mesg += " could not be updated: "+ e.getMessage();
 		}
 		return mesg; 
 	}
-//	@Override
-//	public String updateEntity(Storable bid){
-//		String mesg = null;
-//		try {
-//			mesg = IService.super.update(iStorableRepo, bid);//(CrudRepository<IStorable, Long> )
-//			
-//		} catch (IllegalAccessException e) {
-//			 mesg = "cannot access some fields";
-//		}
-//		return mesg; 
-//	}
-	
+	@Override 
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
 		 
@@ -160,27 +147,6 @@ public class BidServiceImpl implements IService<Bid> {
 
 	
 	
-// 	@Override
-//	public Iterable<Bid> getAllRecordsForEnt() {
-//
-//		return iBidRepo.findAll();
-//	}
-
-//	public  boolean deleteAllEntities(Bid bid) {
-//		
-//			StreamSupport.stream(getAllRecordsForEnt(bid).spliterator(), false)
-//					.forEach(u -> iBidRepo.delete(u));
-//	
-//		return getAllRecordsForEnt(bid).iterator().hasNext() == false;
-//	}
-//
-//	public  boolean deleteEntity(Bid bid)  {
-//		
-//		iBidRepo.delete(bid);	
-//	
-//		return iBidRepo.findById(bid.getId()).isEmpty(); 
-//
-//	}
 
  
 	
