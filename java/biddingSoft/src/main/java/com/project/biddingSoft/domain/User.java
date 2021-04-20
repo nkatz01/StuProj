@@ -40,13 +40,17 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.project.biddingSoft.dao.IUserRepo;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
  /**
  * @author nuchem
  *
  */
-
+@Setter
+@Getter
 @ToString
 @Entity
 @Component
@@ -93,6 +97,8 @@ public class User extends Storable   {//implements  IStorable
 	    
 	   
 	) 
+   @Setter(AccessLevel.NONE)
+   @Getter(AccessLevel.NONE)
 	List<Lot> lotsCreatedList; 
 	
    @JsonManagedReference(value="bidOnUser")
@@ -104,8 +110,8 @@ public class User extends Storable   {//implements  IStorable
 	    // ,	  orphanRemoval = true
 	   
 	)
-// @JoinTable(name= "users_bids", joinColumns={@JoinColumn(referencedColumnName="id")}
-//		 , inverseJoinColumns={@JoinColumn(referencedColumnName="id")}) 
+   @Setter(AccessLevel.NONE)
+   @Getter(AccessLevel.NONE)
 	private List<Bid> bidsBadeList; 
  
  
@@ -140,15 +146,11 @@ public class User extends Storable   {//implements  IStorable
 		return this.lotsCreatedList.contains(lot);
 		
 	}
-	public String getUsername() {
-		return username;
-	}
+	
 //	public Bid getLot(Lot lot) {
 //		return bidList.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
 //	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	
 //	@JsonProperty("id")
 //	@Id
 //	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -167,6 +169,8 @@ public class User extends Storable   {//implements  IStorable
 
 
 	
+
+
 
 	public static class UserBuilder{
 //		@Id

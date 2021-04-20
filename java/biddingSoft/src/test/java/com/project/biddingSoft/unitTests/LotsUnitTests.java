@@ -299,7 +299,7 @@ public class LotsUnitTests {
 		FieldUtils.writeDeclaredField(lot, "clock",
 				Clock.fixed(endTime.minus(Duration.ofSeconds(119)), ZoneId.systemDefault()), true);
 		lot.placeBid(testBidService.getOneIncrBid(lot));
-		assertTrue(lot.getEndTime().compareTo(endTime.plus(Duration.ofMinutes(5))) == 0);
+		assertTrue(lot.getExtendedEndtime().compareTo(endTime.plus(Duration.ofMinutes(5))) == 0);
 
 	}
 

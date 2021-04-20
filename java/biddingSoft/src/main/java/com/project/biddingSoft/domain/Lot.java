@@ -57,7 +57,10 @@ import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -69,9 +72,12 @@ import lombok.ToString;
 @DiscriminatorValue("Lot")
 @PrimaryKeyJoinColumn(name = "id")
 @ToString
+@Setter
+@Getter
 public class Lot extends Storable   {//implements IStorable
 	
-	
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	@Autowired
 	@Transient
 	private static ExceptionsCreateor bidSoftExcepFactory;
@@ -82,17 +88,8 @@ public class Lot extends Storable   {//implements IStorable
 		Lot.bidSoftExcepFactory = bidSoftExcepFactory;
 	}
 
-//	@Transient
-//	private static final  double ONEINCR = 5.0;
-	// Instance variables
-//	@JsonProperty("id")
-//	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-//	private Long id;
-	
-
-	// @ElementCollection(targetClass=Lot.class)
-	
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@JsonManagedReference(value="bidOnLot")
 	@JsonProperty("bidList")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // , orphanRemoval = truevariable in bid class - that links bid to a lot
@@ -106,60 +103,51 @@ public class Lot extends Storable   {//implements IStorable
 	private User user;
 	
 	
+	
+	@Setter(AccessLevel.NONE)
+	private double highestBid;//setter getter?
 
-	private double highestBid;
-//	 private void setHighestBid(Bid highestBid) {
-//		this.highestBid = highestBid;
-//	}
 //	public void remove(Bid bid) {
 //		this.bidList = new ArrayList<Bid>(	bidList.stream().filter(b -> !b.equals(bid)).collect(Collectors.toList() ));
 //	}
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	@Value("${Lot.title}")
 	 @JsonProperty("title")
 	public String title;
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
 
 	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
 	@JsonProperty("ZONE")
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
 	@JsonProperty("biddingIncrement")
+	@Setter(AccessLevel.NONE)
 	private double biddingIncrement;
-	public void setBiddingIncrement(double biddingIncrement) {
-		this.biddingIncrement = biddingIncrement;
-	}
+	
 	@JsonProperty("reservePrice")
-	private double reservePrice = 0.0;
-	public double getReservePrice() {
-		return reservePrice;
-	}
-	public void setReservePrice(double reservePrice) {
-		this.reservePrice = reservePrice;
-	}
+	private double reservePrice = 0.0;//left setter for the purpose of update testing
+
 
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
+	@Setter(AccessLevel.NONE)
 	private double startingPrice;
-	public double getStartingPrice() {
-		return startingPrice;
-	}
-	public void setStartingPrice(double startingPrice) {
-		this.startingPrice = startingPrice;
-	}
+
 
 	@JsonProperty("startTime")
+	@Setter(AccessLevel.NONE)
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
+	@Setter(AccessLevel.NONE)
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
 //	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
 //	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY) //eager, as otherwise jackson has an issue
@@ -172,12 +160,15 @@ public class Lot extends Storable   {//implements IStorable
 
 	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
 	  @JsonProperty("leadingBidder")
+	 @Setter(AccessLevel.NONE)
 	private User leadingBidder;
 
 	 @ToString.Exclude
  	@OneToOne(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
 	@JoinColumn(name = "autoBid_id")
 	  @JsonProperty("pendingAutoBid")
+	 @Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	private Bid pendingAutoBid;
 
 	 @JsonIgnore //otherwise jackson has an issue
@@ -187,15 +178,7 @@ public class Lot extends Storable   {//implements IStorable
 		else
 			throw bidSoftExcepFactory.new AutobidNotSet();
 	}
-	public User getLeadingBidder() {
-		return leadingBidder;
-	}
-	public Instant getEndTime() {
-		return endTime;
-	}
-	public double getBiddingIncrement() {
-		return biddingIncrement;
-	}
+
 
 	public Bid getBid(Bid bid) {
 		return bidList.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
@@ -207,20 +190,21 @@ public class Lot extends Storable   {//implements IStorable
 
 	// @Basic
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	private Duration triggerDuration;
-
+	@Setter(AccessLevel.NONE)
+	   @Getter(AccessLevel.NONE)
 	@Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
 	private Duration autoExtendDuration;
+	@Setter(AccessLevel.NONE)
 	private Instant extendedEndtime = endTime;
-//	@OneToOne(cascade = CascadeType.ALL, 
-//			fetch = FetchType.LAZY)
-//	@JoinColumn(name="highstBid_id", nullable=false)
-// 	private Bid highestBid; 
 
-	// Static variables
 	public static  String ANSI_RED = "\u001B[31m";
 	public static  String ANSI_RESET = "\u001B[0m";
 	private static  Logger logger = LoggerFactory.getLogger(Lot.class);
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Transient
 	private Clock clock;
 
@@ -257,8 +241,9 @@ public class Lot extends Storable   {//implements IStorable
 
 
 
-	public Optional<Lot> placeBid(Bid bid) {
+	public Optional<Lot> placeBid(Bid bid ) {//oldBid
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
+	//	Bid bid = new Bid(oldBid.getLot(),(((int) oldBid.getAmount() / biddingIncrement) * biddingIncrement), oldBid.getBidder()); 
 		try {
 		 addBid(bid);
 			
@@ -303,12 +288,12 @@ public class Lot extends Storable   {//implements IStorable
 			throw bidSoftExcepFactory.new LotHasEndedException();
 		
 		if (isInTriggerPeriod(now))
-			endTime = extendedEndtime = extendedEndtime.plus(autoExtendDuration);
+			extendedEndtime = extendedEndtime.plus(autoExtendDuration);
 		
 	}
 
 	private boolean isOverHigestBid(Bid bid) {
-		if (bid.getAmount() > getHighestBid()) {
+		if (bid.getAmount() > highestBid) {
 			pendingAutoBid = bid;
 			return true;
 		}
@@ -328,8 +313,8 @@ public class Lot extends Storable   {//implements IStorable
 
 	private boolean bidHighEnough(Bid bid) {
 		boolean isHihger = false;
-		if (getHighestBid() > 0.0)// there are bid/s already placed
-			isHihger = bid.getAmount() >= getHighestBid() + biddingIncrement;
+		if (highestBid > 0.0)// there are bid/s already placed
+			isHihger = bid.getAmount() >= highestBid + biddingIncrement;
 		else {// no bids placed yet
 				// there's startingPrice and bid is less OR there's isn't startingPrice and bid
 				// is lower than 1 increment
@@ -342,51 +327,17 @@ public class Lot extends Storable   {//implements IStorable
 
 		}
 		if (!isHihger)
-			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), getHighestBid() + biddingIncrement);
+			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), highestBid + biddingIncrement);
 		return true;
 
 	}
 
-//	public Lot(List<Bid> bidList, User user) {
-//		
-//		this.bidList = bidList;
-//		this.user = user;
-//	}
-//	
-//	public Lot(User user) {
-//		this(new ArrayList<Bid>(), user);
-//	}
-//	
 
-	public double getHighestBid() {
-		return highestBid;
-//			 bidList.stream().max(Comparator.comparingDouble(Bid::getAmount)).orElseThrow(NoSuchElementException::new);
-	}
-
-//	//@Override
-//	public void setId(Long id) {
-//		super.id = id;
-//	}
-//	//@Override
-//	public Long getId() {
-//		return super.id;
-//	}
-
-	public void setUser(User user) {//remove
-		this.user = user;
-	}
-	
-	public User getUser() {
-		return user;
-	}
 
 
 	public boolean contains(Bid bid) {
 		return bidList.contains(bid);
 	}
-	// @JsonProperty(value = "user")
-
-
 
 
 	public static class LotBuilder {

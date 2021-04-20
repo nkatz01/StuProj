@@ -33,7 +33,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 
@@ -49,6 +52,8 @@ import lombok.ToString;
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("Bid")
+@Setter
+@Getter
 public class Bid extends Storable {//implements IStorable 
 	 
 	@ToString.Exclude
@@ -56,24 +61,10 @@ public class Bid extends Storable {//implements IStorable
 	@ManyToOne(fetch = FetchType.LAZY )//orphanRemoval=true cascade = CascadeType.REFRESH,
 	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable=false)
 	@JsonProperty(value = "bidder")
-	//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private User bidder;
-//	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
-//	private Long id;
-	 
-	//@Override
-//	public Long getId() {
-//		return super.id;
-//	}
-//	//@Override
-//	public void setId(Long id) {
-//		super.id = id;
-//	}
+	
+	private User bidder;//setter/getter for the purpose of update testing
 
-	public void setBidder(User bidder) {
-		this.bidder = bidder;
-	}
+	
 
 	@ToString.Exclude
 	@ManyToOne(
@@ -84,17 +75,16 @@ public class Bid extends Storable {//implements IStorable
 	@JsonBackReference(value="bidOnLot")
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable=false)
 	 @JsonProperty(value = "lot")
-	private Lot lot;
+	@Getter(AccessLevel.NONE)
+	private Lot lot; //setter for the purpose of update testing
 	//static variables
 	
 
 
-public void setLot(Lot lot) {
-		this.lot = lot;
-	}
 
 
-@JsonProperty("amount")
+
+   @JsonProperty("amount")
 	private double amount; 
 	
 	
@@ -105,13 +95,8 @@ public void setLot(Lot lot) {
 		
 	}
 
-	
-	public User getBidder() {
-		return bidder;
-	}
-	public void setAmount(double amount) {//delete
-		this.amount = amount;
-	}
+
+
 	public Bid(BidBuilder bidBuilder) {
 		this.id = bidBuilder.id;
 		this.lot = bidBuilder.lot;
@@ -123,9 +108,7 @@ public void setLot(Lot lot) {
 	
 	
 	 
-	public double getAmount() {
-		return amount;
-	}
+	
 	
 	public Bid(Lot lot, double amount, User bidder) {
 		this.lot = lot;
