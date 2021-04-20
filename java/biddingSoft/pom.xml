@@ -19,6 +19,8 @@
 		<testcontainers.version>1.15.1</testcontainers.version>
 		 <start-class>com.project.biddingSoft.BiddingSoftwareApplication</start-class>
 		 <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+		   <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+		 
 	</properties>
 	<dependencies>
 		<dependency>
@@ -175,6 +177,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.18</version>
+			 <scope>provided</scope>
 		</dependency>
 		
    
@@ -194,7 +198,18 @@
 			<artifactId>mapstruct-processor</artifactId>
 			<version>${org.mapstruct.version}</version>
 		</dependency>
-	
+
+
+		<dependency>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<version>3.5.5</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+		
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

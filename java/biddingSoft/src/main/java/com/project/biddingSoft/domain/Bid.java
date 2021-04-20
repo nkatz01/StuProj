@@ -33,6 +33,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 
 
 
@@ -40,16 +43,15 @@ import com.project.biddingSoft.dao.IBidRepo;
  * @author nuchem
  *
  */
-//@JsonIdentityInfo(
-//		  generator = ObjectIdGenerators.PropertyGenerator.class, 
-//		  property = "id")
+
+@ToString
 @Entity
-//@Inheritance(strategy = InheritanceType.JOINED)
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("Bid")
 public class Bid extends Storable {//implements IStorable 
 	 
+	@ToString.Exclude
 	@JsonBackReference(value="bidOnUser")
 	@ManyToOne(fetch = FetchType.LAZY )//orphanRemoval=true cascade = CascadeType.REFRESH,
 	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable=false)
@@ -73,7 +75,7 @@ public class Bid extends Storable {//implements IStorable
 		this.bidder = bidder;
 	}
 
-
+	@ToString.Exclude
 	@ManyToOne(
 			fetch = FetchType.LAZY//in order for jackson to work cascade = CascadeType.REFRESH
 			 
@@ -171,61 +173,5 @@ public void setLot(Lot lot) {
 		}
 	}
 	
-	@Override
-	public String toString() {
-		return "Bid [bidder=" + bidder + ", id=" + id + ", lot=" + lot + ", amount=" + amount + "]";
-	}
 
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(amount);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((bidder == null) ? 0 : bidder.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((lot == null) ? 0 : lot.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Bid other = (Bid) obj;
-		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
-			return false;
-		if (bidder == null) {
-			if (other.bidder != null)
-				return false;
-		} else if (!bidder.equals(other.bidder))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (lot == null) {
-			if (other.lot != null)
-				return false;
-		} else if (!lot.equals(other.lot))
-			return false;
-		return true;
-	}
-
- 
-//	public static class BidComp implements Comparator<Bid>{
-//	@Override
-//	public int compare(Bid o1, Bid o2) {
-//		 
-//		return  ((Double) o1.amount).compareTo(((Double) o2.amount));
-//	}
-//	}
 }

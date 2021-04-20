@@ -57,18 +57,18 @@ import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 /**
  * @author nuchem
  *
  */
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
-
 @Entity
 @Component
-//@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorValue("Lot")
 @PrimaryKeyJoinColumn(name = "id")
-
+@ToString
 public class Lot extends Storable   {//implements IStorable
 	
 	
@@ -92,12 +92,13 @@ public class Lot extends Storable   {//implements IStorable
 	
 
 	// @ElementCollection(targetClass=Lot.class)
+	
 	@JsonManagedReference(value="bidOnLot")
 	@JsonProperty("bidList")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // , orphanRemoval = truevariable in bid class - that links bid to a lot
 			cascade = CascadeType.ALL)
 	private List<Bid> bidList;
-	
+	@ToString.Exclude
 	@JsonBackReference(value="lotOnUser")
 	@ManyToOne( fetch = FetchType.LAZY)//cascade = CascadeType.REFRESH,
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // 
@@ -173,6 +174,7 @@ public class Lot extends Storable   {//implements IStorable
 	  @JsonProperty("leadingBidder")
 	private User leadingBidder;
 
+	 @ToString.Exclude
  	@OneToOne(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
 	@JoinColumn(name = "autoBid_id")
 	  @JsonProperty("pendingAutoBid")
@@ -180,7 +182,7 @@ public class Lot extends Storable   {//implements IStorable
 
 	 @JsonIgnore //otherwise jackson has an issue
 	public Bid getPendingAutoBid() {
-		if (pendingAutoBid != null)
+		if (pendingAutoBid != null )
 			return pendingAutoBid;
 		else
 			throw bidSoftExcepFactory.new AutobidNotSet();
@@ -258,7 +260,7 @@ public class Lot extends Storable   {//implements IStorable
 	public Optional<Lot> placeBid(Bid bid) {
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
 		try {
-		 addBid(bid);// handle exception
+		 addBid(bid);
 			
 			if (pendingAutoBid == null) {
 				highestBid += biddingIncrement;
@@ -465,135 +467,9 @@ public class Lot extends Storable   {//implements IStorable
 		}
 
 	}
-	@Override
-	public String toString() {
-		return "Lot [id=" + id + ", bidList=" + bidList + ", highestBid=" + highestBid + ", title=" + title
-				+ ", description=" + description + ", ZONE=" + ZONE + ", user=" + user + ", biddingIncrement="
-				+ biddingIncrement + ", reservePrice=" + reservePrice + ", startingPrice=" + startingPrice
-				+ ", startTime=" + startTime + ", endTime=" + endTime + ", leadingBidder=" + leadingBidder
-				+ ", pendingAutoBid=" + pendingAutoBid + ", triggerDuration=" + triggerDuration
-				+ ", autoExtendDuration=" + autoExtendDuration + ", extendedEndtime=" + extendedEndtime + ", clock="
-				+ clock + "]";
-	}
+	
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((ZONE == null) ? 0 : ZONE.hashCode());
-		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
-		result = prime * result + ((bidList == null) ? 0 : bidList.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(biddingIncrement);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((clock == null) ? 0 : clock.hashCode());
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
-		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
-		temp = Double.doubleToLongBits(highestBid);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((leadingBidder == null) ? 0 : leadingBidder.hashCode());
-		result = prime * result + ((pendingAutoBid == null) ? 0 : pendingAutoBid.hashCode());
-		temp = Double.doubleToLongBits(reservePrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
-		temp = Double.doubleToLongBits(startingPrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
-		return result;
-	} 
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Lot other = (Lot) obj;
-		if (ZONE == null) {
-			if (other.ZONE != null)
-				return false;
-		} else if (!ZONE.equals(other.ZONE))
-			return false;
-		if (autoExtendDuration == null) {
-			if (other.autoExtendDuration != null)
-				return false;
-		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
-			return false;
-		if (bidList == null) {
-			if (other.bidList != null)
-				return false;
-		} else if (!bidList.equals(other.bidList))
-			return false;
-		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
-			return false;
-		if (clock == null) {
-			if (other.clock != null)
-				return false;
-		} else if (!clock.equals(other.clock))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (endTime == null) {
-			if (other.endTime != null)
-				return false;
-		} else if (!endTime.equals(other.endTime))
-			return false;
-		if (extendedEndtime == null) {
-			if (other.extendedEndtime != null)
-				return false;
-		} else if (!extendedEndtime.equals(other.extendedEndtime))
-			return false;
-		if (Double.doubleToLongBits(highestBid) != Double.doubleToLongBits(other.highestBid))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (leadingBidder == null) {
-			if (other.leadingBidder != null)
-				return false;
-		} else if (!leadingBidder.equals(other.leadingBidder))
-			return false;
-		if (pendingAutoBid == null) {
-			if (other.pendingAutoBid != null)
-				return false;
-		} else if (!pendingAutoBid.equals(other.pendingAutoBid))
-			return false;
-		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
-			return false;
-		if (startTime == null) {
-			if (other.startTime != null)
-				return false;
-		} else if (!startTime.equals(other.startTime))
-			return false;
-		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
-			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
-			return false;
-		if (triggerDuration == null) {
-			if (other.triggerDuration != null)
-				return false;
-		} else if (!triggerDuration.equals(other.triggerDuration))
-			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.equals(other.user))
-			return false;
-		return true;
-	}
+	
 
 }

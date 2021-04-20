@@ -39,16 +39,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.project.biddingSoft.dao.IUserRepo;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
  /**
  * @author nuchem
  *
  */
-//@JsonIdentityInfo(
-//		  generator = ObjectIdGenerators.PropertyGenerator.class, 
-//		  property = "id")
+
+@ToString
 @Entity
 @Component
-//@Inheritance(strategy = InheritanceType.JOINED)
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
 public class User extends Storable   {//implements  IStorable
@@ -93,7 +94,7 @@ public class User extends Storable   {//implements  IStorable
 	   
 	) 
 	List<Lot> lotsCreatedList; 
-   
+	
    @JsonManagedReference(value="bidOnUser")
  @JsonProperty("bidsBadeList")//causes recursion in curl request
  @OneToMany(
@@ -203,54 +204,7 @@ public class User extends Storable   {//implements  IStorable
 	}
 	
 
-	@Override
-	public String toString() {
-		return "User [lotsCreatedList=" + lotsCreatedList + ", bidsBadeList=" + bidsBadeList + ", id=" + id + ", username="
-				+ username + "]";
-	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((bidsBadeList == null) ? 0 : bidsBadeList.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((lotsCreatedList == null) ? 0 : lotsCreatedList.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (bidsBadeList == null) {
-			if (other.bidsBadeList != null)
-				return false;
-		} else if (!bidsBadeList.equals(other.bidsBadeList))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (lotsCreatedList == null) {
-			if (other.lotsCreatedList != null)
-				return false;
-		} else if (!lotsCreatedList.equals(other.lotsCreatedList))
-			return false;
-		if (username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!username.equals(other.username))
-			return false;
-		return true;
-	}
 
 
 }

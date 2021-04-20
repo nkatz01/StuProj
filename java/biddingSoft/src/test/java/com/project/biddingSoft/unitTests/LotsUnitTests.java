@@ -1,19 +1,19 @@
 package com.project.biddingSoft.unitTests;
 
+
+
+
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import nl.jqno.equalsverifier.Warning;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,15 +21,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -42,8 +36,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -60,23 +52,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
-import org.testcontainers.shaded.org.bouncycastle.util.test.TestFailedException;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.Gson;
 import com.project.biddingSoft.controller.ServletInitializer;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
@@ -90,9 +72,7 @@ import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
-
-
-import junit.framework.TestFailure;
+import nl.jqno.equalsverifier.EqualsVerifier;
 @TestMethodOrder(OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -520,6 +500,7 @@ public class LotsUnitTests {
 	public void assertWiredLot_isInDtbs_andIdIsNotNull() {
 		assertTrue(iLotRepo.existsById(wiredLot.getId()));
 		assertTrue(iBidrepo.existsById(wiredLot.getBid(0).getId()));
+		System.out.println(wiredLot);
 	}
 	@Test
 	@Order(6)
@@ -588,30 +569,29 @@ public class LotsUnitTests {
 
 	}
 
-	@Test
-	 @Order(9)
-	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
-	
-		
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(200,response.getStatusLine().getStatusCode());
-		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
-	}
-	@Test
-	 @AfterAll
-	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
-	
-		assertTrue(iStorableRepo.count() >0 );
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
-		HttpResponse response = httpClient.execute(request);
-		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		assertTrue(iStorableRepo.count() == 0 );
- 	}
+//	@Test
+//	 @Order(9)
+//	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
+//	
+//		
+//		HttpClient httpClient = HttpClientBuilder.create().build();
+//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
+//		HttpResponse response = httpClient.execute(request);
+//		assertEquals(200,response.getStatusLine().getStatusCode());
+//		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
+//	}
+//	@Test
+//	 @AfterAll
+//	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
+//	
+//		assertTrue(iStorableRepo.count() >0 );
+//		HttpClient httpClient = HttpClientBuilder.create().build();
+//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
+//		HttpResponse response = httpClient.execute(request);
+//		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+//		assertTrue(iStorableRepo.count() == 0 );
+// 	}
 
-	
 
 
 }
