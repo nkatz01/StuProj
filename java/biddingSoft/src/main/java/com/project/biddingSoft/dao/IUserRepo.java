@@ -10,7 +10,5 @@ import com.project.biddingSoft.domain.User;
 @Repository
 @Transactional
 @Qualifier("IUserRepo")
-public interface IUserRepo extends  IStorableRepo<User>{//  CrudRepository<User, Long> 
-	 
-
+public interface IUserRepo extends  IStorableRepo<User>{
 }

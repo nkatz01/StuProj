@@ -99,6 +99,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		return new ResponseEntity(message, HttpStatus.OK);
 	}
 
+
 	@PostMapping(path = "/create")
 	ResponseEntity<Object> addNewEntity(@RequestBody Storable entity) {
 		String message = "";

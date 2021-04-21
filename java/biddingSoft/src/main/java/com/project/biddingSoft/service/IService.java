@@ -24,6 +24,7 @@ import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.domain.UserDTO;
+
 /**
  * @author nuchem
  *

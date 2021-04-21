@@ -10,10 +10,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.stereotype.Repository;
 
 import com.project.biddingSoft.domain.Storable;
-//@NoRepositoryBean
 @Qualifier("IStorableRepo")
 public interface IStorableRepo<T extends Storable> extends CrudRepository<T, Long> {
-
 	@Query("select s from Storable s where s.id = ?1")
 	 Optional< T> findByEntityId(Long id);
 }

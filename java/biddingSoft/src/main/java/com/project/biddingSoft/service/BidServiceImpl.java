@@ -56,41 +56,45 @@ public class BidServiceImpl implements IService<Bid> {
 	@Transient
 	@Autowired
 	private static IBidRepo iBidRepo;
+
 	@Autowired
 	public void setIRepo(IBidRepo ibidRepo) {
 		iBidRepo = ibidRepo;
 	}
+
 	@Autowired
 	public void setILotRepo(ILotRepo ilotrepo) {
 		iLotRepo = ilotrepo;
 	}
+
 	@Autowired
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		iUserRepo = iuserRepo;
-	}	
+	}
+
+	
 	@Autowired
-	private   IStorableRepo<Storable> iStorableRepo;
-	@Autowired
-	private BiddingSoftMapper bidMapper; 
-	@Override 
-	public String updateEntity(StorableDTO bidDto){
-		String mesg = ""+ Bid.class.getName() +  " " + bidDto.getId();
+	private BiddingSoftMapper bidMapper;
+
+	@Override
+	public String updateEntity(StorableDTO bidDto) {
+		String mesg = "" + Bid.class.getName() + " " + bidDto.getId();
 		try {
 			Bid bid = iBidRepo.findById(bidDto.getId()).get();
-			bidMapper.updateBidFromDto((BidDTO)bidDto, bid);
+			bidMapper.updateBidFromDto((BidDTO) bidDto, bid);
 			iBidRepo.save(bid);
 			mesg += " successfully updated";
 		} catch (Exception e) {
-			 mesg += " could not be updated: "+ e.getMessage();
+			mesg += " could not be updated: " + e.getMessage();
 		}
-		return mesg; 
+		return mesg;
 	}
-	@Override 
+
+	@Override
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
-		 
+
 		associatedCreatorWithLot(bid);
-		
 
 		if (lotCreatorAndLotAreNew(bid)) {
 
@@ -124,32 +128,25 @@ public class BidServiceImpl implements IService<Bid> {
 
 		}
 		return true;
-	}	
- 		
+	}
 
- 	public boolean lotCreatorAndLotAreNew(Bid bid) {
-  		return bid.getLot().getId()==null && bid.getLot().getUser().getId()==null ; 
- 		 
- 		
- 	}
- 	public boolean lotIsNew(Bid bid) {
- 		return bid.getLot().getId()==null; 
- 		
- 	}
- 	public boolean bidderIsNew(Bid bid) {
- 		return bid.getBidder().getId()==null;
- 		
- 	}
-	//bidder exists AND					//bidder doesn't exist AND
-	//1. both, lot and user exist		//1. both lot and user exist
-	//2. both don't exist				//2. both dont' exist
-	//3. only user						//. only user
+	public boolean lotCreatorAndLotAreNew(Bid bid) {
+		return bid.getLot().getId() == null && bid.getLot().getUser().getId() == null;
 
-	
-	
+	}
 
- 
-	
+	public boolean lotIsNew(Bid bid) {
+		return bid.getLot().getId() == null;
 
+	}
+
+	public boolean bidderIsNew(Bid bid) {
+		return bid.getBidder().getId() == null;
+
+	}
+	// bidder exists AND //bidder doesn't exist AND
+	// 1. both, lot and user exist //1. both lot and user exist
+	// 2. both don't exist //2. both dont' exist
+	// 3. only user //. only user
 
 }

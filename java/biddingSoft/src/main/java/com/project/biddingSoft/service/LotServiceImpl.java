@@ -47,9 +47,9 @@ import com.project.biddingSoft.domain.UserDTO;
 @Service
 @Component
 @Qualifier("LotServiceImpl")
-public class LotServiceImpl implements IService<Lot> {//
+public class LotServiceImpl implements IService<Lot> {
 	private static final Logger logger = LoggerFactory.getLogger(LotServiceImpl.class);
-	@Autowired 
+	@Autowired
 	private BiddingSoftMapper lotMapper;
 	@Transient
 	@Autowired
@@ -62,48 +62,42 @@ public class LotServiceImpl implements IService<Lot> {//
 	public void setILotRepo(ILotRepo ilotrepo) {
 		iLotRepo = ilotrepo;
 	}
+
 	@Autowired
 	public void setIUserRepo(IUserRepo iuserRepo) {
 		iUserRepo = iuserRepo;
 	}
-	@Autowired
-	private   IStorableRepo<Storable> iStorableRepo;
-	@Override 
-	public String updateEntity(StorableDTO lotDto){
-		String mesg = ""+ Lot.class.getName() +  " " + lotDto.getId();
+
+	@Override
+	public String updateEntity(StorableDTO lotDto) {
+		String mesg = "" + Lot.class.getName() + " " + lotDto.getId();
 		try {
 			Lot lot = iLotRepo.findById(lotDto.getId()).get();
-			lotMapper.updateLotFromDto((LotDTO)lotDto, lot);
+			lotMapper.updateLotFromDto((LotDTO) lotDto, lot);
 			iLotRepo.save(lot);
 			mesg += " successfully updated";
 		} catch (Exception e) {
-			 mesg += " could not be updated: " + e.getMessage();
+			mesg += " could not be updated: " + e.getMessage();
 		}
-		return mesg; 
+		return mesg;
 	}
+
 	@Override
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
 		if (!lot.getUser().createdLotscontainsLot(lot))
 			lot.getUser().addLotToList(lot);
-
 		if (lot.getUser().getId() == null) {
 			iUserRepo.save(lot.getUser());
 			stringBuilder.append(lot.getUser().getClass().getName() + " " + lot.getUser().getId());
 
 		}
-
 		else {
 			iLotRepo.save(lot);
 		}
-		stringBuilder.append("\n" + lot.getClass().getName() + " " + lot.getId());//gets saved via cascade, in the first case.
+		stringBuilder.append("\n" + lot.getClass().getName() + " " + lot.getId());// gets saved via cascade, in the	 first case.
 		return stringBuilder.toString();
 
 	}
-
-
-
-
-
 
 }

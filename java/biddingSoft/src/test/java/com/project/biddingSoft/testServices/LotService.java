@@ -12,9 +12,7 @@ public class LotService {
 		long startSeconds = startInclusive.getEpochSecond();
 		long endSeconds = endExclusive.getEpochSecond();
 		long random = ThreadLocalRandom.current().nextLong(startSeconds, endSeconds);
-
 		return Instant.ofEpochSecond(random);
 	}
-	
 
 }

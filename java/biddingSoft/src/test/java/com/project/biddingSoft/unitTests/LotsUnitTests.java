@@ -1,9 +1,5 @@
 package com.project.biddingSoft.unitTests;
 
-
-
-
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -73,6 +69,7 @@ import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
 import nl.jqno.equalsverifier.EqualsVerifier;
+
 @TestMethodOrder(OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -80,8 +77,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 @TestInstance(Lifecycle.PER_CLASS)
 public class LotsUnitTests {
 
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_RESET = "\u001B[0m";
+	static final String ANSI_RED = "\u001B[31m";
+	static final String ANSI_RESET = "\u001B[0m";
 	private static final Logger logger = LoggerFactory.getLogger(LotsUnitTests.class);
 	@Autowired
 	ServletInitializer servletInitializer;
@@ -100,31 +97,33 @@ public class LotsUnitTests {
 	private EntityManagerFactory entityManagerFactory;
 	@Autowired
 	private IUserRepo iUserRepo;
-	@Autowired 
+	@Autowired
 	private ILotRepo iLotRepo;
-	@Autowired 
+	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
+
 	@Autowired
 	@Qualifier("IStorableRepo")
-	public void setIStorable(IStorableRepo istorableRepo) {
+	void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
+
 	@Test
 	@Order(1)
-	public void testThatSuperRepo_canReturnSubclass_ofStorable() {
+	void testThatSuperRepo_canReturnSubclass_ofStorable() {
 		assertTrue(iStorableRepo.findById(wiredLot.getId()).isPresent());
 	}
+
 	@Test
-	public void contextLoads() throws Exception {
+	void contextLoads() throws Exception {
 		assertThat(servletInitializer).isNotNull();
 
 	}
 
-	
 	@BeforeAll
-	public void removeAllTables() {
+	void removeAllTables() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
 		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
@@ -137,35 +136,30 @@ public class LotsUnitTests {
 		entityManager.createNativeQuery("UPDATE  biddingsoft.hibernate_sequence SET next_val = 1;").executeUpdate();
 		entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 1;").executeUpdate();
 
-	entityManager.flush();
+		entityManager.flush();
 		entityManager.getTransaction().commit();
-		
+
 		User user = testUserService.getMeSimpleUser();
 		user.addLotToList(wiredLot);
 		wiredLot.setUser(user);
-		
-		Bid bid = testBidService.getOneIncrBid(wiredLot);//for the purpose of endpoints' tests
-	wiredLot.placeBid(bid);
-		 iUserRepo.save(wiredLot.getUser());//error bidder inside Bid and lot inside Bid are transient still
-		 iUserRepo.save(bid.getBidder());
-	 	iBidrepo.save(bid); 
-	
 
-			
-		
+		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
+		wiredLot.placeBid(bid);
+		iUserRepo.save(wiredLot.getUser());
+		iUserRepo.save(bid.getBidder());
+		iBidrepo.save(bid);
 
 	}
 
-
 	@Test
-	public void test_app_is_up() throws IOException {
+	void test_app_is_up() throws IOException {
 		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8080/", String.class);
-		assertEquals(HttpStatus.OK,response.getStatusCode());
-		assertEquals( "Service running",response.getBody());
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals("Service running", response.getBody());
 	}
-	
+
 	@Test
-	public void newLot_canBeSavedToDtbs() throws Exception {
+	void newLot_canBeSavedToDtbs() throws Exception {
 
 		Lot lot = testLotService.getMeSimpleLot();
 		iUserRepo.save(lot.getUser());
@@ -173,54 +167,57 @@ public class LotsUnitTests {
 
 	}
 
-
 	@Test
-	public void createTwoLots_areNotTheSame() throws Exception {
+	void createTwoLots_areNotTheSame() throws Exception {
 		Lot lot1 = testLotService.getMeSimpleLot();
 		Lot lot2 = testLotService.getMeSimpleLot();
 		assertNotEquals(lot1, lot2);
 	}
 
 	@Test
-	public void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception {
+	void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		iUserRepo.save(testLotService.lotsUser(bid.getLot().placeBid(bid)));
 		assertTrue(iBidrepo.existsById(bid.getId()));
 
 	}
+
 	@Test
-	public void addingSecondBidOnLot_doesntAffectFirstBid() {
+	void addingSecondBidOnLot_doesntAffectFirstBid() {
 		Lot lot = testLotService.getMeSimpleLot();
 		Bid bid = testBidService.getOneIncrBid(lot);
 		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-		
-		Bid bid2 = testBidService.getBidBumpedUpByOneIncrMore(lot,bid);
+
+		Bid bid2 = testBidService.getBidBumpedUpByOneIncrMore(lot, bid);
 		lot.placeBid(bid2);
 		iLotRepo.save(bid.getLot());
-		assertEquals(bid.getLot().getId(), lot.getId());	
-		
+		assertEquals(bid.getLot().getId(), lot.getId());
+
 	}
-	//@Transactional//because lots are loaded eagurly together with bids, bids won't get deleted. 
-	//I guess the reason is because of the reference to lot maintained within bid's FK column named  lot_id
+
+	// @Transactional//because lots are loaded eagurly together with bids, bids
+	// won't get deleted.
+	// I guess the reason is because of the reference to lot maintained within bid's
+	// FK column named lot_id
 	@Test
-	public void deleteBid_leavesLotInDtbs() {
+	void deleteBid_leavesLotInDtbs() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
 		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-		//iStorableRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
+		// iStorableRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
 		assertTrue(iBidrepo.existsById(bid.getId()));
 		iBidrepo.delete(bid);
-		//iStorableRepo.delete(bid);
-		 assertTrue(iLotRepo.existsById(lot.getId()));
-		 assertTrue(!iLotRepo.existsById(bid.getId()));
+		// iStorableRepo.delete(bid);
+		assertTrue(iLotRepo.existsById(lot.getId()));
+		assertTrue(!iLotRepo.existsById(bid.getId()));
 	}
 
 	@Test
-	public void deleteLot_leavesUserInDtbs() throws IllegalAccessException {
+	void deleteLot_leavesUserInDtbs() throws IllegalAccessException {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
 		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-		
+
 		User user = lot.getUser();
 		iLotRepo.delete(lot);
 		assertTrue(iUserRepo.existsById(user.getId()));
@@ -228,21 +225,21 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void deleteLot_removesAllRelatedBids() {
+	void deleteLot_removesAllRelatedBids() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
 		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-		
+
 		assertTrue(iBidrepo.existsById(bid.getId()));
 		iLotRepo.delete(lot);
 		assertTrue(!iBidrepo.existsById(bid.getId()));
-	} 
+	}
 
 	@Test
-	public void deleteUser_removesAllRelatedLots() throws IllegalAccessException {
+	void deleteUser_removesAllRelatedLots() throws IllegalAccessException {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
-		iUserRepo.save(testLotService.lotsUser( lot.placeBid(bid)));
+		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
 		assertTrue(iLotRepo.existsById(lot.getId()));
 		iUserRepo.delete(lot.getUser());
 		assertTrue(!iLotRepo.existsById(lot.getId()));
@@ -251,7 +248,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void whenLotIsAutoWired_autowiredAttributes_areSet() throws NoSuchFieldException, IllegalAccessException {
+	void whenLotIsAutoWired_autowiredAttributes_areSet() throws NoSuchFieldException, IllegalAccessException {
 		assertNotNull(FieldUtils.readField(wiredLot, "title", true));
 		assertNotNull(FieldUtils.readField(wiredLot, "description", true));
 		assertNotNull(FieldUtils.readField(wiredLot, "ZONE", true));
@@ -265,13 +262,13 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void whenLotIsCreated_extendedEndTimeEqueals_endTime() throws IllegalAccessException {
+	void whenLotIsCreated_extendedEndTimeEqueals_endTime() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
-		assertEquals(FieldUtils.readField(lot, "endTime", true),FieldUtils.readField(lot, "extendedEndtime", true));
+		assertEquals(FieldUtils.readField(lot, "endTime", true), FieldUtils.readField(lot, "extendedEndtime", true));
 	}
 
 	@Test
-	public void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException {
+	void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		assertNotNull(FieldUtils.readField(bid.getLot(), "clock", true));
 		assertNotNull(FieldUtils.readField(bid.getLot(), "bidSoftExcepFactory", true));
@@ -279,7 +276,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void placeBid_equalOrAfterEndTime_ThrowsException() throws IllegalAccessException {
+	void placeBid_equalOrAfterEndTime_ThrowsException() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
 		Instant endTime = lot.getEndTime();
 		FieldUtils.writeDeclaredField(lot, "clock", Clock.fixed(endTime, ZoneId.systemDefault()), true);
@@ -289,11 +286,11 @@ public class LotsUnitTests {
 				});
 		String expectedExcepId = "1";
 		assertEquals(exception.getId(), expectedExcepId);
-		assertEquals("lot endTime is qual or before current time",exception.getCause().getMessage());
+		assertEquals("lot endTime is qual or before current time", exception.getCause().getMessage());
 	}
 
 	@Test
-	public void placeBidWithin_triggerDuration_extendsEndTime() throws IllegalAccessException {
+	void placeBidWithin_triggerDuration_extendsEndTime() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
 		Instant endTime = lot.getEndTime();
 		FieldUtils.writeDeclaredField(lot, "clock",
@@ -304,7 +301,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void placeBidBefore_triggerDuration_EndTimeIsNotExtended() throws IllegalAccessException {
+	void placeBidBefore_triggerDuration_EndTimeIsNotExtended() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
 		Instant endTime = lot.getEndTime();
 		FieldUtils.writeDeclaredField(lot, "clock",
@@ -315,7 +312,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void bidWhenThereIsNoStartingPrice_thatIsLowerThanOneBidIncr_isRefused() {
+	void bidWhenThereIsNoStartingPrice_thatIsLowerThanOneBidIncr_isRefused() {
 		Lot lot = testLotService.getMeSimpleLot();
 		ExceptionsCreateor.BidTooLow exception = assertThrows(ExceptionsCreateor.BidTooLow.class, () -> {
 			lot.placeBid(testBidService.getArbitraryAmountBid(lot, 4.99));
@@ -325,7 +322,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void bidWhenThereIsNoStartingPrice_thatIsEqualToOneBidIncr_isAccepted() {
+	void bidWhenThereIsNoStartingPrice_thatIsEqualToOneBidIncr_isAccepted() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		bid.getLot().placeBid(bid);
 		assertTrue(bid.getLot().contains(bid));
@@ -333,7 +330,7 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void bidBelowStartingPrice_isRefused() {
+	void bidBelowStartingPrice_isRefused() {
 		Lot lot = testLotService.getMeLotWithStrtingPrice(7.0);
 		ExceptionsCreateor.BidTooLow exception = assertThrows(ExceptionsCreateor.BidTooLow.class, () -> {
 			lot.placeBid(testBidService.getOneIncrBid(lot));
@@ -343,13 +340,13 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	public void bidEqualToStartingPrice_isAccepted() {
+	void bidEqualToStartingPrice_isAccepted() {
 		Lot lot = testLotService.getMeLotWithStrtingPrice(5.0);
 		assertTrue(lot.placeBid(testBidService.getOneIncrBid(lot)).isPresent());
 	}
 
 	@Test
-	public void placeBid_higherThanCurrentHighestBid_changesLeadingBidder() {
+	void placeBid_higherThanCurrentHighestBid_changesLeadingBidder() {
 		Lot lot = testLotService.getMeSimpleLot();
 		Bid bid1 = testBidService.getOneIncrBid(lot);
 		User bidder1 = lot.placeBid(bid1).get().getLeadingBidder();
@@ -358,20 +355,20 @@ public class LotsUnitTests {
 
 		User bidder2 = lot.placeBid(bid2).get().getLeadingBidder();
 		assertTrue(!bidder1.equals(bidder2));
-		assertEquals(lot.getLeadingBidder(),bidder2);
+		assertEquals(lot.getLeadingBidder(), bidder2);
 	}
 
 	@Test
-	public void placeOneBidIncr_bumpsHighestBidUp_byOneIncr() throws Exception {
+	void placeOneBidIncr_bumpsHighestBidUp_byOneIncr() throws Exception {
 		Bid prevHighestBid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = prevHighestBid.getLot();
 		lot.placeBid(prevHighestBid);
 		lot.placeBid(testBidService.getOneIncrBid(lot));
-		assertEquals(testBidService.bumpUpOne(prevHighestBid),lot.getHighestBid());
+		assertEquals(testBidService.bumpUpOne(prevHighestBid), lot.getHighestBid());
 	}
 
 	@Test
-	public void bidThatIsOver_orEqualTo_oneIncrMoreThanPrevBid_becomesPendingAutoBid() {
+	void bidThatIsOver_orEqualTo_oneIncrMoreThanPrevBid_becomesPendingAutoBid() {
 		Lot lot = testLotService.getMeSimpleLot();
 		Bid bid1 = testBidService.getOneIncrBid(lot);
 		Bid bid2 = testBidService.getBidBumpedUpByTwoIncrMore(lot, bid1);// bid2 is bumped up by two increments relative
@@ -386,12 +383,12 @@ public class LotsUnitTests {
 		Bid autoBid = testBidService.getThreeIncrBid(lot);
 		lot.placeBid(autoBid);
 		assertEquals(lot.getBiddingIncrement(), lot.getHighestBid());
-		assertEquals(autoBid,lot.getPendingAutoBid());
+		assertEquals(autoBid, lot.getPendingAutoBid());
 
 		Bid newBid = testBidService.getOneIncrBid(lot);
 		lot.placeBid(newBid);
-		assertEquals(testBidService.bumpUpOne(newBid),lot.getHighestBid());
-		assertEquals(lot.getLeadingBidder(),autoBid.getBidder());
+		assertEquals(testBidService.bumpUpOne(newBid), lot.getHighestBid());
+		assertEquals(lot.getLeadingBidder(), autoBid.getBidder());
 
 	}
 
@@ -407,9 +404,9 @@ public class LotsUnitTests {
 			lot.getPendingAutoBid();
 		});
 		String expectedExcepId = "3";
-		assertEquals(expectedExcepId,exception.getId());
-		assertEquals(autoBid.getAmount(),lot.getHighestBid() );
-		assertEquals(autoBidder,lot.getLeadingBidder() );
+		assertEquals(expectedExcepId, exception.getId());
+		assertEquals(autoBid.getAmount(), lot.getHighestBid());
+		assertEquals(autoBidder, lot.getLeadingBidder());
 	}
 
 	@Test
@@ -426,7 +423,7 @@ public class LotsUnitTests {
 			lot.getPendingAutoBid();
 		});
 		String expectedExcepId = "3";
-		assertEquals(expectedExcepId,exception.getId());
+		assertEquals(expectedExcepId, exception.getId());
 	}
 
 	@Test
@@ -434,144 +431,157 @@ public class LotsUnitTests {
 		Lot lot = testLotService.getMeSimpleLot();
 		lot.placeBid(testBidService.getTwoIncrBid(lot));
 		Bid newBid = testBidService.getThreeIncrBid(lot);// bids at 20
-		assertEquals(testBidService.bumpOneDown(newBid),lot.placeBid(newBid).get().getHighestBid());	//new highest bid is only raised to one incrementA																								
-		assertEquals(lot.getLeadingBidder(),newBid.getBidder());
-		assertEquals(newBid,lot.getPendingAutoBid());
+		assertEquals(testBidService.bumpOneDown(newBid), lot.placeBid(newBid).get().getHighestBid()); // new highest bid
+																										// is only
+																										// raised to one
+																										// incrementA
+		assertEquals(lot.getLeadingBidder(), newBid.getBidder());
+		assertEquals(newBid, lot.getPendingAutoBid());
 
 	}
-	
-//	//Test methods for endpoints
-	
+
+	// Test methods for endpoints
 
 	@Test
-	public void testGetAllEnts() throws IOException , URISyntaxException, JSONException {
-	
-		
+	void testGetAllEnts() throws IOException, URISyntaxException, JSONException {
+
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpGet request = new HttpGet(new URI("http://localhost:8080/allents"));
-		request.addHeader("content-type",  "application/json");
+		request.addHeader("content-type", "application/json");
 		HttpResponse response = httpClient.execute(request);
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
 		JSONArray json = new JSONArray(EntityUtils.toString(response.getEntity()));
-		assertEquals(json.length(),iStorableRepo.count() );
- 	}
+		assertEquals(json.length(), iStorableRepo.count());
+	}
+
 	@Test
 	@Order(2)
-	public void testPostEntity_forUser() throws IOException , URISyntaxException {
-			
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-			StringEntity params = new StringEntity("{\"type\": \"user\"}");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(201, response.getStatusLine().getStatusCode());
-		
+	void testPostEntity_forUser() throws IOException, URISyntaxException {
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
+		StringEntity params = new StringEntity("{\"type\": \"user\"}");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(201, response.getStatusLine().getStatusCode());
+
 	}
+
 	@Test
 	@Order(3)
-	public void testPostEntity_newLotWithExistingUser() throws IOException , URISyntaxException {
-			
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-			StringEntity params = new StringEntity("{\"type\":\"lot\", \"user\":{\"id\": "+ wiredLot.getUser().getId() +" }}");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(201, response.getStatusLine().getStatusCode());
-		
+	void testPostEntity_newLotWithExistingUser() throws IOException, URISyntaxException {
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
+		StringEntity params = new StringEntity(
+				"{\"type\":\"lot\", \"user\":{\"id\": " + wiredLot.getUser().getId() + " }}");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(201, response.getStatusLine().getStatusCode());
+
 	}
+
 	@Test
 	@Order(4)
-	public void testPostEntity_newBidWithExistingUser_AndExistingBidder() throws IOException , URISyntaxException {
-			
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-			StringEntity params = new StringEntity("{\"type\":\"bid\", \"lot\": {\"type\":\"lot\",\"user\":{\"id\": "+ wiredLot.getUser().getId() +"}}, \"bidder\":{\"id\": "+ wiredLot.getLeadingBidder().getId() +"} }\r\n"
-					+ "");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(201, response.getStatusLine().getStatusCode());
-		
+	void testPostEntity_newBidWithExistingUser_AndExistingBidder() throws IOException, URISyntaxException {
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
+		StringEntity params = new StringEntity(
+				"{\"type\":\"bid\", \"lot\": {\"type\":\"lot\",\"user\":{\"id\": " + wiredLot.getUser().getId()
+						+ "}}, \"bidder\":{\"id\": " + wiredLot.getLeadingBidder().getId() + "} }\r\n" + "");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(201, response.getStatusLine().getStatusCode());
+
 	}
+
 	@Test
 	@Order(5)
-	public void assertWiredLot_isInDtbs_andIdIsNotNull() {
+	void assertWiredLot_isInDtbs_andIdIsNotNull() {
 		assertTrue(iLotRepo.existsById(wiredLot.getId()));
 		assertTrue(iBidrepo.existsById(wiredLot.getBid(0).getId()));
-		System.out.println(wiredLot);
+
 	}
+
 	@Test
 	@Order(6)
-	public void testGetOneEntity() throws IOException , URISyntaxException , JSONException{
-		
+	void testGetOneEntity() throws IOException, URISyntaxException, JSONException {
+
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(new URI("http://localhost:8080/getent/"+ wiredLot.getId()));
-	request.addHeader("content-type",  "application/json");
+		HttpGet request = new HttpGet(new URI("http://localhost:8080/getent/" + wiredLot.getId()));
+		request.addHeader("content-type", "application/json");
 		HttpResponse response = httpClient.execute(request);
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		Lot lot = new ObjectMapper()
-				.findAndRegisterModules()
-				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+		Lot lot = new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.readValue(EntityUtils.toString(response.getEntity()), Lot.class);
-		 assertEquals(wiredLot.getId(),lot.getId());		
+		assertEquals(wiredLot.getId(), lot.getId());
 	}
+
 	@Test
 	@Order(7)
-	public void testUpdateUser() throws IOException , URISyntaxException {
-			String username = iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername();
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-			StringEntity params = new StringEntity("{\"type\": \"userdto\",\"id\": "+ wiredLot.getUser().getId()+", \"username\":\"Jim\"}");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(200, response.getStatusLine().getStatusCode());
+	void testUpdateUser() throws IOException, URISyntaxException {
+		String username = iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername();
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+		StringEntity params = new StringEntity(
+				"{\"type\": \"userdto\",\"id\": " + wiredLot.getUser().getId() + ", \"username\":\"Jim\"}");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(200, response.getStatusLine().getStatusCode());
 		assertNotEquals(username, iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername());
-		
+
 	}
+
 	@Test
 	@Order(7)
-	public void testUpdateLot() throws IOException , URISyntaxException {
-			User newUser = testUserService.getMeSimpleUser();
-			iUserRepo.save(newUser);
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-			StringEntity params = new StringEntity("{\"type\": \"lotdto\",\"id\": "+ wiredLot.getId()+", \"reservePrice\":\"50.0\", \"user\": {\"id\":"+ newUser.getId()+"}}");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(200, response.getStatusLine().getStatusCode());
-			assertEquals(50.0, iLotRepo.findById(wiredLot.getId()).get().getReservePrice());
-			assertEquals(newUser.getId(), iLotRepo.findById(wiredLot.getId()).get().getUser().getId());
-		
+	void testUpdateLot() throws IOException, URISyntaxException {
+		User newUser = testUserService.getMeSimpleUser();
+		iUserRepo.save(newUser);
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+		StringEntity params = new StringEntity("{\"type\": \"lotdto\",\"id\": " + wiredLot.getId()
+				+ ", \"reservePrice\":\"50.0\", \"user\": {\"id\":" + newUser.getId() + "}}");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(200, response.getStatusLine().getStatusCode());
+		assertEquals(50.0, iLotRepo.findById(wiredLot.getId()).get().getReservePrice());
+		assertEquals(newUser.getId(), iLotRepo.findById(wiredLot.getId()).get().getUser().getId());
+
 	}
+
 	@Test
 	@Order(8)
-	public void testUpdateBid() throws IOException , URISyntaxException {
-			Lot newLot = testLotService.getMeSimpleLot();
-			iUserRepo.save(newLot.getUser());
-			iLotRepo.save(newLot);
-			User newBidder = testUserService.getMeSimpleUser();
-			iUserRepo.save(newBidder);
-			
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-			StringEntity params = new StringEntity("{\"type\": \"biddto\",\"id\": "+ wiredLot.getBid(0).getId()+", \"amount\":\"20.0\", \"bidder\": {\"id\":"+ newBidder.getId()+"}, \"lot\": {\"type\":\"lot\",\"id\":"+ newLot.getId()+"}}");
-			request.addHeader("content-type",  "application/json");
-			request.setEntity(params);
-			HttpResponse response = httpClient.execute(request);
-			assertEquals(200, response.getStatusLine().getStatusCode());
-			assertEquals(newLot.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getLot().getId());
-			assertEquals(newBidder.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getBidder().getId());
-			assertEquals(20.0, iBidrepo.findById(wiredLot.getBid(0).getId()).get().getAmount());
+	void testUpdateBid() throws IOException, URISyntaxException {
+		Lot newLot = testLotService.getMeSimpleLot();
+		iUserRepo.save(newLot.getUser());
+		iLotRepo.save(newLot);
+		User newBidder = testUserService.getMeSimpleUser();
+		iUserRepo.save(newBidder);
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
+		StringEntity params = new StringEntity("{\"type\": \"biddto\",\"id\": " + wiredLot.getBid(0).getId()
+				+ ", \"amount\":\"20.0\", \"bidder\": {\"id\":" + newBidder.getId()
+				+ "}, \"lot\": {\"type\":\"lot\",\"id\":" + newLot.getId() + "}}");
+		request.addHeader("content-type", "application/json");
+		request.setEntity(params);
+		HttpResponse response = httpClient.execute(request);
+		assertEquals(200, response.getStatusLine().getStatusCode());
+		assertEquals(newLot.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getLot().getId());
+		assertEquals(newBidder.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getBidder().getId());
+		assertEquals(20.0, iBidrepo.findById(wiredLot.getBid(0).getId()).get().getAmount());
 
 	}
 
 //	@Test
 //	 @Order(9)
-//	public void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
+//	 void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
 //	
 //		
 //		HttpClient httpClient = HttpClientBuilder.create().build();
@@ -582,7 +592,7 @@ public class LotsUnitTests {
 //	}
 //	@Test
 //	 @AfterAll
-//	public void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
+//	 void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
 //	
 //		assertTrue(iStorableRepo.count() >0 );
 //		HttpClient httpClient = HttpClientBuilder.create().build();
@@ -591,7 +601,5 @@ public class LotsUnitTests {
 //		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
 //		assertTrue(iStorableRepo.count() == 0 );
 // 	}
-
-
 
 }

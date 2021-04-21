@@ -74,10 +74,10 @@ import lombok.ToString;
 @ToString
 @Setter
 @Getter
-public class Lot extends Storable   {//implements IStorable
-	
+public class Lot extends Storable {
+
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Autowired
 	@Transient
 	private static ExceptionsCreateor bidSoftExcepFactory;
@@ -90,58 +90,52 @@ public class Lot extends Storable   {//implements IStorable
 
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	@JsonManagedReference(value="bidOnLot")
+	@JsonManagedReference(value = "bidOnLot")
 	@JsonProperty("bidList")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", // , orphanRemoval = truevariable in bid class - that links bid to a lot
-			cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL)
 	private List<Bid> bidList;
 	@ToString.Exclude
-	@JsonBackReference(value="lotOnUser")
-	@ManyToOne( fetch = FetchType.LAZY)//cascade = CascadeType.REFRESH,
-	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // 
+	@JsonBackReference(value = "lotOnUser")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) 
 	@JsonProperty("user")
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private User user;
-	
-	
-	
-	@Setter(AccessLevel.NONE)
-	private double highestBid;//setter getter?
 
-//	public void remove(Bid bid) {
-//		this.bidList = new ArrayList<Bid>(	bidList.stream().filter(b -> !b.equals(bid)).collect(Collectors.toList() ));
-//	}
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	private double highestBid;// setter getter?
+
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Value("${Lot.title}")
-	 @JsonProperty("title")
+	@JsonProperty("title")
 	public String title;
 
 	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
 	@JsonProperty("ZONE")
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
 	@JsonProperty("biddingIncrement")
 	@Setter(AccessLevel.NONE)
 	private double biddingIncrement;
-	
-	@JsonProperty("reservePrice")
-	private double reservePrice = 0.0;//left setter for the purpose of update testing
 
+	@JsonProperty("reservePrice")
+	private double reservePrice = 0.0;// left setter for the purpose of update testing
 
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
 	@Setter(AccessLevel.NONE)
 	private double startingPrice;
-
 
 	@JsonProperty("startTime")
 	@Setter(AccessLevel.NONE)
@@ -149,36 +143,30 @@ public class Lot extends Storable   {//implements IStorable
 	@JsonProperty("endTime")
 	@Setter(AccessLevel.NONE)
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
-//	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
-//	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY) //eager, as otherwise jackson has an issue
-//	 @JsonBackReference(value="leadingLotsOnBidder")
-//	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id", nullable = true)//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
-//	  @JsonProperty(value = "leadingBidder")
-//	 private User leadingBidder;
-	 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
-	 @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,  orphanRemoval = true) //eager, as otherwise jackson has an issue
 
-	 @JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")//, nullable = true, updatable = true, insertable = true interesting question - if a user is deleted, all their dependencies are deleted including bids that are currently leading on other lots
-	  @JsonProperty("leadingBidder")
-	 @Setter(AccessLevel.NONE)
+	@JsonIgnoreProperties(value = { "applications", "hibernateLazyInitializer" })
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+
+	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
+	@JsonProperty("leadingBidder")
+	@Setter(AccessLevel.NONE)
 	private User leadingBidder;
 
-	 @ToString.Exclude
- 	@OneToOne(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true) // , orphanRemoval=true
+	@ToString.Exclude
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name = "autoBid_id")
-	  @JsonProperty("pendingAutoBid")
-	 @Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@JsonProperty("pendingAutoBid")
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Bid pendingAutoBid;
 
-	 @JsonIgnore //otherwise jackson has an issue
+	@JsonIgnore
 	public Bid getPendingAutoBid() {
-		if (pendingAutoBid != null )
+		if (pendingAutoBid != null)
 			return pendingAutoBid;
 		else
 			throw bidSoftExcepFactory.new AutobidNotSet();
 	}
-
 
 	public Bid getBid(Bid bid) {
 		return bidList.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
@@ -188,21 +176,20 @@ public class Lot extends Storable   {//implements IStorable
 		return bidList.get(id);
 	}
 
-	// @Basic
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Duration triggerDuration;
 	@Setter(AccessLevel.NONE)
-	   @Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
 	private Duration autoExtendDuration;
 	@Setter(AccessLevel.NONE)
 	private Instant extendedEndtime = endTime;
 
-	public static  String ANSI_RED = "\u001B[31m";
-	public static  String ANSI_RESET = "\u001B[0m";
-	private static  Logger logger = LoggerFactory.getLogger(Lot.class);
+	public static String ANSI_RED = "\u001B[31m";
+	public static String ANSI_RESET = "\u001B[0m";
+	private static Logger logger = LoggerFactory.getLogger(Lot.class);
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
 	@Transient
@@ -226,27 +213,25 @@ public class Lot extends Storable   {//implements IStorable
 		this.autoExtendDuration = lotBuilder.autoExtendDuration;
 		this.ZONE = lotBuilder.ZONE;
 		clock = Clock.system(this.ZONE);
-		// this.highestBid = lotBuilder.highestBid;
 		this.id = lotBuilder.id;
 		this.endTime = lotBuilder.endTime;
 		this.extendedEndtime = lotBuilder.extendedEndtime;
 		user.addLotToList(this);
 	}
 
-	@PostConstruct // is only called after defautl constructor
+	@PostConstruct // is only called after default constructor
 	public void postConstruct() {
 		clock = Clock.system(ZONE);
 
 	}
 
-
-
-	public Optional<Lot> placeBid(Bid bid ) {//oldBid
+	public Optional<Lot> placeBid(Bid bid) {// oldBid
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
-	//	Bid bid = new Bid(oldBid.getLot(),(((int) oldBid.getAmount() / biddingIncrement) * biddingIncrement), oldBid.getBidder()); 
+		// Bid bid = new Bid(oldBid.getLot(),(((int) oldBid.getAmount() /
+		// biddingIncrement) * biddingIncrement), oldBid.getBidder());
 		try {
-		 addBid(bid);
-			
+			addBid(bid);
+
 			if (pendingAutoBid == null) {
 				highestBid += biddingIncrement;
 				isOverHigestBid(bid);
@@ -264,32 +249,30 @@ public class Lot extends Storable   {//implements IStorable
 						pendingAutoBid = null;
 				}
 			}
-		
-		}
-		catch (ExceptionsCreateor.LotHasEndedException e) {
+
+		} catch (ExceptionsCreateor.LotHasEndedException e) {
 			throw e;
-		}
-		catch (ExceptionsCreateor.BidTooLow e) {
+		} catch (ExceptionsCreateor.BidTooLow e) {
 			throw e;
-		}		
-		catch (Exception e) {
+		} catch (Exception e) {
 			return Optional.empty();
 		}
-		
-		return Optional.of(this) ;
+
+		return Optional.of(this);
 
 	}
+
 	private void addBid(Bid bid) {
 		Instant now = Instant.now(clock);
 		Objects.requireNonNull(bid);
 		if (!hasLotExpired(now) && bidHighEnough(bid))
-			 bidList.add(bid);
+			bidList.add(bid);
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
-		
+
 		if (isInTriggerPeriod(now))
 			extendedEndtime = extendedEndtime.plus(autoExtendDuration);
-		
+
 	}
 
 	private boolean isOverHigestBid(Bid bid) {
@@ -299,9 +282,6 @@ public class Lot extends Storable   {//implements IStorable
 		}
 		return false;
 	}
-
-
-
 
 	private boolean isInTriggerPeriod(Instant now) {
 		return now.compareTo(extendedEndtime) < 0 && now.compareTo(extendedEndtime.minus(triggerDuration)) >= 0;
@@ -332,16 +312,19 @@ public class Lot extends Storable   {//implements IStorable
 
 	}
 
-
-
-
 	public boolean contains(Bid bid) {
 		return bidList.contains(bid);
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 	public static class LotBuilder {
-
 
 		private Long id;
 		private ZoneId ZONE;
@@ -366,7 +349,6 @@ public class Lot extends Storable   {//implements IStorable
 			this.ZONE = ZONE;
 			return this;
 		}
-
 
 		public LotBuilder(ArrayList<Bid> bidList) {
 			this.bidList = new ArrayList<Bid>(bidList);
@@ -418,9 +400,5 @@ public class Lot extends Storable   {//implements IStorable
 		}
 
 	}
-	
-
-
-	
 
 }

@@ -39,9 +39,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
-
-
 /**
  * @author nuchem
  *
@@ -54,48 +51,33 @@ import lombok.ToString;
 @DiscriminatorValue("Bid")
 @Setter
 @Getter
-public class Bid extends Storable {//implements IStorable 
-	 
+public class Bid extends Storable {
+
 	@ToString.Exclude
-	@JsonBackReference(value="bidOnUser")
-	@ManyToOne(fetch = FetchType.LAZY )//orphanRemoval=true cascade = CascadeType.REFRESH,
-	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable=false)
+	@JsonBackReference(value = "bidOnUser")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "bidder")
-	
-	private User bidder;//setter/getter for the purpose of update testing
 
-	
+	private User bidder;// setter/getter for the purpose of update testing
 
 	@ToString.Exclude
-	@ManyToOne(
-			fetch = FetchType.LAZY//in order for jackson to work cascade = CascadeType.REFRESH
-			 
-			
-		)
-	@JsonBackReference(value="bidOnLot")
-	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable=false)
-	 @JsonProperty(value = "lot")
+	@ManyToOne(fetch = FetchType.LAZY
+
+	)
+	@JsonBackReference(value = "bidOnLot")
+	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable = false)
+	@JsonProperty(value = "lot")
 	@Getter(AccessLevel.NONE)
-	private Lot lot; //setter for the purpose of update testing
-	//static variables
-	
+	private Lot lot; // setter for the purpose of update testing
 
+	@JsonProperty("amount")
+	private double amount;
 
-
-
-
-   @JsonProperty("amount")
-	private double amount; 
-	
-	
-	
 	@JsonCreator
 	public Bid() {
 
-		
 	}
-
-
 
 	public Bid(BidBuilder bidBuilder) {
 		this.id = bidBuilder.id;
@@ -104,57 +86,47 @@ public class Bid extends Storable {//implements IStorable
 		this.bidder = bidBuilder.bidder;
 		this.bidder.addBidToList(this);
 	}
-	//instance variables
-	
-	
-	 
-	
-	
+	// instance variables
+
 	public Bid(Lot lot, double amount, User bidder) {
 		this.lot = lot;
 		this.amount = amount;
-		this.bidder = bidder; 
+		this.bidder = bidder;
 		this.bidder.addBidToList(this);
 	}
 
-	//setters, getters
-	
+	// setters, getters
+
 	public Lot getLot() {
 		return lot;
 	}
-	
-	
 
+	public static class BidBuilder {
 
-	
-	
-
-	
-
-	public static class BidBuilder{
-//		@Id
-//		@GeneratedValue(strategy = GenerationType.AUTO)
 		private Long id;
 		private Lot lot;
 		private double amount;
 		private User bidder;
+
 		public BidBuilder(Lot lot) {
 			this.lot = lot;
-			
+
 		}
+
 		public BidBuilder amount(double amount) {
-			this.amount  = amount; 
+			this.amount = amount;
 			return this;
 		}
+
 		public BidBuilder bidder(User bidder) {
-			this.bidder = bidder; 
+			this.bidder = bidder;
 			return this;
 		}
+
 		public Bid build() {
-			
+
 			return new Bid(this);
 		}
 	}
-	
 
 }

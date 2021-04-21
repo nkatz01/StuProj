@@ -23,13 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.service.UserServiceImpl;
-//@EnableJpaRepositories
 
-//@Configuration
-//@ComponentScan({"com.project.biddingSoft.domain","com.project.biddingSoft.dao","com.project.biddingSoft.controller","com.project.biddingSoft.service"})
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
-//@PropertySource("classpath:application.properties")
-public class BiddingSoftwareApplication implements CommandLineRunner {
+public class BiddingSoftwareApplication  {
 	@Autowired
     ApplicationContext applicationContext;
 	@Autowired Lot lot;
@@ -41,21 +37,5 @@ public class BiddingSoftwareApplication implements CommandLineRunner {
 		SpringApplication.run(BiddingSoftwareApplication.class, args);
 		
 	}
-	  @Override
-	    public void run(String...args) throws Exception {
-		 
-	       // logger.info("Application started with command-line arguments: {} . \n To kill this application, press Ctrl + C.", Arrays.toString(args));
-			//Arrays.asList(args).forEach(arg -> logger.info(ANSI_RED+ arg+ANSI_RESET ) ) ;
-		  
-
-// 		     String[] allBeanNames = applicationContext.getBeanDefinitionNames();
-// 		        for(String beanName : allBeanNames) {
-// 		            System.out.println(beanName);	  }
-// 		       System.out.println(allBeanNames.length);
- 	  }
-//	  @Bean
-//	    static PropertySourcesPlaceholderConfigurer propertyPlaceHolderConfigurer() {
-//	        return new PropertySourcesPlaceholderConfigurer();
-//	    }
 
 }

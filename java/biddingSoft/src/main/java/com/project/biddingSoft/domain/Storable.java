@@ -2,6 +2,7 @@ package com.project.biddingSoft.domain;
 
 
 
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.DiscriminatorColumn;
@@ -15,7 +16,6 @@ import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.NaturalId;
 import org.springframework.stereotype.Component;
-import org.testcontainers.shaded.com.google.common.base.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -34,7 +34,7 @@ import lombok.ToString;
 @Component
 
 @ToString
-public abstract class Storable  {//implements IStorable
+public abstract class Storable  {
 	
 	@Override
 	public int hashCode() {
@@ -49,7 +49,7 @@ public abstract class Storable  {//implements IStorable
 		if (getClass() != obj.getClass())
 			return false;
 		Storable other = (Storable) obj;
-		return Objects.equal(businessId, other.businessId);
+		return Objects.equals(businessId, other.businessId);
 			
 	}
 
@@ -60,7 +60,7 @@ public abstract class Storable  {//implements IStorable
 	public Long getId() {
 		return id;
 	}
-	//@Override
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
