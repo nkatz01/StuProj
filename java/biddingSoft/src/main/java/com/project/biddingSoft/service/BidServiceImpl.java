@@ -123,10 +123,13 @@ public class BidServiceImpl implements IService<Bid> {
 
 	public boolean associatedCreatorWithLot(Bid bid) {
 		if (bid.getLot().getId() == null) {
+			// redundant check given that add lot does the check as well
 			if (!bid.getLot().getUser().createdLotscontainsLot(bid.getLot()))
 				return bid.getLot().getUser().addLotToList(bid.getLot());
 
 		}
+		// no need to return stuff if you aren't going to do anything with the returned value
+		// also doesn't make sense to return anything from this method given that its an action method - it does something, its not a getter
 		return true;
 	}
 

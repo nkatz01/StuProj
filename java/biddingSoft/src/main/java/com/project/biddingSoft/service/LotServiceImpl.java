@@ -85,6 +85,7 @@ public class LotServiceImpl implements IService<Lot> {
 	@Override
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
+		// reduntant check, can just remove
 		if (!lot.getUser().createdLotscontainsLot(lot))
 			lot.getUser().addLotToList(lot);
 		if (lot.getUser().getId() == null) {

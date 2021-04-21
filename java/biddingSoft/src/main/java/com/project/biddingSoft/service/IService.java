@@ -34,6 +34,8 @@ public interface IService<T extends Storable> {
 
 	public String persistEntity(T iStorable);
 
+	// these methods don't need to exist (they don't get called) and they don't need to ever get called,
+	// if you have the repo you can call delete on that yourself, the method has nothing to do with the interface its on
 	public default void deleteAllEntities(IStorableRepo<Storable> repo) {
 		repo.deleteAll();
 	}
@@ -42,6 +44,7 @@ public interface IService<T extends Storable> {
 		repo.deleteById(id);
 	}
 
+	// This should be a default method
 	public String updateEntity(StorableDTO strblDto);
 
 }

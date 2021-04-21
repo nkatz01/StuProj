@@ -87,6 +87,7 @@ public class User extends Storable {
 	)
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
+	// you don't ever use this list
 	List<Lot> lotsCreatedList = new ArrayList<Lot>();
 
 	@JsonManagedReference(value = "bidOnUser")
@@ -104,10 +105,15 @@ public class User extends Storable {
 	}
 
 	public boolean addLotToList(Lot lot) {// handle exception
+		// This method shouldn't return antyhing
+		// and its simpler if you do it as an if and then add
+		//also, does this need to be an ordered list? If not, just use a set and then you don't have to worry about checking before adding
+		// If this needs to be a list, you will need to think about concurrency - two methods could add to the list at once and then you have two items in the list
 		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(lot);
 	}
 
 	public boolean addBidToList(Bid bid) {// handle exception
+		// this is the same as the lots list, if you need to keep insertion order, you need to keep the list and manage concurrency, otherwise change to a set and all is good.
 		return !bidsBadeList.contains(bid) && bidsBadeList.add(bid);
 	}
 
