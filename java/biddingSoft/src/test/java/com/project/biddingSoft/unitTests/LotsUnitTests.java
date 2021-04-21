@@ -3,6 +3,7 @@ package com.project.biddingSoft.unitTests;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -17,6 +18,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -65,9 +67,13 @@ import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
+import com.project.biddingSoft.service.StorableService;
+import com.project.biddingSoft.testServices.StorableTestService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
+import com.rits.cloning.Cloner;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 @TestMethodOrder(OrderAnnotation.class)
@@ -103,12 +109,14 @@ public class LotsUnitTests {
 	private IBidRepo iBidrepo;
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
-
+	private static Cloner cloner = new Cloner();
 	@Autowired
 	@Qualifier("IStorableRepo")
 	void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
+	@Autowired
+	private StorableTestService strblService; 
 //	@Test
 //	void canCloneUser() {
 //		//User user1 = testUserService.getMeSimpleUser();
@@ -146,15 +154,39 @@ public class LotsUnitTests {
 		entityManager.getTransaction().commit();
 
 		User user = testUserService.getMeSimpleUser();
-		user.addLotToList(wiredLot);
-		wiredLot.setUser(user);
-
-		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
-		wiredLot.placeBid(bid);
+		wiredLot.setUser(user);//wiredlot has a copy of user
+		user.addLotToList(wiredLot);//user has a copy of wiredlot
+		
+		
+		//User user2 = wiredLot.getUser();
+		//System.out.println(wiredLot.equals(user.getLot(0)));
+		//System.out.println(user.equals(user.getLot(0).getUser()));
+		
 		iUserRepo.save(wiredLot.getUser());
-		iUserRepo.save(bid.getBidder());
-		iBidrepo.save(bid);
+//		iLotRepo.save(wiredLot);
+//		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
+//		wiredLot.placeBid(bid);
+//		iUserRepo.save(bid.getBidder());
+//		iBidrepo.save(bid);
 
+	}
+	
+	@Test
+	void testEqualityOnUsers(){
+		User user1 = testUserService.getMeSimpleUser();
+		User user2 = testUserService.getMeSimpleUser();
+		assertNotEquals(user1, user2);
+		user2 = cloner.deepClone(user1);
+		assertFalse(user1==user2);
+		assertEquals(user1, user2);
+		user2.setUsername("somethingElse");
+		assertNotEquals(user1, user2);
+		
+		user2 = cloner.deepClone(user1);
+		user2.setBusinessId(strblService.newUUID());
+		iStorableRepo.save(user1);
+		//user2.setBusinessId(new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1()));
+		iStorableRepo.save(user2);
 	}
 
 	@Test

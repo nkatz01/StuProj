@@ -56,6 +56,7 @@ import com.project.biddingSoft.dao.ILotRepo;
 
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
+import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -76,6 +77,9 @@ import lombok.ToString;
 @Getter
 public class Lot extends Storable {
 
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	private static Cloner cloner =  new Cloner();
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
 	@Autowired
@@ -202,7 +206,7 @@ public class Lot extends Storable {
 	}
 
 	public Lot(LotBuilder lotBuilder) {
-		this.user = lotBuilder.user;
+		this.user = cloner.deepClone(lotBuilder.user);
 		this.bidList = new ArrayList<Bid>(lotBuilder.bidList);
 		this.title = lotBuilder.title;
 		this.description = lotBuilder.description;
@@ -216,6 +220,7 @@ public class Lot extends Storable {
 		this.id = lotBuilder.id;
 		this.endTime = lotBuilder.endTime;
 		this.extendedEndtime = lotBuilder.extendedEndtime;
+		
 		user.addLotToList(this);
 	}
 
@@ -266,7 +271,7 @@ public class Lot extends Storable {
 		Instant now = Instant.now(clock);
 		Objects.requireNonNull(bid);
 		if (!hasLotExpired(now) && bidHighEnough(bid))
-			bidList.add(bid);
+			bidList.add(cloner.deepClone(bid));
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
 
@@ -321,7 +326,7 @@ public class Lot extends Storable {
 	}
 
 	public void setUser(User user) {
-		this.user = user;
+		this.user = cloner.deepClone(user);
 	}
 
 	public static class LotBuilder {
@@ -399,6 +404,120 @@ public class Lot extends Storable {
 			return this;
 		}
 
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((ZONE == null) ? 0 : ZONE.hashCode());
+		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
+		result = prime * result + ((bidList == null) ? 0 : bidList.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(biddingIncrement);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((clock == null) ? 0 : clock.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
+		temp = Double.doubleToLongBits(highestBid);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((leadingBidder == null) ? 0 : leadingBidder.hashCode());
+		result = prime * result + ((pendingAutoBid == null) ? 0 : pendingAutoBid.hashCode());
+		temp = Double.doubleToLongBits(reservePrice);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+		temp = Double.doubleToLongBits(startingPrice);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
+		result = prime * result + ((user == null) ? 0 : user.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Lot other = (Lot) obj;
+		if (ZONE == null) {
+			if (other.ZONE != null)
+				return false;
+		} else if (!ZONE.equals(other.ZONE))
+			return false;
+		if (autoExtendDuration == null) {
+			if (other.autoExtendDuration != null)
+				return false;
+		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
+			return false;
+		if (bidList == null) {
+			if (other.bidList != null)
+				return false;
+		} else if (!bidList.equals(other.bidList))
+			return false;
+		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
+			return false;
+		if (clock == null) {
+			if (other.clock != null)
+				return false;
+		} else if (!clock.equals(other.clock))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (endTime == null) {
+			if (other.endTime != null)
+				return false;
+		} else if (!endTime.equals(other.endTime))
+			return false;
+		if (extendedEndtime == null) {
+			if (other.extendedEndtime != null)
+				return false;
+		} else if (!extendedEndtime.equals(other.extendedEndtime))
+			return false;
+		if (Double.doubleToLongBits(highestBid) != Double.doubleToLongBits(other.highestBid))
+			return false;
+		if (leadingBidder == null) {
+			if (other.leadingBidder != null)
+				return false;
+		} else if (!leadingBidder.equals(other.leadingBidder))
+			return false;
+		if (pendingAutoBid == null) {
+			if (other.pendingAutoBid != null)
+				return false;
+		} else if (!pendingAutoBid.equals(other.pendingAutoBid))
+			return false;
+		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
+			return false;
+		if (startTime == null) {
+			if (other.startTime != null)
+				return false;
+		} else if (!startTime.equals(other.startTime))
+			return false;
+		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (triggerDuration == null) {
+			if (other.triggerDuration != null)
+				return false;
+		} else if (!triggerDuration.equals(other.triggerDuration))
+			return false;
+		if (user == null) {
+			if (other.user != null)
+				return false;
+		} else if (!user.equals(other.user))
+			return false;
+		return true;
 	}
 
 }

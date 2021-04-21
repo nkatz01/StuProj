@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
+import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -53,6 +54,9 @@ import lombok.ToString;
 @Getter
 public class Bid extends Storable {
 
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	private static Cloner cloner =  new Cloner();
 	@ToString.Exclude
 	@JsonBackReference(value = "bidOnUser")
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -83,7 +87,7 @@ public class Bid extends Storable {
 		this.id = bidBuilder.id;
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
-		this.bidder = bidBuilder.bidder;
+		this.bidder = cloner.deepClone(bidBuilder.bidder);
 		this.bidder.addBidToList(this);
 	}
 	// instance variables
@@ -91,7 +95,7 @@ public class Bid extends Storable {
 	public Bid(Lot lot, double amount, User bidder) {
 		this.lot = lot;
 		this.amount = amount;
-		this.bidder = bidder;
+		this.bidder = cloner.deepClone(bidder);
 		this.bidder.addBidToList(this);
 	}
 
@@ -128,5 +132,41 @@ public class Bid extends Storable {
 			return new Bid(this);
 		}
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		long temp;
+		temp = Double.doubleToLongBits(amount);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((bidder == null) ? 0 : bidder.hashCode());
+		result = prime * result + ((lot == null) ? 0 : lot.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Bid other = (Bid) obj;
+		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
+			return false;
+		if (bidder == null) {
+			if (other.bidder != null)
+				return false;
+		} else if (!bidder.equals(other.bidder))
+			return false;
+		if (lot == null) {
+			if (other.lot != null)
+				return false;
+		} else if (!lot.equals(other.lot))
+			return false;
+		return true;
+	}
+
 
 }
