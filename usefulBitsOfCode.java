@@ -73,3 +73,44 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
 		//Lot lot =   new Gson().fromJson(EntityUtils.toString(response.getEntity()), Lot.class);
 		Lot lot = new ObjectMapper()
 				//.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+				
+					<repositories>
+	<repository>
+    <id>com.springsource.repository.bundles.release</id>
+    <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+    <url>http://repository.springsource.com/maven/bundles/release</url>
+</repository>
+<repository>
+    <id>com.springsource.repository.bundles.external</id>
+    <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+    <url>http://repository.springsource.com/maven/bundles/external</url>
+</repository>
+<repository>
+    <id>maven2</id>
+    <url>http://repo1.maven.org/maven2</url>
+</repository>
+<repository>
+    <id>org.springframework.maven.release</id>
+    <name>Spring Maven Release Repository</name>
+    <url>http://repo.springsource.org/libs-release-local</url>
+    <releases><enabled>true</enabled></releases>
+    <snapshots><enabled>false</enabled></snapshots>
+</repository>
+<!-- For testing against latest Spring snapshots -->
+<repository>
+    <id>org.springframework.maven.snapshot</id>
+    <name>Spring Maven Snapshot Repository</name>
+    <url>http://repo.springsource.org/libs-snapshot-local</url>
+    <releases><enabled>false</enabled></releases>
+    <snapshots><enabled>true</enabled></snapshots>
+</repository>
+<!-- For developing against latest Spring milestones -->
+<repository>
+    <id>org.springframework.maven.milestone</id>
+    <name>Spring Maven Milestone Repository</name>
+    <url>http://repo.springsource.org/libs-milestone-local</url>
+    <snapshots><enabled>false</enabled></snapshots>
+</repository>
+</repositories>
+				
+				

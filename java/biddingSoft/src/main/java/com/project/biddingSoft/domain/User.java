@@ -39,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import com.project.biddingSoft.dao.IUserRepo;
+import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -57,8 +58,11 @@ import lombok.ToString;
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
-public class User extends Storable implements Cloneable{
-
+public class User extends Storable {
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	@Autowired
+	private Cloner cloner;
 	public User(UserBuilder userBuilder) {
 		this.id = userBuilder.id;
 		this.username = userBuilder.username;
@@ -83,7 +87,7 @@ public class User extends Storable implements Cloneable{
 	)
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	List<Lot> lotsCreatedList;
+	List<Lot> lotsCreatedList = new ArrayList<Lot>();
 
 	@JsonManagedReference(value = "bidOnUser")
 	@JsonProperty("bidsBadeList")
@@ -91,12 +95,11 @@ public class User extends Storable implements Cloneable{
 			cascade = CascadeType.ALL)
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	private List<Bid> bidsBadeList;
+	private List<Bid> bidsBadeList = new ArrayList<Bid>();
 
-	public Lot getLot(int id) throws IndexOutOfBoundsException {
-		Lot lot = null;
-		lot = lotsCreatedList.get(id);
-		return lot;
+	public Lot getLot(int id) {
+		return lotsCreatedList.get(id);
+		
 
 	}
 
@@ -110,8 +113,7 @@ public class User extends Storable implements Cloneable{
 
 	@JsonCreator
 	public User() {
-		this.bidsBadeList = new ArrayList<Bid>();
-		this.lotsCreatedList = new ArrayList<Lot>();
+
 
 	}
 
@@ -133,13 +135,13 @@ public class User extends Storable implements Cloneable{
 
 		}
 
-		public UserBuilder lotsCreated(List<Lot> lotsCreatedList) {// fix
-			this.lotsCreatedList = lotsCreatedList;
+		public UserBuilder lotsCreated(List<Lot> lotsCreatedList) {
+			this.lotsCreatedList = new ArrayList<Lot>( lotsCreatedList);
 			return this;
 		}
 
-		public UserBuilder bidsCreated(List<Bid> bidsBadeList) {// fix
-			this.bidsBadeList = bidsBadeList;
+		public UserBuilder bidsCreated(List<Bid> bidsBadeList) {
+			this.bidsBadeList = new ArrayList<Bid>( bidsBadeList);
 			return this;
 		}
 

@@ -11,6 +11,7 @@ run as maven build (as goal) eclipse:eclipse
 mvn dependency:tree
 mvn dependency:analyze -DignoreNonCompile
 mvn dependency:resolve -Dclassifier=javadoc
+mvn clean install -U | grep ERROR
 sc.exe delete tomcat8
 
 ping localhost

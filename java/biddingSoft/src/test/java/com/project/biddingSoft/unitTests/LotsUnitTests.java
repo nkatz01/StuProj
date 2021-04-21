@@ -109,7 +109,13 @@ public class LotsUnitTests {
 	void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
-
+//	@Test
+//	void canCloneUser() {
+//		//User user1 = testUserService.getMeSimpleUser();
+//		Lot lot1 = testLotService.getMeSimpleLot();
+//		var attr = lot1.getStartTime().
+//	}
+	
 	@Test
 	@Order(1)
 	void testThatSuperRepo_canReturnSubclass_ofStorable() {
