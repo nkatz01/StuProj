@@ -7,14 +7,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -33,7 +27,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.internal.TextListener;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -44,22 +37,16 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 
@@ -74,23 +61,21 @@ import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
-import com.project.biddingSoft.testServices.StorableTestService;
+import com.project.biddingSoft.testServices.TestStorableService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
 import com.project.biddingSoft.unitTests.LotsUnitTests;
+
 @TestMethodOrder(OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @RunWith(JUnitPlatform.class)
-@AutoConfigureMockMvc
-@SelectClasses({BiddingSoftwareApplicationIntegTests.class,LotsUnitTests.class})
-//@AutoConfigureMockMvc
+
+@SelectClasses({ BiddingSoftwareApplicationIntegTests.class, LotsUnitTests.class })
 @ComponentScan(basePackages = { "com.project.biddingSoft" })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@TestPropertySource(locations = "classpath:application.properties") // change to separate prop file
 class BiddingSoftwareApplicationIntegTests {
-//	@Value("${local.server.port}")
-//	String port;
+
 	@Value("${service.url}")
 	String serverAddress;
 	@Autowired
@@ -115,7 +100,7 @@ class BiddingSoftwareApplicationIntegTests {
 	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
-	private StorableTestService strblService;
+	private TestStorableService strblService;
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
 
@@ -125,20 +110,18 @@ class BiddingSoftwareApplicationIntegTests {
 		iStorableRepo = istorableRepo;
 	}
 
-	
 	public static void main(String[] args) {
 
 		JUnitCore junit = new JUnitCore();
 		junit.addListener(new TextListener(System.out));
 		junit.run(LotsUnitTests.class);
 
-		
 	}
 
 	public static final String ANSI_RED = "\u001B[31m";
 	public static final String ANSI_RESET = "\u001B[0m";
 	private static final Logger logger = LoggerFactory.getLogger(BiddingSoftwareApplicationIntegTests.class);
-	
+
 	@BeforeAll
 	void removeAllTables() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -165,13 +148,14 @@ class BiddingSoftwareApplicationIntegTests {
 		iUserRepo.save(wiredLot.getUser());
 
 	}
-	
+
 	@Test
 	void test_app_is_up() throws IOException {
-		ResponseEntity<String> response = restTemplate.getForEntity(serverAddress+"/", String.class);
+		ResponseEntity<String> response = restTemplate.getForEntity(serverAddress + "/", String.class);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals("Service running", response.getBody());
 	}
+
 	@Test
 	void whenLotIsAutoWired_autowiredAttributes_areSet() throws NoSuchFieldException, IllegalAccessException {
 		assertNotNull(FieldUtils.readField(wiredLot, "title", true));
@@ -189,23 +173,22 @@ class BiddingSoftwareApplicationIntegTests {
 	@Test
 	void contextLoads() throws Exception {
 		assertThat(servletInitializer).isNotNull();
-		
+		logger.info(ANSI_RED + "Tests running" + ANSI_RESET);
 
 	}
-
 
 	@Test
 	@Order(1)
 	void testThatSuperRepo_canReturnSubclass_ofStorable() {
 		assertTrue(iStorableRepo.findById(wiredLot.getId()).isPresent());
 	}
-	
+
 	@Test
 	@Order(2)
 	void testPostEntity_forUser() throws IOException, URISyntaxException {
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI(serverAddress+"/create"));
+		HttpPost request = new HttpPost(new URI(serverAddress + "/create"));
 		StringEntity params = new StringEntity("{\"type\": \"user\"}");
 		request.addHeader("content-type", "application/json");
 		request.setEntity(params);
@@ -219,7 +202,7 @@ class BiddingSoftwareApplicationIntegTests {
 	void testPostEntity_newLotWithExistingUser() throws IOException, URISyntaxException {
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI(serverAddress+"/create"));
+		HttpPost request = new HttpPost(new URI(serverAddress + "/create"));
 		StringEntity params = new StringEntity(
 				"{\"type\":\"lot\", \"user\":{\"id\": " + wiredLot.getUser().getId() + " }}");
 		request.addHeader("content-type", "application/json");
@@ -234,7 +217,7 @@ class BiddingSoftwareApplicationIntegTests {
 	void testPostEntity_newBidWithExistingUser_AndExistingBidder() throws IOException, URISyntaxException {
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI(serverAddress+"/create"));
+		HttpPost request = new HttpPost(new URI(serverAddress + "/create"));
 		StringEntity params = new StringEntity(
 				"{\"type\":\"bid\", \"lot\": {\"type\":\"lot\",\"user\":{\"id\": " + wiredLot.getUser().getId()
 						+ "}}, \"bidder\":{\"id\": " + wiredLot.getLeadingBidder().getId() + "} }\r\n" + "");
@@ -256,9 +239,8 @@ class BiddingSoftwareApplicationIntegTests {
 	@Test
 	@Order(6)
 	void testGetOneEntity() throws IOException, URISyntaxException, JSONException {
-
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(new URI(serverAddress+"/getent/" + wiredLot.getId()));
+		HttpGet request = new HttpGet(new URI(serverAddress + "/getent/" + wiredLot.getId()));
 		request.addHeader("content-type", "application/json");
 		HttpResponse response = httpClient.execute(request);
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
@@ -272,7 +254,7 @@ class BiddingSoftwareApplicationIntegTests {
 	void testUpdateUser() throws IOException, URISyntaxException {
 		String username = iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername();
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI(serverAddress+"/update"));
+		HttpPut request = new HttpPut(new URI(serverAddress + "/update"));
 		StringEntity params = new StringEntity(
 				"{\"type\": \"userdto\",\"id\": " + wiredLot.getUser().getId() + ", \"username\":\"Jim\"}");
 		request.addHeader("content-type", "application/json");
@@ -289,7 +271,7 @@ class BiddingSoftwareApplicationIntegTests {
 		User newUser = testUserService.getMeSimpleUser();
 		iUserRepo.save(newUser);
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI(serverAddress+"/update"));
+		HttpPut request = new HttpPut(new URI(serverAddress + "/update"));
 		StringEntity params = new StringEntity("{\"type\": \"lotdto\",\"id\": " + wiredLot.getId()
 				+ ", \"reservePrice\":\"50.0\", \"user\": {\"id\":" + newUser.getId() + "}}");
 		request.addHeader("content-type", "application/json");
@@ -311,7 +293,7 @@ class BiddingSoftwareApplicationIntegTests {
 		iUserRepo.save(newBidder);
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI(serverAddress+"/update"));
+		HttpPut request = new HttpPut(new URI(serverAddress + "/update"));
 		StringEntity params = new StringEntity("{\"type\": \"biddto\",\"id\": " + wiredLot.getBid(0).getId()
 				+ ", \"amount\":\"20.0\", \"bidder\": {\"id\":" + newBidder.getId()
 				+ "}, \"lot\": {\"type\":\"lot\",\"id\":" + newLot.getId() + "}}");
@@ -324,40 +306,40 @@ class BiddingSoftwareApplicationIntegTests {
 		assertEquals(20.0, iBidrepo.findById(wiredLot.getBid(0).getId()).get().getAmount());
 
 	}
+
 	@Test
 	@Order(10)
 	void testGetAllEnts() throws IOException, URISyntaxException, JSONException {
 
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(new URI(serverAddress+"/allents"));
+		HttpGet request = new HttpGet(new URI(serverAddress + "/allents"));
 		request.addHeader("content-type", "application/json");
 		HttpResponse response = httpClient.execute(request);
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
 		JSONArray json = new JSONArray(EntityUtils.toString(response.getEntity()));
 		assertEquals(json.length(), iStorableRepo.count());
 	}
-	
 
 	@Test
-	 @Order(11)
-	 void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
-	
-		
+	@Order(11)
+	void testDelOneEnt() throws IOException, URISyntaxException, JSONException {
+
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI(serverAddress+"/delent/" +wiredLot.getId()));
+		HttpDelete request = new HttpDelete(new URI(serverAddress + "/delent/" + wiredLot.getId()));
 		HttpResponse response = httpClient.execute(request);
-		assertEquals(200,response.getStatusLine().getStatusCode());
+		assertEquals(200, response.getStatusLine().getStatusCode());
 		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
 	}
-	@Test
-	 void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
 
-		assertTrue(iStorableRepo.count() >0 );
+	@Test
+	void testDelAllEnts() throws IOException, URISyntaxException, JSONException {
+
+		assertTrue(iStorableRepo.count() > 0);
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpDelete request = new HttpDelete(new URI(serverAddress+"/delents"));
+		HttpDelete request = new HttpDelete(new URI(serverAddress + "/delents"));
 		HttpResponse response = httpClient.execute(request);
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		assertTrue(iStorableRepo.count() == 0 );
+		assertTrue(iStorableRepo.count() == 0);
 	}
-	
+
 }

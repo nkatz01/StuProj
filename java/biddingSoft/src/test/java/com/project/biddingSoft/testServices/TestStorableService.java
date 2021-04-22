@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.biddingSoft.service.StorableService;
 @Component
-public class StorableTestService {
+public class TestStorableService {
 	public UUID newUUID() {
 		return new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1());
 	}

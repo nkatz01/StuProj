@@ -3,7 +3,6 @@ package com.project.biddingSoft.testServices;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -46,10 +45,7 @@ public class TestLotService {
 				.timeZone(ZoneId.systemDefault()).biddingIncrement(5.0).startingPrice(startingPrice).build();
 	}
 
-	public User lotsUser(Lot lot) {
-		return lot.getUser();
-	}
-
+	
 	public User lotsUser(Optional<Lot> lot) {
 		return lot.get().getUser();
 	}

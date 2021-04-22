@@ -2,22 +2,15 @@ package com.project.biddingSoft.controller;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.project.biddingSoft.BiddingSoftwareApplication;
-import com.project.biddingSoft.dao.IBidRepo;
-
 import com.project.biddingSoft.dao.IStorableRepo;
-import com.project.biddingSoft.dao.IUserRepo;
-import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.BidDTO;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.LotDTO;
@@ -39,21 +28,16 @@ import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.domain.UserDTO;
-import com.project.biddingSoft.service.BidServiceImpl;
 import com.project.biddingSoft.service.IService;
-import com.project.biddingSoft.service.LotServiceImpl;
-import com.project.biddingSoft.service.UserServiceImpl;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @RestController
 public class ServletInitializer extends SpringBootServletInitializer {
 
-	private static final Logger logger = LoggerFactory.getLogger(SpringBootServletInitializer.class);
 	@Autowired
 	@Qualifier("getUserServiceImpl")
 	private IService<Storable> userServiceImpl;
@@ -79,8 +63,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@RequestMapping(value = "/")
-	public ResponseEntity<Object> hello() {
-
+	public ResponseEntity<Object> isRunning() {
 		return new ResponseEntity<>("Service running", HttpStatus.OK);
 	}
 
@@ -98,7 +81,6 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 		return new ResponseEntity(message, HttpStatus.OK);
 	}
-
 
 	@PostMapping(path = "/create")
 	ResponseEntity<Object> addNewEntity(@RequestBody Storable entity) {

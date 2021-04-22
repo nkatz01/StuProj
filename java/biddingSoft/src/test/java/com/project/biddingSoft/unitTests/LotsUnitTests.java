@@ -1,28 +1,21 @@
 package com.project.biddingSoft.unitTests;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import nl.jqno.equalsverifier.Warning;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -31,26 +24,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.hamcrest.MatcherAssert;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -63,15 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.project.biddingSoft.controller.ServletInitializer;
+
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
 import com.project.biddingSoft.dao.IStorableRepo;
@@ -81,14 +50,12 @@ import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
-import com.project.biddingSoft.testServices.StorableTestService;
+import com.project.biddingSoft.testServices.TestStorableService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
 import com.rits.cloning.Cloner;
 
-import bsh.Console;
-import nl.jqno.equalsverifier.EqualsVerifier;
 
 @TestMethodOrder(OrderAnnotation.class)
 @AutoConfigureMockMvc
@@ -118,7 +85,7 @@ public class LotsUnitTests {
 	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
-	private StorableTestService strblService;
+	private TestStorableService strblService;
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
 

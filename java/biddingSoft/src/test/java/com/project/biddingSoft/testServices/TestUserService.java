@@ -1,6 +1,5 @@
 package com.project.biddingSoft.testServices;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -18,22 +17,19 @@ public class TestUserService {
 
 	@Bean
 	public User getMeSimpleUser() {
-		return new User.UserBuilder(genRandString(7, false), genRandString(8, true))
-				.lotsCreated(new HashSet<Lot>())
-				.bidsCreated(new HashSet<Bid>())
-				.build();
+		return new User.UserBuilder(genRandString(7, false), genRandString(8, true)).lotsCreated(new HashSet<Lot>())
+				.bidsCreated(new HashSet<Bid>()).build();
 	}
+
 	public User getMeSimpleBidder() {
-		return new User.UserBuilder(genRandString(7, false), genRandString(8, true))
-				.lotsCreated(new HashSet<Lot>())
-				.bidsCreated(new HashSet<Bid>())
-				.build();
+		return new User.UserBuilder(genRandString(7, false), genRandString(8, true)).lotsCreated(new HashSet<Lot>())
+				.bidsCreated(new HashSet<Bid>()).build();
 	}
-	
+
 	public static synchronized String genRandString(int targetStrLength, boolean alphanum) {
 		Predicate<Integer> cond = (i) -> alphanum ? (i <= 57 || i >= 65) && (i <= 90 || i >= 97)
 				: (i >= 65 && i <= 90) || (i >= 97 && i <= 122); // alphanumeric (=true) or alphabetic
-		int leftLimit = 48; // numeral '0' //https://www.baeldung.com/java-random-string
+		int leftLimit = 48; // numeral '0' 
 		int rightLimit = 122; // letter 'z'
 		int targetStringLength = targetStrLength;
 		Random random = new Random();
