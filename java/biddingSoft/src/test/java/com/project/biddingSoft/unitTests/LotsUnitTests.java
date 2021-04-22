@@ -18,7 +18,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -67,7 +66,6 @@ import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
-import com.project.biddingSoft.service.StorableService;
 import com.project.biddingSoft.testServices.StorableTestService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
@@ -86,6 +84,7 @@ public class LotsUnitTests {
 	static final String ANSI_RED = "\u001B[31m";
 	static final String ANSI_RESET = "\u001B[0m";
 	private static final Logger logger = LoggerFactory.getLogger(LotsUnitTests.class);
+	private Cloner cloner = new Cloner();
 	@Autowired
 	ServletInitializer servletInitializer;
 	@Autowired
@@ -108,15 +107,15 @@ public class LotsUnitTests {
 	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
+	private StorableTestService strblService; 
+	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
-	private static Cloner cloner = new Cloner();
+
 	@Autowired
 	@Qualifier("IStorableRepo")
 	void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
-	@Autowired
-	private StorableTestService strblService; 
 //	@Test
 //	void canCloneUser() {
 //		//User user1 = testUserService.getMeSimpleUser();
@@ -154,20 +153,14 @@ public class LotsUnitTests {
 		entityManager.getTransaction().commit();
 
 		User user = testUserService.getMeSimpleUser();
-		wiredLot.setUser(user);//wiredlot has a copy of user
-		user.addLotToList(wiredLot);//user has a copy of wiredlot
-		
-		
-		//User user2 = wiredLot.getUser();
-		//System.out.println(wiredLot.equals(user.getLot(0)));
-		//System.out.println(user.equals(user.getLot(0).getUser()));
-		
+		user.addLotToList(wiredLot);//user has lot
+		wiredLot.setUser(user);
+
+		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
+		wiredLot.placeBid(bid);
 		iUserRepo.save(wiredLot.getUser());
-//		iLotRepo.save(wiredLot);
-//		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
-//		wiredLot.placeBid(bid);
-//		iUserRepo.save(bid.getBidder());
-//		iBidrepo.save(bid);
+		iUserRepo.save(bid.getBidder());
+		iBidrepo.save(bid);
 
 	}
 	
@@ -185,7 +178,6 @@ public class LotsUnitTests {
 		user2 = cloner.deepClone(user1);
 		user2.setBusinessId(strblService.newUUID());
 		iStorableRepo.save(user1);
-		//user2.setBusinessId(new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1()));
 		iStorableRepo.save(user2);
 	}
 

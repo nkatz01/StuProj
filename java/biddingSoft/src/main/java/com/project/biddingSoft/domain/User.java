@@ -59,11 +59,43 @@ import lombok.ToString;
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
 public class User extends Storable {
-	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((bidsBadeList == null) ? 0 : bidsBadeList.hashCode());
+		result = prime * result + ((lotsCreatedList == null) ? 0 : lotsCreatedList.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
 
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	private static Cloner cloner =  new Cloner();
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (bidsBadeList == null) {
+			if (other.bidsBadeList != null)
+				return false;
+		} else if (!bidsBadeList.equals(other.bidsBadeList))
+			return false;
+		if (lotsCreatedList == null) {
+			if (other.lotsCreatedList != null)
+				return false;
+		} else if (!lotsCreatedList.equals(other.lotsCreatedList))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
 	public User(UserBuilder userBuilder) {
 		this.id = userBuilder.id;
 		this.username = userBuilder.username;
@@ -82,7 +114,7 @@ public class User extends Storable {
 	private String username;
 	@JsonProperty("lotsCreatedList")
 	@JsonManagedReference(value = "lotOnUser")
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user", // , variable in Lot class - links a lot with a given user
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", // , variable in Lot class - links a lot with a given user
 			cascade = CascadeType.ALL
 
 	)
@@ -105,13 +137,11 @@ public class User extends Storable {
 	}
 
 	public boolean addLotToList(Lot lot) {// handle exception
-		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(cloner.deepClone(lot));
+		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(lot);
 	}
-//	public boolean addLotToList(Lot lot) {// handle exception
-//		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(lot);
-//	}
+
 	public boolean addBidToList(Bid bid) {// handle exception
-		return !bidsBadeList.contains(bid) && bidsBadeList.add(cloner.deepClone(bid));
+		return !bidsBadeList.contains(bid) && bidsBadeList.add(bid);
 	}
 
 	@JsonCreator
@@ -152,42 +182,6 @@ public class User extends Storable {
 			return new User(this);
 		}
 
-	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((bidsBadeList == null) ? 0 : bidsBadeList.hashCode());
-		result = prime * result + ((lotsCreatedList == null) ? 0 : lotsCreatedList.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (bidsBadeList == null) {
-			if (other.bidsBadeList != null)
-				return false;
-		} else if (!bidsBadeList.equals(other.bidsBadeList))
-			return false;
-		if (lotsCreatedList == null) {
-			if (other.lotsCreatedList != null)
-				return false;
-		} else if (!lotsCreatedList.equals(other.lotsCreatedList))
-			return false;
-		if (username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!username.equals(other.username))
-			return false;
-		return true;
 	}
 
 }

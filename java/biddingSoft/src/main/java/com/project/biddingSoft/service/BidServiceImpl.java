@@ -94,7 +94,7 @@ public class BidServiceImpl implements IService<Bid> {
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
 
-		associatedCreatorWithLot(bid);
+		associatCreatorWithLot(bid);
 
 		if (lotCreatorAndLotAreNew(bid)) {
 
@@ -121,13 +121,12 @@ public class BidServiceImpl implements IService<Bid> {
 
 	}
 
-	public boolean associatedCreatorWithLot(Bid bid) {
+	public void associatCreatorWithLot(Bid bid) {
 		if (bid.getLot().getId() == null) {
-			if (!bid.getLot().getUser().createdLotscontainsLot(bid.getLot()))
-				return bid.getLot().getUser().addLotToList(bid.getLot());
+				 bid.getLot().getUser().addLotToList(bid.getLot());
 
 		}
-		return true;
+	
 	}
 
 	public boolean lotCreatorAndLotAreNew(Bid bid) {

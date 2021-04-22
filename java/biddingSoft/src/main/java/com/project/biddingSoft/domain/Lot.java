@@ -79,9 +79,6 @@ public class Lot extends Storable {
 
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	private static Cloner cloner =  new Cloner();
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	@Autowired
 	@Transient
 	private static ExceptionsCreateor bidSoftExcepFactory;
@@ -206,7 +203,7 @@ public class Lot extends Storable {
 	}
 
 	public Lot(LotBuilder lotBuilder) {
-		this.user = cloner.deepClone(lotBuilder.user);
+		this.user = lotBuilder.user;
 		this.bidList = new ArrayList<Bid>(lotBuilder.bidList);
 		this.title = lotBuilder.title;
 		this.description = lotBuilder.description;
@@ -220,7 +217,6 @@ public class Lot extends Storable {
 		this.id = lotBuilder.id;
 		this.endTime = lotBuilder.endTime;
 		this.extendedEndtime = lotBuilder.extendedEndtime;
-		
 		user.addLotToList(this);
 	}
 
@@ -271,7 +267,7 @@ public class Lot extends Storable {
 		Instant now = Instant.now(clock);
 		Objects.requireNonNull(bid);
 		if (!hasLotExpired(now) && bidHighEnough(bid))
-			bidList.add(cloner.deepClone(bid));
+			bidList.add(bid);
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
 
@@ -326,7 +322,7 @@ public class Lot extends Storable {
 	}
 
 	public void setUser(User user) {
-		this.user = cloner.deepClone(user);
+		this.user = user;
 	}
 
 	public static class LotBuilder {

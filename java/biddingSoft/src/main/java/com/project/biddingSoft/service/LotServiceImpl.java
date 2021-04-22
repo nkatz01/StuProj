@@ -85,8 +85,7 @@ public class LotServiceImpl implements IService<Lot> {
 	@Override
 	public String persistEntity(Lot lot) {
 		StringBuilder stringBuilder = new StringBuilder();
-		if (!lot.getUser().createdLotscontainsLot(lot))
-			lot.getUser().addLotToList(lot);
+		
 		if (lot.getUser().getId() == null) {
 			iUserRepo.save(lot.getUser());
 			stringBuilder.append(lot.getUser().getClass().getName() + " " + lot.getUser().getId());

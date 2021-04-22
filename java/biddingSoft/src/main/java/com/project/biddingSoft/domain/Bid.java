@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.project.biddingSoft.dao.IBidRepo;
-import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -54,9 +53,7 @@ import lombok.ToString;
 @Getter
 public class Bid extends Storable {
 
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	private static Cloner cloner =  new Cloner();
+
 	@ToString.Exclude
 	@JsonBackReference(value = "bidOnUser")
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -87,7 +84,7 @@ public class Bid extends Storable {
 		this.id = bidBuilder.id;
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
-		this.bidder = cloner.deepClone(bidBuilder.bidder);
+		this.bidder = bidBuilder.bidder;
 		this.bidder.addBidToList(this);
 	}
 	// instance variables
@@ -95,7 +92,7 @@ public class Bid extends Storable {
 	public Bid(Lot lot, double amount, User bidder) {
 		this.lot = lot;
 		this.amount = amount;
-		this.bidder = cloner.deepClone(bidder);
+		this.bidder = bidder;
 		this.bidder.addBidToList(this);
 	}
 
@@ -132,6 +129,8 @@ public class Bid extends Storable {
 			return new Bid(this);
 		}
 	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -167,6 +166,4 @@ public class Bid extends Storable {
 			return false;
 		return true;
 	}
-
-
 }
