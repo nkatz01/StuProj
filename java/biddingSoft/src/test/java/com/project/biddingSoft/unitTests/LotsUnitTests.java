@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import nl.jqno.equalsverifier.Warning;
@@ -18,6 +19,17 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -31,8 +43,10 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.hamcrest.MatcherAssert;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -150,9 +164,8 @@ public class LotsUnitTests {
 		entityManager.getTransaction().commit();
 
 		User user = testUserService.getMeSimpleUser();
-		user.addLotToSet(wiredLot);//user has lot
+		user.addLotToSet(wiredLot);
 		wiredLot.setUser(user);
-		//System.out.println(wiredLot);
 		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
 
 		wiredLot.placeBid(bid);
@@ -161,8 +174,10 @@ public class LotsUnitTests {
 
 	}
 	
+
+	
 	@Test
-	void testEqualityOnUsers(){//remember to test that with different ids can also be equal
+	void testEqualityOnUsers(){
 		User user1 = testUserService.getMeSimpleUser();
 		User user2 = testUserService.getMeSimpleUser();
 		assertNotEquals(user1, user2);
@@ -248,10 +263,8 @@ public class LotsUnitTests {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		Lot lot = bid.getLot();
 		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-		// iStorableRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
 		assertTrue(iBidrepo.existsById(bid.getId()));
 		iBidrepo.delete(bid);
-		// iStorableRepo.delete(bid);
 		assertTrue(iLotRepo.existsById(lot.getId()));
 		assertTrue(!iLotRepo.existsById(bid.getId()));
 	}
@@ -483,8 +496,47 @@ public class LotsUnitTests {
 		assertEquals(newBid, lot.getPendingAutoBid());
 
 	}
+	
+	
+	@Test
+	void addMultipileUniqueLots_toSetInUser_inMultipleThreadsPassess() throws InterruptedException, ExecutionException {
+		 User user =  testUserService.getMeSimpleUser();
+		    int threads = 10;
+		    ExecutorService service =
+		      Executors.newFixedThreadPool(threads);
+		 CountDownLatch latch = new CountDownLatch(1);
+		 AtomicBoolean running = new AtomicBoolean();
+		 AtomicInteger overlaps = new AtomicInteger();
+		 Collection<Future<Boolean>> futures =
+				  new ArrayList<>(threads);
+		 for (int t = 0; t < threads; ++t) {
+		   final Lot lot = testLotService.getMeSimpleLot();		
+		   futures.add(
+		     service.submit(
+		       () ->  {
+		        
+					latch.await();
+				
+		         if (running.get()) {
+		           overlaps.incrementAndGet();
+		         }
+		         running.set(true);
+		         boolean bool = user.addLotToSet(lot);
+		         running.set(false);
+		         return bool;
+		       }
+		     )
+		     );
+		    
+		 }
+		 latch.countDown();
+		 for (Future<Boolean> f : futures) {
+			 assertTrue(f.get().equals(true));
+		 }
+		 assertTrue(overlaps.get()>0);
+		 assertTrue(user.getNumberOfLots()==10);
+	}
 
-	// Test methods for endpoints
 
 	@Test
 	void testGetAllEnts() throws IOException, URISyntaxException, JSONException {
@@ -645,5 +697,7 @@ public class LotsUnitTests {
 //		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
 //		assertTrue(iStorableRepo.count() == 0 );
 // 	}
+	
+	
 
 }

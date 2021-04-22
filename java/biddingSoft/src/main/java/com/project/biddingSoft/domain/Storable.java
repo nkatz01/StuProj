@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.project.biddingSoft.service.StorableService;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,22 +69,15 @@ public abstract class Storable  {
 	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	//@Setter(AccessLevel.NONE)
- protected Long id;
+	protected Long id;	
+
 	
 	public Long getId() {
 		return id;
 	}
 	
-	
 	@NaturalId
 	protected UUID businessId = new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1());
 
-	public UUID getBusinessId() {
-		return businessId;
-	}
-	public void setBusinessId(UUID businessId) {
-		this.businessId = businessId;
-	}
-
+	 
 }

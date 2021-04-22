@@ -193,8 +193,8 @@ public class Lot extends Storable {
 		return true;
 	}
 
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Autowired
 	@Transient
 	private static ExceptionsCreateor bidSoftExcepFactory;
@@ -205,8 +205,8 @@ public class Lot extends Storable {
 		Lot.bidSoftExcepFactory = bidSoftExcepFactory;
 	}
 
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@JsonManagedReference(value = "bidOnLot")
 	@JsonProperty("bidSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL)
@@ -216,16 +216,16 @@ public class Lot extends Storable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) 
 	@JsonProperty("user")
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	
 	private User user;
 
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private double highestBid;// setter getter?
 
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Value("${Lot.title}")
 	@JsonProperty("title")
 	public String title;
@@ -233,18 +233,18 @@ public class Lot extends Storable {
 	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
 	@JsonProperty("ZONE")
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
 	@JsonProperty("biddingIncrement")
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private double biddingIncrement;
 
 	@JsonProperty("reservePrice")
@@ -252,14 +252,14 @@ public class Lot extends Storable {
 
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private double startingPrice;
 
 	@JsonProperty("startTime")
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
 
 	@JsonIgnoreProperties(value = { "applications", "hibernateLazyInitializer" })
@@ -267,15 +267,15 @@ public class Lot extends Storable {
 
 	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
 	@JsonProperty("leadingBidder")
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private User leadingBidder;
 
 	@ToString.Exclude
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name = "autoBid_id")
 	@JsonProperty("pendingAutoBid")
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Bid pendingAutoBid;
 
 	@JsonIgnore
@@ -302,21 +302,21 @@ public class Lot extends Storable {
 	}
 
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Duration triggerDuration;
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
 	private Duration autoExtendDuration;
-	//@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	private Instant extendedEndtime = endTime;
 
 	public static String ANSI_RED = "\u001B[31m";
 	public static String ANSI_RESET = "\u001B[0m";
 	private static Logger logger = LoggerFactory.getLogger(Lot.class);
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	@Transient
 	private Clock clock;
 

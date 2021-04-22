@@ -122,23 +122,19 @@ public class User extends Storable {
 			cascade = CascadeType.ALL
 
 	)
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	Set<Lot> lotsCreatedSet =  Collections.synchronizedSet(new HashSet<Lot>());
 
 	@JsonManagedReference(value = "bidOnUser")
 	@JsonProperty("bidsBadeSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", // variable in Bid class - links a Bid with a given user
 			cascade = CascadeType.ALL)
-	//@Setter(AccessLevel.NONE)
-	//@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Set<Bid> bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>());
 
-//	public Lot getLot(int id) {
-//		return lotsCreatedSet.get(id);
-//		
-//
-//	}
+
 
 	public boolean addLotToSet(Lot lot) {
 		return  lotsCreatedSet.add(lot);
@@ -152,6 +148,10 @@ public class User extends Storable {
 	public User() {
 
 
+	}
+	
+	public int getNumberOfLots() {
+		return this.lotsCreatedSet.size();
 	}
 
 	public boolean createdLotscontainsLot(Lot lot) {

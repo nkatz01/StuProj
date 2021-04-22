@@ -98,7 +98,7 @@ public class Bid extends Storable {
 	@JsonBackReference(value = "bidOnLot")
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "lot")
-	//@Getter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private Lot lot; // setter for the purpose of update testing
 
 	@JsonProperty("amount")
