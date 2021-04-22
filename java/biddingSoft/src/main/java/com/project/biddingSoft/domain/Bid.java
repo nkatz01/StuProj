@@ -44,7 +44,7 @@ import lombok.ToString;
  *
  */
 
-@ToString
+@ToString(callSuper=true, includeFieldNames=true)
 @Entity
 @Component
 @PrimaryKeyJoinColumn(name = "id")
@@ -53,6 +53,35 @@ import lombok.ToString;
 @Getter
 public class Bid extends Storable {
 
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		long temp;
+		temp = Double.doubleToLongBits(amount);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Bid other = (Bid) obj;
+		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
+			return false;
+		if (lot == null) {
+			if (other.lot != null)
+				return false;
+		} else if (!lot.equals(other.lot))
+			return false;
+		return true;
+	}
 
 	@ToString.Exclude
 	@JsonBackReference(value = "bidOnUser")
@@ -69,7 +98,7 @@ public class Bid extends Storable {
 	@JsonBackReference(value = "bidOnLot")
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "lot")
-	@Getter(AccessLevel.NONE)
+	//@Getter(AccessLevel.NONE)
 	private Lot lot; // setter for the purpose of update testing
 
 	@JsonProperty("amount")
@@ -85,7 +114,7 @@ public class Bid extends Storable {
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
 		this.bidder = bidBuilder.bidder;
-		this.bidder.addBidToList(this);
+		this.bidder.addBidToSet(this);
 	}
 	// instance variables
 
@@ -93,7 +122,7 @@ public class Bid extends Storable {
 		this.lot = lot;
 		this.amount = amount;
 		this.bidder = bidder;
-		this.bidder.addBidToList(this);
+		this.bidder.addBidToSet(this);
 	}
 
 	// setters, getters
@@ -131,39 +160,5 @@ public class Bid extends Storable {
 	}
 
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		long temp;
-		temp = Double.doubleToLongBits(amount);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((bidder == null) ? 0 : bidder.hashCode());
-		result = prime * result + ((lot == null) ? 0 : lot.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Bid other = (Bid) obj;
-		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
-			return false;
-		if (bidder == null) {
-			if (other.bidder != null)
-				return false;
-		} else if (!bidder.equals(other.bidder))
-			return false;
-		if (lot == null) {
-			if (other.lot != null)
-				return false;
-		} else if (!lot.equals(other.lot))
-			return false;
-		return true;
-	}
+	
 }

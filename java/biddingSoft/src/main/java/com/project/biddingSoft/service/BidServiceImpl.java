@@ -112,7 +112,7 @@ public class BidServiceImpl implements IService<Bid> {
 			stringBuilder.append("\n" + bid.getBidder().getClass().getName() + " as Bidder " + bid.getBidder().getId());
 		}
 
-		bid.getBidder().addBidToList(bid);// fine (for the purpose of demonstrating persistence) even though bid might
+		bid.getBidder().addBidToSet(bid);// fine (for the purpose of demonstrating persistence) even though bid might
 											// not be valid according to business rules.
 		iBidRepo.save(bid);// doesn't get saved via cascade, as bid wasn't added to lot.bidList via
 							// placeBid() -> addBid().
@@ -123,7 +123,7 @@ public class BidServiceImpl implements IService<Bid> {
 
 	public void associatCreatorWithLot(Bid bid) {
 		if (bid.getLot().getId() == null) {
-				 bid.getLot().getUser().addLotToList(bid.getLot());
+				 bid.getLot().getUser().addLotToSet(bid.getLot());
 
 		}
 	

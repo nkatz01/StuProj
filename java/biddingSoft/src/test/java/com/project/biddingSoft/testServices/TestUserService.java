@@ -19,14 +19,14 @@ public class TestUserService {
 	@Bean
 	public User getMeSimpleUser() {
 		return new User.UserBuilder(genRandString(7, false), genRandString(8, true))
-				.lotsCreated(new ArrayList<Lot>())
-				.bidsCreated(new ArrayList<Bid>())
+				.lotsCreated(new HashSet<Lot>())
+				.bidsCreated(new HashSet<Bid>())
 				.build();
 	}
 	public User getMeSimpleBidder() {
 		return new User.UserBuilder(genRandString(7, false), genRandString(8, true))
-				.lotsCreated(new ArrayList<Lot>())
-				.bidsCreated(new ArrayList<Bid>())
+				.lotsCreated(new HashSet<Lot>())
+				.bidsCreated(new HashSet<Bid>())
 				.build();
 	}
 	

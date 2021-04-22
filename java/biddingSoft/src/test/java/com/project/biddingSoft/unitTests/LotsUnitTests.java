@@ -51,6 +51,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 
@@ -72,6 +73,7 @@ import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
 import com.rits.cloning.Cloner;
 
+import bsh.Console;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 @TestMethodOrder(OrderAnnotation.class)
@@ -116,12 +118,7 @@ public class LotsUnitTests {
 	void setIStorable(IStorableRepo istorableRepo) {
 		iStorableRepo = istorableRepo;
 	}
-//	@Test
-//	void canCloneUser() {
-//		//User user1 = testUserService.getMeSimpleUser();
-//		Lot lot1 = testLotService.getMeSimpleLot();
-//		var attr = lot1.getStartTime().
-//	}
+
 	
 	@Test
 	@Order(1)
@@ -134,7 +131,7 @@ public class LotsUnitTests {
 		assertThat(servletInitializer).isNotNull();
 
 	}
-
+	
 	@BeforeAll
 	void removeAllTables() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -153,32 +150,52 @@ public class LotsUnitTests {
 		entityManager.getTransaction().commit();
 
 		User user = testUserService.getMeSimpleUser();
-		user.addLotToList(wiredLot);//user has lot
+		user.addLotToSet(wiredLot);//user has lot
 		wiredLot.setUser(user);
-
+		//System.out.println(wiredLot);
 		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
+
 		wiredLot.placeBid(bid);
 		iUserRepo.save(wiredLot.getUser());
-		iUserRepo.save(bid.getBidder());
-		iBidrepo.save(bid);
+	
 
 	}
 	
 	@Test
-	void testEqualityOnUsers(){
+	void testEqualityOnUsers(){//remember to test that with different ids can also be equal
 		User user1 = testUserService.getMeSimpleUser();
 		User user2 = testUserService.getMeSimpleUser();
 		assertNotEquals(user1, user2);
 		user2 = cloner.deepClone(user1);
 		assertFalse(user1==user2);
 		assertEquals(user1, user2);
+		
+		
 		user2.setUsername("somethingElse");
 		assertNotEquals(user1, user2);
 		
 		user2 = cloner.deepClone(user1);
+		iUserRepo.save(user1);
+		System.out.println(user1.hashCode());
+		System.out.println(user2.hashCode());
+		assertEquals(user1, user2);
 		user2.setBusinessId(strblService.newUUID());
-		iStorableRepo.save(user1);
-		iStorableRepo.save(user2);
+		iUserRepo.save(user2);
+		
+	}
+	
+	@Test 
+	void testThatCallingEquals_andHashCode_doesntThrowStackOverFlow() {
+		User user = testUserService.getMeSimpleUser();
+		assertTrue(user.equals(user));
+		user.hashCode(); 
+		Lot lot = testLotService.getMeSimpleLot(user); 
+		assertTrue(lot.equals(lot));
+		lot.hashCode();
+		Bid bid = testBidService.getOneIncrBid(lot);
+		assertTrue(bid.equals(bid));
+		bid.hashCode();
+		
 	}
 
 	@Test
@@ -225,10 +242,7 @@ public class LotsUnitTests {
 
 	}
 
-	// @Transactional//because lots are loaded eagurly together with bids, bids
-	// won't get deleted.
-	// I guess the reason is because of the reference to lot maintained within bid's
-	// FK column named lot_id
+	
 	@Test
 	void deleteBid_leavesLotInDtbs() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());

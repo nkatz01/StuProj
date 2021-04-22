@@ -70,5 +70,14 @@ public    class ExceptionsCreateor {
 	  }
 	  
   }
+  public class BidderOwnsLot extends BiddingSoftExceptions {
+	  private static final String throwableMsg = "owner of a lot can not bid on it";
+	  private static final int id = 4;
+	  
+	  public BidderOwnsLot() {
+		  super(id, new Throwable(throwableMsg));
+	  }
+	  
+  }
   
 }

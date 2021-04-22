@@ -4,10 +4,12 @@
 package com.project.biddingSoft.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -53,18 +55,20 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@ToString
+@ToString(callSuper=true, includeFieldNames=true)
 @Entity
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
 public class User extends Storable {
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((bidsBadeList == null) ? 0 : bidsBadeList.hashCode());
-		result = prime * result + ((lotsCreatedList == null) ? 0 : lotsCreatedList.hashCode());
+		result = prime * result + ((bidsBadeSet == null) ? 0 : bidsBadeSet.hashCode());
+		result = prime * result + ((lotsCreatedSet == null) ? 0 : lotsCreatedSet.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
@@ -78,15 +82,15 @@ public class User extends Storable {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (bidsBadeList == null) {
-			if (other.bidsBadeList != null)
+		if (bidsBadeSet == null) {
+			if (other.bidsBadeSet != null)
 				return false;
-		} else if (!bidsBadeList.equals(other.bidsBadeList))
+		} else if (!bidsBadeSet.equals(other.bidsBadeSet))
 			return false;
-		if (lotsCreatedList == null) {
-			if (other.lotsCreatedList != null)
+		if (lotsCreatedSet == null) {
+			if (other.lotsCreatedSet != null)
 				return false;
-		} else if (!lotsCreatedList.equals(other.lotsCreatedList))
+		} else if (!lotsCreatedSet.equals(other.lotsCreatedSet))
 			return false;
 		if (username == null) {
 			if (other.username != null)
@@ -99,49 +103,49 @@ public class User extends Storable {
 	public User(UserBuilder userBuilder) {
 		this.id = userBuilder.id;
 		this.username = userBuilder.username;
-		this.lotsCreatedList = new ArrayList<Lot>(userBuilder.lotsCreatedList);
-		this.bidsBadeList = new ArrayList<Bid>(userBuilder.bidsBadeList);
+		this.lotsCreatedSet = userBuilder.lotsCreatedSet;//lot builder has already done the sync work
+		this.bidsBadeSet = userBuilder.bidsBadeSet;
 	}
 
-	public User(Long id, String username, List<Lot> lotsCreatedList) {
+	public User(Long id, String username, Set<Lot> lotsCreatedSet, Set<Bid> bidsBadeSet) {
 		this.id = id;
 		this.username = username;
-		this.lotsCreatedList = new ArrayList<Lot>(lotsCreatedList);
-		this.bidsBadeList = new ArrayList<Bid>(bidsBadeList);
+		this.lotsCreatedSet =Collections.synchronizedSet( new HashSet<Lot>(lotsCreatedSet));
+		this.bidsBadeSet =Collections.synchronizedSet(new HashSet<Bid>( bidsBadeSet));
 	}
 
 	@Column(name = "username")
 	private String username;
-	@JsonProperty("lotsCreatedList")
+	@JsonProperty("lotsCreatedSet")
 	@JsonManagedReference(value = "lotOnUser")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", // , variable in Lot class - links a lot with a given user
 			cascade = CascadeType.ALL
 
 	)
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	List<Lot> lotsCreatedList = new ArrayList<Lot>();
+	//@Setter(AccessLevel.NONE)
+	//@Getter(AccessLevel.NONE)
+	Set<Lot> lotsCreatedSet =  Collections.synchronizedSet(new HashSet<Lot>());
 
 	@JsonManagedReference(value = "bidOnUser")
-	@JsonProperty("bidsBadeList")
+	@JsonProperty("bidsBadeSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", // variable in Bid class - links a Bid with a given user
 			cascade = CascadeType.ALL)
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	private List<Bid> bidsBadeList = new ArrayList<Bid>();
+	//@Setter(AccessLevel.NONE)
+	//@Getter(AccessLevel.NONE)
+	private Set<Bid> bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>());
 
-	public Lot getLot(int id) {
-		return lotsCreatedList.get(id);
-		
+//	public Lot getLot(int id) {
+//		return lotsCreatedSet.get(id);
+//		
+//
+//	}
 
+	public boolean addLotToSet(Lot lot) {
+		return  lotsCreatedSet.add(lot);
 	}
 
-	public boolean addLotToList(Lot lot) {// handle exception
-		return !lotsCreatedList.contains(lot) && lotsCreatedList.add(lot);
-	}
-
-	public boolean addBidToList(Bid bid) {// handle exception
-		return !bidsBadeList.contains(bid) && bidsBadeList.add(bid);
+	public boolean addBidToSet(Bid bid) {
+		return bidsBadeSet.add(bid);
 	}
 
 	@JsonCreator
@@ -151,7 +155,7 @@ public class User extends Storable {
 	}
 
 	public boolean createdLotscontainsLot(Lot lot) {
-		return this.lotsCreatedList.contains(lot);
+		return this.lotsCreatedSet.contains(lot);
 
 	}
 
@@ -160,21 +164,21 @@ public class User extends Storable {
 		private Long id;
 
 		private String username;
-		private List<Lot> lotsCreatedList;
-		private List<Bid> bidsBadeList;
+		private Set<Lot> lotsCreatedSet;
+		private Set<Bid> bidsBadeSet;
 
 		public UserBuilder(String username, String password) {
 			this.username = username;
 
 		}
 
-		public UserBuilder lotsCreated(List<Lot> lotsCreatedList) {
-			this.lotsCreatedList = new ArrayList<Lot>( lotsCreatedList);
+		public UserBuilder lotsCreated(Set<Lot> lotsCreatedSet) {
+			this.lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>( lotsCreatedSet));
 			return this;
 		}
 
-		public UserBuilder bidsCreated(List<Bid> bidsBadeList) {
-			this.bidsBadeList = new ArrayList<Bid>( bidsBadeList);
+		public UserBuilder bidsCreated(Set<Bid> bidsBadeSet) {
+			this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>( bidsBadeSet));
 			return this;
 		}
 
