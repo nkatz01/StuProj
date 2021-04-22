@@ -101,21 +101,16 @@ public class LotsUnitTests {
 	static final String ANSI_RESET = "\u001B[0m";
 	private static final Logger logger = LoggerFactory.getLogger(LotsUnitTests.class);
 	private Cloner cloner = new Cloner();
-	@Autowired
-	ServletInitializer servletInitializer;
-	@Autowired
-	Lot wiredLot;
+	
+	
 	@Autowired
 	TestLotService testLotService;
 	@Autowired
 	TestBidService testBidService;
 	@Autowired
 	TestUserService testUserService;
-	@Autowired
-	@Qualifier("getTestRestTemplate")
-	RestTemplate restTemplate;
-	@Autowired
-	private EntityManagerFactory entityManagerFactory;
+	
+
 	@Autowired
 	private IUserRepo iUserRepo;
 	@Autowired
@@ -123,7 +118,7 @@ public class LotsUnitTests {
 	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
-	private StorableTestService strblService; 
+	private StorableTestService strblService;
 	@Autowired
 	private static IStorableRepo<Storable> iStorableRepo;
 
@@ -134,91 +129,45 @@ public class LotsUnitTests {
 	}
 
 	
-	@Test
-	@Order(1)
-	void testThatSuperRepo_canReturnSubclass_ofStorable() {
-		assertTrue(iStorableRepo.findById(wiredLot.getId()).isPresent());
-	}
+
+	
+	
 
 	@Test
-	void contextLoads() throws Exception {
-		assertThat(servletInitializer).isNotNull();
-
-	}
-	
-	@BeforeAll
-	void removeAllTables() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		entityManager.getTransaction().begin();
-		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
-		entityManager.createNativeQuery("TRUNCATE TABLE bid;").executeUpdate();
-		entityManager.createNativeQuery("TRUNCATE TABLE lot;").executeUpdate();
-		entityManager.createNativeQuery("TRUNCATE TABLE user;").executeUpdate();
-		entityManager.createNativeQuery("TRUNCATE TABLE storable;").executeUpdate();
-		entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
-		entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 0;").executeUpdate();
-		entityManager.createNativeQuery("UPDATE  biddingsoft.hibernate_sequence SET next_val = 1;").executeUpdate();
-		entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 1;").executeUpdate();
-
-		entityManager.flush();
-		entityManager.getTransaction().commit();
-
-		User user = testUserService.getMeSimpleUser();
-		user.addLotToSet(wiredLot);
-		wiredLot.setUser(user);
-		Bid bid = testBidService.getOneIncrBid(wiredLot);// for the purpose of endpoints' tests
-
-		wiredLot.placeBid(bid);
-		iUserRepo.save(wiredLot.getUser());
-	
-
-	}
-	
-
-	
-	@Test
-	void testEqualityOnUsers(){
+	void testEqualityOnUsers() {
 		User user1 = testUserService.getMeSimpleUser();
 		User user2 = testUserService.getMeSimpleUser();
 		assertNotEquals(user1, user2);
 		user2 = cloner.deepClone(user1);
-		assertFalse(user1==user2);
+		assertFalse(user1 == user2);
 		assertEquals(user1, user2);
-		
-		
+
 		user2.setUsername("somethingElse");
 		assertNotEquals(user1, user2);
-		
+
 		user2 = cloner.deepClone(user1);
 		iUserRepo.save(user1);
-		System.out.println(user1.hashCode());
-		System.out.println(user2.hashCode());
 		assertEquals(user1, user2);
 		user2.setBusinessId(strblService.newUUID());
 		iUserRepo.save(user2);
-		
+
 	}
-	
-	@Test 
+
+	@Test
 	void testThatCallingEquals_andHashCode_doesntThrowStackOverFlow() {
 		User user = testUserService.getMeSimpleUser();
 		assertTrue(user.equals(user));
-		user.hashCode(); 
-		Lot lot = testLotService.getMeSimpleLot(user); 
+		user.hashCode();
+		Lot lot = testLotService.getMeSimpleLot(user);
 		assertTrue(lot.equals(lot));
 		lot.hashCode();
 		Bid bid = testBidService.getOneIncrBid(lot);
 		assertTrue(bid.equals(bid));
 		bid.hashCode();
-		
+
 	}
 
-	@Test
-	void test_app_is_up() throws IOException {
-		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8080/", String.class);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("Service running", response.getBody());
-	}
+
 
 	@Test
 	void newLot_canBeSavedToDtbs() throws Exception {
@@ -257,7 +206,6 @@ public class LotsUnitTests {
 
 	}
 
-	
 	@Test
 	void deleteBid_leavesLotInDtbs() {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
@@ -304,19 +252,6 @@ public class LotsUnitTests {
 
 	}
 
-	@Test
-	void whenLotIsAutoWired_autowiredAttributes_areSet() throws NoSuchFieldException, IllegalAccessException {
-		assertNotNull(FieldUtils.readField(wiredLot, "title", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "description", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "ZONE", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "biddingIncrement", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "startingPrice", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "triggerDuration", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "autoExtendDuration", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "clock", true));
-		assertNotNull(FieldUtils.readField(wiredLot, "bidSoftExcepFactory", true));
-
-	}
 
 	@Test
 	void whenLotIsCreated_extendedEndTimeEqueals_endTime() throws IllegalAccessException {
@@ -496,208 +431,40 @@ public class LotsUnitTests {
 		assertEquals(newBid, lot.getPendingAutoBid());
 
 	}
-	
-	
+
 	@Test
 	void addMultipileUniqueLots_toSetInUser_inMultipleThreadsPassess() throws InterruptedException, ExecutionException {
-		 User user =  testUserService.getMeSimpleUser();
-		    int threads = 10;
-		    ExecutorService service =
-		      Executors.newFixedThreadPool(threads);
-		 CountDownLatch latch = new CountDownLatch(1);
-		 AtomicBoolean running = new AtomicBoolean();
-		 AtomicInteger overlaps = new AtomicInteger();
-		 Collection<Future<Boolean>> futures =
-				  new ArrayList<>(threads);
-		 for (int t = 0; t < threads; ++t) {
-		   final Lot lot = testLotService.getMeSimpleLot();		
-		   futures.add(
-		     service.submit(
-		       () ->  {
-		        
-					latch.await();
-				
-		         if (running.get()) {
-		           overlaps.incrementAndGet();
-		         }
-		         running.set(true);
-		         boolean bool = user.addLotToSet(lot);
-		         running.set(false);
-		         return bool;
-		       }
-		     )
-		     );
-		    
-		 }
-		 latch.countDown();
-		 for (Future<Boolean> f : futures) {
-			 assertTrue(f.get().equals(true));
-		 }
-		 assertTrue(overlaps.get()>0);
-		 assertTrue(user.getNumberOfLots()==10);
+		User user = testUserService.getMeSimpleUser();
+		int threads = 10;
+		ExecutorService service = Executors.newFixedThreadPool(threads);
+		CountDownLatch latch = new CountDownLatch(1);
+		AtomicBoolean running = new AtomicBoolean();
+		AtomicInteger overlaps = new AtomicInteger();
+		Collection<Future<Boolean>> futures = new ArrayList<>(threads);
+		for (int t = 0; t < threads; ++t) {
+			final Lot lot = testLotService.getMeSimpleLot();
+			futures.add(service.submit(() -> {
+				latch.await();
+				if (running.get()) {
+					overlaps.incrementAndGet();
+				}
+				running.set(true);
+				boolean bool = user.addLotToSet(lot);
+				running.set(false);
+				return bool;
+			}));
+
+		}
+		latch.countDown();
+		for (Future<Boolean> f : futures) {
+			assertTrue(f.get().equals(true));
+		}
+		assertTrue(overlaps.get() > 0);
+		assertTrue(user.getNumberOfLots() == 10);
 	}
-
-
-	@Test
-	void testGetAllEnts() throws IOException, URISyntaxException, JSONException {
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(new URI("http://localhost:8080/allents"));
-		request.addHeader("content-type", "application/json");
-		HttpResponse response = httpClient.execute(request);
-		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		JSONArray json = new JSONArray(EntityUtils.toString(response.getEntity()));
-		assertEquals(json.length(), iStorableRepo.count());
-	}
-
-	@Test
-	@Order(2)
-	void testPostEntity_forUser() throws IOException, URISyntaxException {
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-		StringEntity params = new StringEntity("{\"type\": \"user\"}");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(201, response.getStatusLine().getStatusCode());
-
-	}
-
-	@Test
-	@Order(3)
-	void testPostEntity_newLotWithExistingUser() throws IOException, URISyntaxException {
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-		StringEntity params = new StringEntity(
-				"{\"type\":\"lot\", \"user\":{\"id\": " + wiredLot.getUser().getId() + " }}");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(201, response.getStatusLine().getStatusCode());
-
-	}
-
-	@Test
-	@Order(4)
-	void testPostEntity_newBidWithExistingUser_AndExistingBidder() throws IOException, URISyntaxException {
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost request = new HttpPost(new URI("http://localhost:8080/create"));
-		StringEntity params = new StringEntity(
-				"{\"type\":\"bid\", \"lot\": {\"type\":\"lot\",\"user\":{\"id\": " + wiredLot.getUser().getId()
-						+ "}}, \"bidder\":{\"id\": " + wiredLot.getLeadingBidder().getId() + "} }\r\n" + "");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(201, response.getStatusLine().getStatusCode());
-
-	}
-
-	@Test
-	@Order(5)
-	void assertWiredLot_isInDtbs_andIdIsNotNull() {
-		assertTrue(iLotRepo.existsById(wiredLot.getId()));
-		assertTrue(iBidrepo.existsById(wiredLot.getBid(0).getId()));
-
-	}
-
-	@Test
-	@Order(6)
-	void testGetOneEntity() throws IOException, URISyntaxException, JSONException {
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(new URI("http://localhost:8080/getent/" + wiredLot.getId()));
-		request.addHeader("content-type", "application/json");
-		HttpResponse response = httpClient.execute(request);
-		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-		Lot lot = new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-				.readValue(EntityUtils.toString(response.getEntity()), Lot.class);
-		assertEquals(wiredLot.getId(), lot.getId());
-	}
-
-	@Test
-	@Order(7)
-	void testUpdateUser() throws IOException, URISyntaxException {
-		String username = iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername();
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-		StringEntity params = new StringEntity(
-				"{\"type\": \"userdto\",\"id\": " + wiredLot.getUser().getId() + ", \"username\":\"Jim\"}");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(200, response.getStatusLine().getStatusCode());
-		assertNotEquals(username, iUserRepo.findById(wiredLot.getUser().getId()).get().getUsername());
-
-	}
-
-	@Test
-	@Order(7)
-	void testUpdateLot() throws IOException, URISyntaxException {
-		User newUser = testUserService.getMeSimpleUser();
-		iUserRepo.save(newUser);
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-		StringEntity params = new StringEntity("{\"type\": \"lotdto\",\"id\": " + wiredLot.getId()
-				+ ", \"reservePrice\":\"50.0\", \"user\": {\"id\":" + newUser.getId() + "}}");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(200, response.getStatusLine().getStatusCode());
-		assertEquals(50.0, iLotRepo.findById(wiredLot.getId()).get().getReservePrice());
-		assertEquals(newUser.getId(), iLotRepo.findById(wiredLot.getId()).get().getUser().getId());
-
-	}
-
-	@Test
-	@Order(8)
-	void testUpdateBid() throws IOException, URISyntaxException {
-		Lot newLot = testLotService.getMeSimpleLot();
-		iUserRepo.save(newLot.getUser());
-		iLotRepo.save(newLot);
-		User newBidder = testUserService.getMeSimpleUser();
-		iUserRepo.save(newBidder);
-
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPut request = new HttpPut(new URI("http://localhost:8080/update"));
-		StringEntity params = new StringEntity("{\"type\": \"biddto\",\"id\": " + wiredLot.getBid(0).getId()
-				+ ", \"amount\":\"20.0\", \"bidder\": {\"id\":" + newBidder.getId()
-				+ "}, \"lot\": {\"type\":\"lot\",\"id\":" + newLot.getId() + "}}");
-		request.addHeader("content-type", "application/json");
-		request.setEntity(params);
-		HttpResponse response = httpClient.execute(request);
-		assertEquals(200, response.getStatusLine().getStatusCode());
-		assertEquals(newLot.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getLot().getId());
-		assertEquals(newBidder.getId(), iBidrepo.findById(wiredLot.getBid(0).getId()).get().getBidder().getId());
-		assertEquals(20.0, iBidrepo.findById(wiredLot.getBid(0).getId()).get().getAmount());
-
-	}
-
-//	@Test
-//	 @Order(9)
-//	 void testDelOneEnt() throws IOException , URISyntaxException, JSONException {
-//	
-//		
-//		HttpClient httpClient = HttpClientBuilder.create().build();
-//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delent/" +wiredLot.getId()));
-//		HttpResponse response = httpClient.execute(request);
-//		assertEquals(200,response.getStatusLine().getStatusCode());
-//		assertTrue(!iLotRepo.existsById(wiredLot.getId()));
-//	}
-//	@Test
-//	 @AfterAll
-//	 void testDelAllEnts() throws IOException , URISyntaxException, JSONException {
-//	
-//		assertTrue(iStorableRepo.count() >0 );
-//		HttpClient httpClient = HttpClientBuilder.create().build();
-//		HttpDelete request = new HttpDelete(new URI("http://localhost:8080/delents"));
-//		HttpResponse response = httpClient.execute(request);
-//		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-//		assertTrue(iStorableRepo.count() == 0 );
-// 	}
 	
-	
+
+
+
 
 }

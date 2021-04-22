@@ -44,7 +44,7 @@ import lombok.ToString;
  *
  */
 
-@ToString(callSuper=true, includeFieldNames=true)
+@ToString(callSuper = true, includeFieldNames = true)
 @Entity
 @Component
 @PrimaryKeyJoinColumn(name = "id")
@@ -52,7 +52,6 @@ import lombok.ToString;
 @Setter
 @Getter
 public class Bid extends Storable {
-
 
 	@Override
 	public int hashCode() {
@@ -159,6 +158,4 @@ public class Bid extends Storable {
 		}
 	}
 
-
-	
 }

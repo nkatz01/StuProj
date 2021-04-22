@@ -149,7 +149,7 @@ public class User extends Storable {
 
 
 	}
-	
+	@JsonIgnore
 	public int getNumberOfLots() {
 		return this.lotsCreatedSet.size();
 	}
