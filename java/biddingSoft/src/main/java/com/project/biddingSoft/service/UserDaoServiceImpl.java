@@ -3,33 +3,13 @@
  */
 package com.project.biddingSoft.service;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.StreamSupport;
-
-import javax.persistence.Transient;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-
-import java.lang.reflect.*;
-
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.project.biddingSoft.BiddingSoftwareApplication;
-import com.project.biddingSoft.dao.ILotRepo;
-
 import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
-import com.project.biddingSoft.domain.Bid;
-import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
@@ -43,24 +23,13 @@ import com.project.biddingSoft.domain.BiddingSoftMapper;
 @Service
 @Component
 @Qualifier("UserServiceImpl")
-public   class UserServiceImpl implements IService<User> {
-	private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-	 public UserServiceImpl() {
-	}
+public   class UserDaoServiceImpl implements IDaoService<User> {
 	 
 	@Autowired
 	BiddingSoftMapper userMapper; 
 	@Autowired
-	private static IUserRepo iUserRepo;
+	private IUserRepo iUserRepo;
 
-	
-	@Autowired
-	public void setIUserRepo(IUserRepo iuserRepo) {
-		 iUserRepo = iuserRepo;
-	}
-	@Autowired
-	private   IStorableRepo<Storable> iStorableRepo;
 
 	@Override
  	public  String persistEntity(User user)  {

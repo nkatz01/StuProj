@@ -3,24 +3,22 @@ package com.project.biddingSoft.service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.project.biddingSoft.dao.IUserRepo;
-
 @Configuration
 public class FactoryService {
 
 	@Bean
-	IService getUserServiceImpl() {
-		return new UserServiceImpl();
+	IDaoService getUserServiceImpl() {
+		return new UserDaoServiceImpl();
 	}
 
 	@Bean
-	IService getLotServiceImpl() {
-		return new LotServiceImpl();
+	IDaoService getLotServiceImpl() {
+		return new LotDaoServiceImpl();
 	}
 
 	@Bean
-	IService getBidServiceImpl() {
-		return new BidServiceImpl();
+	IDaoService getBidServiceImpl() {
+		return new BidDaoServiceImpl();
 	}
 
 }

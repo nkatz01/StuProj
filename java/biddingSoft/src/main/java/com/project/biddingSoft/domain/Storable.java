@@ -2,7 +2,6 @@ package com.project.biddingSoft.domain;
 
 
 
-import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.DiscriminatorColumn;
@@ -12,18 +11,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.NaturalId;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.project.biddingSoft.service.StorableService;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -67,15 +63,12 @@ public abstract class Storable  {
 		
 		return true;
 	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Setter(AccessLevel.NONE)
 	protected Long id;	
 
-	
-	public Long getId() {
-		return id;
-	}
-	
 	@NaturalId
 	protected UUID businessId = new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1());
 

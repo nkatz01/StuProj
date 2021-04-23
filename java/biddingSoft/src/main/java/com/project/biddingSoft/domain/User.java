@@ -3,12 +3,8 @@
  */
 package com.project.biddingSoft.domain;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -16,35 +12,16 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.JoinColumn;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import com.project.biddingSoft.dao.IUserRepo;
-import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -55,13 +32,12 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@ToString(callSuper=true, includeFieldNames=true)
+@ToString(callSuper = true, includeFieldNames = true)
 @Entity
 @Component
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue("User")
 public class User extends Storable {
-	
 
 	@Override
 	public int hashCode() {
@@ -103,15 +79,15 @@ public class User extends Storable {
 	public User(UserBuilder userBuilder) {
 		this.id = userBuilder.id;
 		this.username = userBuilder.username;
-		this.lotsCreatedSet = userBuilder.lotsCreatedSet;//lot builder has already done the sync work
+		this.lotsCreatedSet = userBuilder.lotsCreatedSet;// lot builder has already done the sync work
 		this.bidsBadeSet = userBuilder.bidsBadeSet;
 	}
 
 	public User(Long id, String username, Set<Lot> lotsCreatedSet, Set<Bid> bidsBadeSet) {
 		this.id = id;
 		this.username = username;
-		this.lotsCreatedSet =Collections.synchronizedSet( new HashSet<Lot>(lotsCreatedSet));
-		this.bidsBadeSet =Collections.synchronizedSet(new HashSet<Bid>( bidsBadeSet));
+		this.lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>(lotsCreatedSet));
+		this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>(bidsBadeSet));
 	}
 
 	@Column(name = "username")
@@ -122,22 +98,18 @@ public class User extends Storable {
 			cascade = CascadeType.ALL
 
 	)
-	@Setter(AccessLevel.NONE)
+	
 	@Getter(AccessLevel.NONE)
-	Set<Lot> lotsCreatedSet =  Collections.synchronizedSet(new HashSet<Lot>());
+	private Set<Lot> lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>());
 
 	@JsonManagedReference(value = "bidOnUser")
 	@JsonProperty("bidsBadeSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", // variable in Bid class - links a Bid with a given user
 			cascade = CascadeType.ALL)
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	private Set<Bid> bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>());
 
-
-
 	public boolean addLotToSet(Lot lot) {
-		return  lotsCreatedSet.add(lot);
+		return lotsCreatedSet.add(lot);
 	}
 
 	public boolean addBidToSet(Bid bid) {
@@ -147,8 +119,8 @@ public class User extends Storable {
 	@JsonCreator
 	public User() {
 
-
 	}
+
 	@JsonIgnore
 	public int getNumberOfLots() {
 		return this.lotsCreatedSet.size();
@@ -159,7 +131,7 @@ public class User extends Storable {
 
 	}
 
-	public static class UserBuilder {
+	public final static class UserBuilder {
 
 		private Long id;
 
@@ -173,12 +145,12 @@ public class User extends Storable {
 		}
 
 		public UserBuilder lotsCreated(Set<Lot> lotsCreatedSet) {
-			this.lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>( lotsCreatedSet));
+			this.lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>(lotsCreatedSet));
 			return this;
 		}
 
 		public UserBuilder bidsCreated(Set<Bid> bidsBadeSet) {
-			this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>( bidsBadeSet));
+			this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>(bidsBadeSet));
 			return this;
 		}
 

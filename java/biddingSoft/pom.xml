@@ -252,19 +252,7 @@
                 </annotationProcessorPaths>
             </configuration>
         </plugin>
-	<!-- 	<plugin>
-			<groupId>com.dominikcebula.cloning</groupId>
-			<artifactId>kostaskougios-cloning</artifactId>
-			<version>1.10.1.1</version>
-			<dependencies>
-			<dependency>
-			<groupId>com.dominikcebula.cloning</groupId>
-			<artifactId>kostaskougios-cloning</artifactId>
-			<version>1.10.1.1</version>
-		</dependency>
-		</dependencies>
-			<extensions>true</extensions>
-		</plugin> -->
+	
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

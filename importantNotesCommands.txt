@@ -53,9 +53,8 @@ or git diff FETCH_HEAD -- mydir/myfile.js (for individual file)
 SET FOREIGN_KEY_CHECKS = 0;
 drop table if exists bid;
 drop table if exists lot;
-drop table if exists lot_bid_list;
 drop table if exists user;
-drop table if exists user_lot_list;
+drop table if exists storable;
 SET FOREIGN_KEY_CHECKS = 1
 
 SET SQL_SAFE_UPDATES = 0;

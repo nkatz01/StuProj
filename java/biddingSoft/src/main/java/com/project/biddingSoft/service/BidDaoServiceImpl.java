@@ -3,39 +3,20 @@
  */
 package com.project.biddingSoft.service;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.StreamSupport;
-
 import javax.persistence.Transient;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-
-import java.lang.reflect.*;
-
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
 
-import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.BidDTO;
 import com.project.biddingSoft.domain.BiddingSoftMapper;
-import com.project.biddingSoft.domain.Lot;
-import com.project.biddingSoft.domain.LotDTO;
-import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
-import com.project.biddingSoft.domain.User;
-import com.project.biddingSoft.service.IService;
 
 /**
  * @author nuchem
@@ -44,35 +25,17 @@ import com.project.biddingSoft.service.IService;
 @Service
 @Component
 @Qualifier("BidServiceImpl")
-public class BidServiceImpl implements IService<Bid> {
-	private static final Logger logger = LoggerFactory.getLogger(BidServiceImpl.class);
-
-	@Transient
-	@Autowired
-	private static ILotRepo iLotRepo;
-	@Transient
-	@Autowired
-	private static IUserRepo iUserRepo;
-	@Transient
-	@Autowired
-	private static IBidRepo iBidRepo;
+public class BidDaoServiceImpl implements IDaoService<Bid> {
 
 	@Autowired
-	public void setIRepo(IBidRepo ibidRepo) {
-		iBidRepo = ibidRepo;
-	}
-
+	private ILotRepo iLotRepo;
 	@Autowired
-	public void setILotRepo(ILotRepo ilotrepo) {
-		iLotRepo = ilotrepo;
-	}
-
+	private IUserRepo iUserRepo;
 	@Autowired
-	public void setIUserRepo(IUserRepo iuserRepo) {
-		iUserRepo = iuserRepo;
-	}
+	private IBidRepo iBidRepo;
 
 	
+
 	@Autowired
 	private BiddingSoftMapper bidMapper;
 
@@ -107,7 +70,6 @@ public class BidServiceImpl implements IService<Bid> {
 			stringBuilder.append("\n" + bid.getLot().getClass().getName() + " " + bid.getLot().getId());
 		}
 		if (bidderIsNew(bid)) {
-
 			iUserRepo.save(bid.getBidder());
 			stringBuilder.append("\n" + bid.getBidder().getClass().getName() + " as Bidder " + bid.getBidder().getId());
 		}
@@ -123,15 +85,12 @@ public class BidServiceImpl implements IService<Bid> {
 
 	public void associatCreatorWithLot(Bid bid) {
 		if (bid.getLot().getId() == null) {
-				 bid.getLot().getUser().addLotToSet(bid.getLot());
-
+			bid.getLot().getUser().addLotToSet(bid.getLot());
 		}
-	
 	}
 
 	public boolean lotCreatorAndLotAreNew(Bid bid) {
 		return bid.getLot().getId() == null && bid.getLot().getUser().getId() == null;
-
 	}
 
 	public boolean lotIsNew(Bid bid) {

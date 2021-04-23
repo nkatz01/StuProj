@@ -113,4 +113,6 @@ public void givenPersonEntity_whenInsertedTwiceWithNativeQuery_thenPersistenceEx
 </repository>
 </repositories>
 				
-				
+				Field field =	user2.getClass().getSuperclass().getDeclaredField("businessId");
+		field.setAccessible(true);
+		field.set(user2, strblService.newUUID());

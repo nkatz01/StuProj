@@ -1,26 +1,19 @@
 package com.project.biddingSoft.domain;
 
-import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = UserDTO.class)
 @JsonSubTypes({ @JsonSubTypes.Type(value = LotDTO.class, name = "lotdto"),
-		@JsonSubTypes.Type(value = BidDTO.class, name = "biddto")  })
+		@JsonSubTypes.Type(value = BidDTO.class, name = "biddto") })
+@Setter
+@Getter
 public abstract class StorableDTO {
-	
-	
-	public StorableDTO() {
-		
-	}
-private Long id; 
-public Long getId() {
-	return id;
-}
-public void setId(Long id) {
-	this.id = id;
-}
-	
+	private Long id; 
+	private UUID businessId;
 }

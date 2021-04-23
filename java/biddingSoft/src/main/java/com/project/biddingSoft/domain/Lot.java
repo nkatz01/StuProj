@@ -3,22 +3,17 @@
  */
 package com.project.biddingSoft.domain;
 
-import java.io.Serializable;
 import java.time.Clock;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
@@ -26,11 +21,6 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -47,22 +37,14 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.google.common.annotations.VisibleForTesting;
-import com.project.biddingSoft.dao.ILotRepo;
 
 import com.project.biddingSoft.service.ExceptionsCreateor;
-import com.project.biddingSoft.service.ExceptionsCreateor.BiddingSoftExceptions;
-import com.rits.cloning.Cloner;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -75,7 +57,7 @@ import lombok.ToString;
 @Component
 @DiscriminatorValue("Lot")
 @PrimaryKeyJoinColumn(name = "id")
-@ToString(callSuper=true, includeFieldNames=true)
+@ToString(callSuper = true, includeFieldNames = true)
 @Setter
 @Getter
 public class Lot extends Storable {
@@ -205,8 +187,6 @@ public class Lot extends Storable {
 		Lot.bidSoftExcepFactory = bidSoftExcepFactory;
 	}
 
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	@JsonManagedReference(value = "bidOnLot")
 	@JsonProperty("bidSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL)
@@ -214,18 +194,11 @@ public class Lot extends Storable {
 	@ToString.Exclude
 	@JsonBackReference(value = "lotOnUser")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) 
+	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty("user")
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	
 	private User user;
-
 	@Setter(AccessLevel.NONE)
-	private double highestBid;// setter getter?
-
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
+	private double highestBid;
 	@Value("${Lot.title}")
 	@JsonProperty("title")
 	public String title;
@@ -233,38 +206,29 @@ public class Lot extends Storable {
 	@JsonProperty("description")
 	@Value("${Lot.description}")
 	@Column(name = "description")
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
 	@JsonProperty("ZONE")
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	private ZoneId ZONE;
 	@Value("${Lot.biddingIncrement}")
 	@JsonProperty("biddingIncrement")
-	@Setter(AccessLevel.NONE)
 	private double biddingIncrement;
 
 	@JsonProperty("reservePrice")
-	private double reservePrice = 0.0;// left setter for the purpose of update testing
+	private double reservePrice = 0.0;
 
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
-	@Setter(AccessLevel.NONE)
 	private double startingPrice;
 
 	@JsonProperty("startTime")
-	@Setter(AccessLevel.NONE)
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
-	@Setter(AccessLevel.NONE)
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
 
 	@JsonIgnoreProperties(value = { "applications", "hibernateLazyInitializer" })
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-
 	@JoinColumn(name = "leadingBidder_userId", referencedColumnName = "id")
 	@JsonProperty("leadingBidder")
 	@Setter(AccessLevel.NONE)
@@ -275,7 +239,6 @@ public class Lot extends Storable {
 	@JoinColumn(name = "autoBid_id")
 	@JsonProperty("pendingAutoBid")
 	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	private Bid pendingAutoBid;
 
 	@JsonIgnore
@@ -293,28 +256,21 @@ public class Lot extends Storable {
 	public Bid getBid(int index) {
 		Iterator<Bid> iter = bidSet.iterator();
 		Bid bid = null;
-		for(int i=0; iter.hasNext(); i++) {
+		for (int i = 0; iter.hasNext(); i++) {
 			bid = iter.next();
-			if(i == index)
-			return bid;
+			if (i == index)
+				return bid;
 		}
 		throw new IndexOutOfBoundsException();
 	}
 
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	private Duration triggerDuration;
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
 	@Value("#{T(java.time.Duration).parse('${Lot.autoExtendDuration}')}")
 	private Duration autoExtendDuration;
 	@Setter(AccessLevel.NONE)
 	private Instant extendedEndtime = endTime;
 
-	public static String ANSI_RED = "\u001B[31m";
-	public static String ANSI_RESET = "\u001B[0m";
-	private static Logger logger = LoggerFactory.getLogger(Lot.class);
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
 	@Transient
@@ -323,7 +279,7 @@ public class Lot extends Storable {
 	// Constructors
 	@JsonCreator
 	public Lot() {
-		
+
 	}
 
 	public Lot(LotBuilder lotBuilder) {
@@ -354,7 +310,7 @@ public class Lot extends Storable {
 		if (bid.getBidder().equals(this.user))
 			throw bidSoftExcepFactory.new BidderOwnsLot();
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
-		
+
 		try {
 			addBid(bid);
 
@@ -450,7 +406,7 @@ public class Lot extends Storable {
 		this.user = user;
 	}
 
-	public static class LotBuilder {
+	public final static class LotBuilder {
 
 		private Long id;
 		private ZoneId ZONE;
@@ -526,7 +482,5 @@ public class Lot extends Storable {
 		}
 
 	}
-	
-	
 
 }

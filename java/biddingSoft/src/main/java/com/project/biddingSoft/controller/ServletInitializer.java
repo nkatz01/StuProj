@@ -28,7 +28,7 @@ import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.domain.UserDTO;
-import com.project.biddingSoft.service.IService;
+import com.project.biddingSoft.service.IDaoService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,22 +40,18 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	@Autowired
 	@Qualifier("getUserServiceImpl")
-	private IService<Storable> userServiceImpl;
+	private IDaoService<Storable> userServiceImpl;
 	@Autowired
 	@Qualifier("getLotServiceImpl")
-	private IService<Storable> lotServiceImpl;
+	private IDaoService<Storable> lotServiceImpl;
 	@Autowired
 	@Qualifier("getBidServiceImpl")
-	private IService<Storable> bidServiceImpl;
+	private IDaoService<Storable> bidServiceImpl;
 
 	@Autowired
-	private static IStorableRepo<Storable> iStorableRepo;
+	private  IStorableRepo<Storable> iStorableRepo;
 
-	@Autowired
-	@Qualifier("IStorableRepo")
-	public void setIStorable(IStorableRepo istorableRepo) {
-		iStorableRepo = istorableRepo;
-	}
+
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

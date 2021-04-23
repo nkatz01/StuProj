@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LotService {
 
-	public static Instant between(Instant startInclusive, Instant endExclusive) {
+	public final static Instant between(Instant startInclusive, Instant endExclusive) {
 		long startSeconds = startInclusive.getEpochSecond();
 		long endSeconds = endExclusive.getEpochSecond();
 		long random = ThreadLocalRandom.current().nextLong(startSeconds, endSeconds);

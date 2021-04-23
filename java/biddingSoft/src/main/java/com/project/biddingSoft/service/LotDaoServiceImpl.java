@@ -3,42 +3,18 @@
  */
 package com.project.biddingSoft.service;
 
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import javax.persistence.Transient;
-
-import static org.hamcrest.CoreMatchers.instanceOf;
-
-import java.lang.reflect.*;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.ZoneId;
-
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.dao.ILotRepo;
-
-import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
-import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.BiddingSoftMapper;
 import com.project.biddingSoft.domain.Lot;
 import com.project.biddingSoft.domain.LotDTO;
-import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.StorableDTO;
-import com.project.biddingSoft.domain.User;
-import com.project.biddingSoft.domain.UserDTO;
 
 /**
  * @author nuchem
@@ -47,26 +23,14 @@ import com.project.biddingSoft.domain.UserDTO;
 @Service
 @Component
 @Qualifier("LotServiceImpl")
-public class LotServiceImpl implements IService<Lot> {
-	private static final Logger logger = LoggerFactory.getLogger(LotServiceImpl.class);
+public class LotDaoServiceImpl implements IDaoService<Lot> {
 	@Autowired
 	private BiddingSoftMapper lotMapper;
-	@Transient
 	@Autowired
-	private static ILotRepo iLotRepo;
-	@Transient
+	private  ILotRepo iLotRepo;
 	@Autowired
-	private static IUserRepo iUserRepo;
+	private  IUserRepo iUserRepo;
 
-	@Autowired
-	public void setILotRepo(ILotRepo ilotrepo) {
-		iLotRepo = ilotrepo;
-	}
-
-	@Autowired
-	public void setIUserRepo(IUserRepo iuserRepo) {
-		iUserRepo = iuserRepo;
-	}
 
 	@Override
 	public String updateEntity(StorableDTO lotDto) {

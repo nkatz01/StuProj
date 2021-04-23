@@ -3,38 +3,18 @@
  */
 package com.project.biddingSoft.domain;
 
-import java.io.Serializable;
-import java.util.Optional;
-
-import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Transient;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.project.biddingSoft.dao.IBidRepo;
-
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -87,18 +67,15 @@ public class Bid extends Storable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "bidder")
-
-	private User bidder;// setter/getter for the purpose of update testing
+	private User bidder;// setter/getter for the purpose of testing the update endpoint
 
 	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY
-
-	)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference(value = "bidOnLot")
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "lot")
 	@Getter(AccessLevel.NONE)
-	private Lot lot; // setter for the purpose of update testing
+	private Lot lot; // setter for the purpose of testing the update endpoint
 
 	@JsonProperty("amount")
 	private double amount;
@@ -115,6 +92,7 @@ public class Bid extends Storable {
 		this.bidder = bidBuilder.bidder;
 		this.bidder.addBidToSet(this);
 	}
+
 	// instance variables
 
 	public Bid(Lot lot, double amount, User bidder) {
@@ -130,7 +108,7 @@ public class Bid extends Storable {
 		return lot;
 	}
 
-	public static class BidBuilder {
+	public final static class BidBuilder {
 
 		private Long id;
 		private Lot lot;
@@ -153,7 +131,6 @@ public class Bid extends Storable {
 		}
 
 		public Bid build() {
-
 			return new Bid(this);
 		}
 	}

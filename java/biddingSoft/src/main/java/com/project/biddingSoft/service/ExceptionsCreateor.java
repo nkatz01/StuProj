@@ -4,14 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-public    class ExceptionsCreateor {
+public  class ExceptionsCreateor {
 	
 	private ExceptionsCreateor() {//so that we can't directly instanciate this
 		 
 	}
 	
 	@Bean
-	public static ExceptionsCreateor BiddingSoftExceptionsFactory() {//this works for both, default as well as parameterized constructors 
+	public final static ExceptionsCreateor BiddingSoftExceptionsFactory() {//this works for both, default as well as parameterized constructors 
 		return new ExceptionsCreateor();
 	}
 	

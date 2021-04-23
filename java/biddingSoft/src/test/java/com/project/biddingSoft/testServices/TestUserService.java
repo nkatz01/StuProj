@@ -26,7 +26,7 @@ public class TestUserService {
 				.bidsCreated(new HashSet<Bid>()).build();
 	}
 
-	public static synchronized String genRandString(int targetStrLength, boolean alphanum) {
+	public static final synchronized String genRandString(int targetStrLength, boolean alphanum) {
 		Predicate<Integer> cond = (i) -> alphanum ? (i <= 57 || i >= 65) && (i <= 90 || i >= 97)
 				: (i >= 65 && i <= 90) || (i >= 97 && i <= 122); // alphanumeric (=true) or alphabetic
 		int leftLimit = 48; // numeral '0' 

@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -32,27 +32,21 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.shaded.org.apache.commons.lang.reflect.FieldUtils;
 
 
 import com.project.biddingSoft.dao.IBidRepo;
 import com.project.biddingSoft.dao.ILotRepo;
-import com.project.biddingSoft.dao.IStorableRepo;
 import com.project.biddingSoft.dao.IUserRepo;
 import com.project.biddingSoft.domain.Bid;
 import com.project.biddingSoft.domain.Lot;
-import com.project.biddingSoft.domain.Storable;
 import com.project.biddingSoft.domain.User;
 import com.project.biddingSoft.service.ExceptionsCreateor;
-import com.project.biddingSoft.testServices.TestStorableService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
+import com.project.biddingSoft.testServices.TestStorableService;
 import com.project.biddingSoft.testServices.TestUserService;
 import com.rits.cloning.Cloner;
 
@@ -64,18 +58,15 @@ import com.rits.cloning.Cloner;
 @TestInstance(Lifecycle.PER_CLASS)
 public class LotsUnitTests {
 
-	static final String ANSI_RED = "\u001B[31m";
-	static final String ANSI_RESET = "\u001B[0m";
-	private static final Logger logger = LoggerFactory.getLogger(LotsUnitTests.class);
 	private Cloner cloner = new Cloner();
 	
 	
 	@Autowired
-	TestLotService testLotService;
+	private	TestLotService testLotService;
 	@Autowired
-	TestBidService testBidService;
+	private TestBidService testBidService;
 	@Autowired
-	TestUserService testUserService;
+	private	TestUserService testUserService;
 	
 
 	@Autowired
@@ -86,22 +77,11 @@ public class LotsUnitTests {
 	private IBidRepo iBidrepo;
 	@Autowired
 	private TestStorableService strblService;
-	@Autowired
-	private static IStorableRepo<Storable> iStorableRepo;
 
-	@Autowired
-	@Qualifier("IStorableRepo")
-	void setIStorable(IStorableRepo istorableRepo) {
-		iStorableRepo = istorableRepo;
-	}
-
-	
-
-	
 	
 
 	@Test
-	void testEqualityOnUsers() {
+	void testEqualityOnUsers() throws IllegalAccessException{
 		User user1 = testUserService.getMeSimpleUser();
 		User user2 = testUserService.getMeSimpleUser();
 		assertNotEquals(user1, user2);
@@ -109,7 +89,7 @@ public class LotsUnitTests {
 		assertFalse(user1 == user2);
 		assertEquals(user1, user2);
 
-		user2.setUsername("somethingElse");
+		user2.setUsername("anotherName");
 		assertNotEquals(user1, user2);
 
 		user2 = cloner.deepClone(user1);

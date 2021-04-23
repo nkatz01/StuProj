@@ -100,15 +100,9 @@ class BiddingSoftwareApplicationIntegTests {
 	@Autowired
 	private IBidRepo iBidrepo;
 	@Autowired
-	private TestStorableService strblService;
-	@Autowired
-	private static IStorableRepo<Storable> iStorableRepo;
+	private  IStorableRepo<Storable> iStorableRepo;
 
-	@Autowired
-	@Qualifier("IStorableRepo")
-	void setIStorable(IStorableRepo istorableRepo) {
-		iStorableRepo = istorableRepo;
-	}
+	
 
 	public static void main(String[] args) {
 
