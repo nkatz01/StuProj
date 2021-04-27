@@ -54,11 +54,6 @@ public class Bid extends Storable {
 		Bid other = (Bid) obj;
 		if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
 			return false;
-		if (lot == null) {
-			if (other.lot != null)
-				return false;
-		} else if (!lot.equals(other.lot))
-			return false;
 		return true;
 	}
 
@@ -67,7 +62,7 @@ public class Bid extends Storable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "bidderUser_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "bidder")
-	private User bidder;// setter/getter for the purpose of testing the update endpoint
+	private User bidder;
 
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -86,7 +81,6 @@ public class Bid extends Storable {
 	}
 
 	public Bid(BidBuilder bidBuilder) {
-		this.id = bidBuilder.id;
 		this.lot = bidBuilder.lot;
 		this.amount = bidBuilder.amount;
 		this.bidder = bidBuilder.bidder;
@@ -110,7 +104,6 @@ public class Bid extends Storable {
 
 	public final static class BidBuilder {
 
-		private Long id;
 		private Lot lot;
 		private double amount;
 		private User bidder;

@@ -85,6 +85,8 @@ public class BidDaoServiceImpl implements IDaoService<Bid> {
 
 	public void associatCreatorWithLot(Bid bid) {
 		if (bid.getLot().getId() == null) {
+			
+			if (!bid.getLot().getUser().createdLotscontainsLot(bid.getLot()))
 			bid.getLot().getUser().addLotToSet(bid.getLot());
 		}
 	}

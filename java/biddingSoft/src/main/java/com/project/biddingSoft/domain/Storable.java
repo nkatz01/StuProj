@@ -26,7 +26,7 @@ import lombok.ToString;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = User.class)
 @JsonSubTypes({ @JsonSubTypes.Type(value = Lot.class, name = "lot"),
-		@JsonSubTypes.Type(value = Bid.class, name = "bid")  })
+		@JsonSubTypes.Type(value = Bid.class, name = "bid")})
 @Inheritance(strategy = InheritanceType.JOINED) 
 @DiscriminatorColumn(name = "entity_type")
 @Entity

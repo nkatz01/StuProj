@@ -88,16 +88,35 @@ public class LotsUnitTests {
 		user2 = cloner.deepClone(user1);
 		assertFalse(user1 == user2);
 		assertEquals(user1, user2);
-
-		user2.setUsername("anotherName");
-		assertNotEquals(user1, user2);
+		
 
 		user2 = cloner.deepClone(user1);
 		iUserRepo.save(user1);
-		assertEquals(user1, user2);
-		user2.setBusinessId(strblService.newUUID());
-		iUserRepo.save(user2);
+		assertEquals(user1, user2);//even though id is now different for the two
+		user2.setUsername("anotherName");
+		assertNotEquals(user1, user2);
+		user2.setBusinessId(strblService.newUUID());//if we don't do this, the next line would throw an error
+		iUserRepo.save(user2);						//as the two are still equal in the eyes of the dtbs
+		
+		
+	}
 
+	@Test
+	void testEqualityOnLots() {
+		Lot lot1 = testLotService.getMeSimpleLot();//returns a lot packed with a user
+		Lot lot2 = testLotService.getMeSimpleLot();
+		assertNotEquals(lot1, lot2);
+		lot2 = cloner.deepClone(lot1);
+		assertEquals(lot1, lot2);
+	}
+
+	@Test
+	void testEqualityOnBids() {
+		Bid bid = testBidService.getOneIncrBidAndPlace();//returns a bid packed with a lot and user
+		Bid bid2 = testBidService.getOneIncrBidAndPlace();
+		assertNotEquals(bid, bid2);
+		bid2 = cloner.deepClone(bid);
+		assertEquals(bid, bid2);
 	}
 
 	@Test
@@ -117,6 +136,23 @@ public class LotsUnitTests {
 
 
 	@Test
+	void createTwoLots_areNotTheSame() throws Exception {
+		Lot lot1 = testLotService.getMeSimpleLot();
+		Lot lot2 = testLotService.getMeSimpleLot();
+		assertNotEquals(lot1, lot2);
+	}
+
+	@Test
+	void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException {
+		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
+		assertNotNull(FieldUtils.readField(bid.getLot(), "clock", true));
+		assertNotNull(FieldUtils.readField(bid.getLot(), "bidSoftExcepFactory", true));
+	
+	}
+	
+	//testing persistence
+
+	@Test
 	void newLot_canBeSavedToDtbs() throws Exception {
 
 		Lot lot = testLotService.getMeSimpleLot();
@@ -126,30 +162,10 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	void createTwoLots_areNotTheSame() throws Exception {
-		Lot lot1 = testLotService.getMeSimpleLot();
-		Lot lot2 = testLotService.getMeSimpleLot();
-		assertNotEquals(lot1, lot2);
-	}
-
-	@Test
 	void ableTo_createBid_AddLotToIt_andSaveToDtbs() throws Exception {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
 		iUserRepo.save(testLotService.lotsUser(bid.getLot().placeBid(bid)));
 		assertTrue(iBidrepo.existsById(bid.getId()));
-
-	}
-
-	@Test
-	void addingSecondBidOnLot_doesntAffectFirstBid() {
-		Lot lot = testLotService.getMeSimpleLot();
-		Bid bid = testBidService.getOneIncrBid(lot);
-		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
-
-		Bid bid2 = testBidService.getBidBumpedUpByOneIncrMore(lot, bid);
-		lot.placeBid(bid2);
-		iLotRepo.save(bid.getLot());
-		assertEquals(bid.getLot().getId(), lot.getId());
 
 	}
 
@@ -201,17 +217,22 @@ public class LotsUnitTests {
 
 
 	@Test
+	void addingSecondBidOnLot_doesntAffectFirstBid_indDtbs() {
+		Lot lot = testLotService.getMeSimpleLot();
+		Bid bid = testBidService.getOneIncrBid(lot);
+		iUserRepo.save(testLotService.lotsUser(lot.placeBid(bid)));
+	
+		Bid bid2 = testBidService.getBidBumpedUpByOneIncrMore(lot, bid);
+		lot.placeBid(bid2);
+		iLotRepo.save(bid.getLot());
+		assertEquals(bid.getLot().getId(), lot.getId());
+	
+	}
+	//testing bidding logic
+	@Test
 	void whenLotIsCreated_extendedEndTimeEqueals_endTime() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
 		assertEquals(FieldUtils.readField(lot, "endTime", true), FieldUtils.readField(lot, "extendedEndtime", true));
-	}
-
-	@Test
-	void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException {
-		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
-		assertNotNull(FieldUtils.readField(bid.getLot(), "clock", true));
-		assertNotNull(FieldUtils.readField(bid.getLot(), "bidSoftExcepFactory", true));
-
 	}
 
 	@Test
@@ -229,17 +250,6 @@ public class LotsUnitTests {
 	}
 
 	@Test
-	void placeBidWithin_triggerDuration_extendsEndTime() throws IllegalAccessException {
-		Lot lot = testLotService.getMeSimpleLot();
-		Instant endTime = lot.getEndTime();
-		FieldUtils.writeDeclaredField(lot, "clock",
-				Clock.fixed(endTime.minus(Duration.ofSeconds(119)), ZoneId.systemDefault()), true);
-		lot.placeBid(testBidService.getOneIncrBid(lot));
-		assertTrue(lot.getExtendedEndtime().compareTo(endTime.plus(Duration.ofMinutes(5))) == 0);
-
-	}
-
-	@Test
 	void placeBidBefore_triggerDuration_EndTimeIsNotExtended() throws IllegalAccessException {
 		Lot lot = testLotService.getMeSimpleLot();
 		Instant endTime = lot.getEndTime();
@@ -247,6 +257,17 @@ public class LotsUnitTests {
 				Clock.fixed(endTime.minus(Duration.ofSeconds(121)), ZoneId.systemDefault()), true);
 		lot.placeBid(testBidService.getOneIncrBid(lot));
 		assertTrue(lot.getEndTime().compareTo(endTime) == 0);
+	
+	}
+
+	@Test
+	void placeBidWithin_triggerDuration_extendsEndTime() throws IllegalAccessException {
+		Lot lot = testLotService.getMeSimpleLot();
+		Instant endTime = lot.getEndTime();
+		FieldUtils.writeDeclaredField(lot, "clock",
+				Clock.fixed(endTime.minus(Duration.ofSeconds(119)), ZoneId.systemDefault()), true);
+		lot.placeBid(testBidService.getOneIncrBid(lot));
+		assertTrue(lot.getExtendedEndtime().compareTo(endTime.plus(Duration.ofMinutes(5))) == 0);
 
 	}
 
@@ -378,36 +399,36 @@ public class LotsUnitTests {
 		assertEquals(newBid, lot.getPendingAutoBid());
 
 	}
-
+	
 	@Test
 	void addMultipileUniqueLots_toSetInUser_inMultipleThreadsPassess() throws InterruptedException, ExecutionException {
 		User user = testUserService.getMeSimpleUser();
 		int threads = 10;
 		ExecutorService service = Executors.newFixedThreadPool(threads);
 		CountDownLatch latch = new CountDownLatch(1);
-		AtomicBoolean running = new AtomicBoolean();
-		AtomicInteger overlaps = new AtomicInteger();
-		Collection<Future<Boolean>> futures = new ArrayList<>(threads);
+		AtomicBoolean running = new AtomicBoolean();//shared boolean among threads
+		AtomicInteger overlaps = new AtomicInteger();//shared integer counter among threads
+		Collection<Future<Boolean>> futures = new ArrayList<>(threads);//will store the bools returned after calling add
 		for (int t = 0; t < threads; ++t) {
 			final Lot lot = testLotService.getMeSimpleLot();
 			futures.add(service.submit(() -> {
-				latch.await();
-				if (running.get()) {
-					overlaps.incrementAndGet();
+				latch.await();//instructs all the threads to wait here for the latch.coundDown signal, to force overlapment
+				if (running.get()) {//will be true if other thread is running at the same time (because of line 400)
+					overlaps.incrementAndGet();//this thread indicating that other thread is overlapping its work
 				}
 				running.set(true);
-				boolean bool = user.addLotToSet(lot);
+				boolean bool = user.addLotToSet(lot);//we need to assure overlapment as this naturally takes too little time
 				running.set(false);
-				return bool;
+				return bool;//value returned from calling add
 			}));
 
 		}
-		latch.countDown();
+		latch.countDown();//opens the latch so that all threads start together
 		for (Future<Boolean> f : futures) {
-			assertTrue(f.get().equals(true));
+			assertTrue(f.get().equals(true));//assure each add was successful
 		}
 		assertTrue(overlaps.get() > 0);
-		assertTrue(user.getNumberOfLots() == 10);
+		assertTrue(user.getNumberOfLots() == 10);//assure lotsCreatedSet contains 10 lots
 	}
 	
 

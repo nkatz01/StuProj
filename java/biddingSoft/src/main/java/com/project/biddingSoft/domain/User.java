@@ -77,35 +77,35 @@ public class User extends Storable {
 	}
 
 	public User(UserBuilder userBuilder) {
-		this.id = userBuilder.id;
 		this.username = userBuilder.username;
 		this.lotsCreatedSet = userBuilder.lotsCreatedSet;// lot builder has already done the sync work
 		this.bidsBadeSet = userBuilder.bidsBadeSet;
+		this.password = userBuilder.password;
 	}
 
-	public User(Long id, String username, Set<Lot> lotsCreatedSet, Set<Bid> bidsBadeSet) {
+	public User(Long id, String username, Set<Lot> lotsCreatedSet, Set<Bid> bidsBadeSet, char[] password) {
 		this.id = id;
 		this.username = username;
 		this.lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>(lotsCreatedSet));
 		this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>(bidsBadeSet));
+		this.password = password;
 	}
-
+	private char[] password; 
 	@Column(name = "username")
 	private String username;
+	
 	@JsonProperty("lotsCreatedSet")
 	@JsonManagedReference(value = "lotOnUser")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", // , variable in Lot class - links a lot with a given user
-			cascade = CascadeType.ALL
-
-	)
-	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user",
+			cascade = CascadeType.ALL)
 	@Getter(AccessLevel.NONE)
 	private Set<Lot> lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>());
 
 	@JsonManagedReference(value = "bidOnUser")
 	@JsonProperty("bidsBadeSet")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", // variable in Bid class - links a Bid with a given user
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", 
 			cascade = CascadeType.ALL)
+	@Getter(AccessLevel.NONE)
 	private Set<Bid> bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>());
 
 	public boolean addLotToSet(Lot lot) {
@@ -133,15 +133,14 @@ public class User extends Storable {
 
 	public final static class UserBuilder {
 
-		private Long id;
-
 		private String username;
 		private Set<Lot> lotsCreatedSet;
 		private Set<Bid> bidsBadeSet;
+		private char[] password; 
 
 		public UserBuilder(String username, String password) {
 			this.username = username;
-
+			this.password = password.toCharArray();
 		}
 
 		public UserBuilder lotsCreated(Set<Lot> lotsCreatedSet) {

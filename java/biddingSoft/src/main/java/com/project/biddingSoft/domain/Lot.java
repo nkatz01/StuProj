@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.project.biddingSoft.service.ExceptionsCreateor;
+import com.project.biddingSoft.service.ExceptionsCreateor.AutobidNotSet;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -167,11 +169,6 @@ public class Lot extends Storable {
 				return false;
 		} else if (!triggerDuration.equals(other.triggerDuration))
 			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.equals(other.user))
-			return false;
 		return true;
 	}
 
@@ -190,14 +187,17 @@ public class Lot extends Storable {
 	@JsonManagedReference(value = "bidOnLot")
 	@JsonProperty("bidSet")
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL)
-	private Set<Bid> bidSet = Collections.synchronizedSet(new HashSet<Bid>());;
+	private Set<Bid> bidSet = Collections.synchronizedSet(new HashSet<Bid>());
+	
 	@ToString.Exclude
 	@JsonBackReference(value = "lotOnUser")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty("user")
 	private User user;
+	
 	@Setter(AccessLevel.NONE)
+	@Column(nullable = true)
 	private double highestBid;
 	@Value("${Lot.title}")
 	@JsonProperty("title")
@@ -205,7 +205,6 @@ public class Lot extends Storable {
 
 	@JsonProperty("description")
 	@Value("${Lot.description}")
-	@Column(name = "description")
 	private String description;
 	@Transient
 	@Value("${Lot.timeZone}")
@@ -216,6 +215,7 @@ public class Lot extends Storable {
 	private double biddingIncrement;
 
 	@JsonProperty("reservePrice")
+	@Column(nullable = true)
 	private double reservePrice = 0.0;
 
 	@JsonProperty("startingPrice")
@@ -223,8 +223,10 @@ public class Lot extends Storable {
 	private double startingPrice;
 
 	@JsonProperty("startTime")
+	@Column(nullable = false)
 	private Instant startTime = Instant.now();
 	@JsonProperty("endTime")
+	@Column(nullable = false)
 	private Instant endTime = Instant.now().plus(Duration.ofDays(1));
 
 	@JsonIgnoreProperties(value = { "applications", "hibernateLazyInitializer" })
@@ -240,29 +242,6 @@ public class Lot extends Storable {
 	@JsonProperty("pendingAutoBid")
 	@Setter(AccessLevel.NONE)
 	private Bid pendingAutoBid;
-
-	@JsonIgnore
-	public Bid getPendingAutoBid() {
-		if (pendingAutoBid != null)
-			return pendingAutoBid;
-		else
-			throw bidSoftExcepFactory.new AutobidNotSet();
-	}
-
-	public Bid getBid(Bid bid) {
-		return bidSet.stream().filter(b -> b.equals(bid)).findFirst().orElseThrow(NoSuchElementException::new);
-	}
-
-	public Bid getBid(int index) {
-		Iterator<Bid> iter = bidSet.iterator();
-		Bid bid = null;
-		for (int i = 0; iter.hasNext(); i++) {
-			bid = iter.next();
-			if (i == index)
-				return bid;
-		}
-		throw new IndexOutOfBoundsException();
-	}
 
 	@Value("#{T(java.time.Duration).parse('${Lot.triggerDuration}')}")
 	private Duration triggerDuration;
@@ -294,7 +273,6 @@ public class Lot extends Storable {
 		this.autoExtendDuration = lotBuilder.autoExtendDuration;
 		this.ZONE = lotBuilder.ZONE;
 		clock = Clock.system(this.ZONE);
-		this.id = lotBuilder.id;
 		this.endTime = lotBuilder.endTime;
 		this.extendedEndtime = lotBuilder.extendedEndtime;
 		user.addLotToSet(this);
@@ -307,6 +285,7 @@ public class Lot extends Storable {
 	}
 
 	public Optional<Lot> placeBid(Bid bid) {
+		Objects.requireNonNull(bid);
 		if (bid.getBidder().equals(this.user))
 			throw bidSoftExcepFactory.new BidderOwnsLot();
 		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
@@ -316,7 +295,8 @@ public class Lot extends Storable {
 
 			if (pendingAutoBid == null) {
 				highestBid += biddingIncrement;
-				isOverHigestBid(bid);
+				 	if (bid.getAmount() > highestBid)//if over new highest bid
+				 		pendingAutoBid = bid;
 				leadingBidder = bid.getBidder();
 			} else {
 				if (bid.getAmount() < pendingAutoBid.getAmount())
@@ -327,8 +307,10 @@ public class Lot extends Storable {
 				} else {
 					highestBid = pendingAutoBid.getAmount() + biddingIncrement;
 					leadingBidder = bid.getBidder();
-					if (!isOverHigestBid(bid))
+					if (bid.getAmount() <= highestBid)
 						pendingAutoBid = null;
+					else pendingAutoBid = bid;
+						
 				}
 			}
 
@@ -346,8 +328,8 @@ public class Lot extends Storable {
 
 	private void addBid(Bid bid) {
 		Instant now = Instant.now(clock);
-		Objects.requireNonNull(bid);
-		if (!hasLotExpired(now) && bidHighEnough(bid))
+		
+		if (!hasLotExpired(now) && isBidHighEnough(bid))
 			bidSet.add(bid);
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
@@ -357,13 +339,7 @@ public class Lot extends Storable {
 
 	}
 
-	private boolean isOverHigestBid(Bid bid) {
-		if (bid.getAmount() > highestBid) {
-			pendingAutoBid = bid;
-			return true;
-		}
-		return false;
-	}
+
 
 	private boolean isInTriggerPeriod(Instant now) {
 		return now.compareTo(extendedEndtime) < 0 && now.compareTo(extendedEndtime.minus(triggerDuration)) >= 0;
@@ -373,7 +349,7 @@ public class Lot extends Storable {
 		return now.compareTo(extendedEndtime) >= 0;
 	}
 
-	private boolean bidHighEnough(Bid bid) {
+	private boolean isBidHighEnough(Bid bid) {
 		boolean isHihger = false;
 		if (highestBid > 0.0)// there are bid/s already placed
 			isHihger = bid.getAmount() >= highestBid + biddingIncrement;
@@ -394,6 +370,25 @@ public class Lot extends Storable {
 
 	}
 
+	@JsonIgnore
+	public Bid getPendingAutoBid() {
+		if (pendingAutoBid != null)
+			return pendingAutoBid;
+		else
+			throw bidSoftExcepFactory.new AutobidNotSet();
+	}
+
+	public Bid getBid(int index) {
+		Iterator<Bid> iter = bidSet.iterator();
+		Bid bid = null;
+		for (int i = 0; iter.hasNext(); i++) {
+			bid = iter.next();
+			if (i == index)
+				return bid;
+		}
+		throw new IndexOutOfBoundsException();
+	}
+
 	public boolean contains(Bid bid) {
 		return bidSet.contains(bid);
 	}
@@ -408,7 +403,7 @@ public class Lot extends Storable {
 
 	public final static class LotBuilder {
 
-		private Long id;
+		
 		private ZoneId ZONE;
 		private User user;
 		private String title;

@@ -129,7 +129,7 @@ class BiddingSoftwareApplicationIntegTests {
 		entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 0;").executeUpdate();
 		entityManager.createNativeQuery("UPDATE  biddingsoft.hibernate_sequence SET next_val = 1;").executeUpdate();
 		entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 1;").executeUpdate();
-
+		
 		entityManager.flush();
 		entityManager.getTransaction().commit();
 
@@ -140,7 +140,7 @@ class BiddingSoftwareApplicationIntegTests {
 
 		wiredLot.placeBid(bid);
 		iUserRepo.save(wiredLot.getUser());
-
+		
 	}
 
 	@Test
@@ -177,6 +177,7 @@ class BiddingSoftwareApplicationIntegTests {
 		assertTrue(iStorableRepo.findById(wiredLot.getId()).isPresent());
 	}
 
+	
 	@Test
 	@Order(2)
 	void testPostEntity_forUser() throws IOException, URISyntaxException {
@@ -224,7 +225,7 @@ class BiddingSoftwareApplicationIntegTests {
 
 	@Test
 	@Order(5)
-	void assertWiredLot_isInDtbs_andIdIsNotNull() {
+	void assertWiredLot_andItsBid_areInDtbs_andIdsAreNotNull() {
 		assertTrue(iLotRepo.existsById(wiredLot.getId()));
 		assertTrue(iBidrepo.existsById(wiredLot.getBid(0).getId()));
 
@@ -312,7 +313,7 @@ class BiddingSoftwareApplicationIntegTests {
 		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
 		JSONArray json = new JSONArray(EntityUtils.toString(response.getEntity()));
 		assertEquals(json.length(), iStorableRepo.count());
-	}
+		}
 
 	@Test
 	@Order(11)

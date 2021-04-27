@@ -16,8 +16,10 @@ only user
 only users existing but both
 {"type":"bid", "lot": {"type":"lot","user":{"id": "4"}}, "bidder":{"id":"6"} }
 
+*******
 just new lot and new user
 {"type":"lot", "user":{}} 
+***************
 
 new lot with existing user
 {"type":"lot", "user":{"id": "2" }}

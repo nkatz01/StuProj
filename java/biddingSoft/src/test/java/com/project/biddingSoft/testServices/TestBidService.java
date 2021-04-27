@@ -20,13 +20,18 @@ public class TestBidService {
 	@Autowired
 	TestUserService testUserService;
 
-	
+
 
 	public Bid getOneIncrBid(Lot lot) {
 		return new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid())
 				.bidder(testUserService.getMeSimpleBidder()).build();
 	}
 
+	public Bid getOneIncrBidAndPlace() {
+		Lot lot = testLotService.getMeSimpleLot();
+		return lot.placeBid( new Bid.BidBuilder(lot).amount(lot.getBiddingIncrement() + lot.getHighestBid())
+				.bidder(testUserService.getMeSimpleBidder()).build()).get().getBid(0);
+	}
 	public Bid getTwoIncrBid(Lot lot) {
 		return new Bid.BidBuilder(lot).amount((lot.getBiddingIncrement() * 2) + lot.getHighestBid())
 				.bidder(testUserService.getMeSimpleBidder()).build();
