@@ -42,7 +42,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.project.biddingSoft.BiddingSoftwareApplication;
 import com.project.biddingSoft.service.ExceptionsCreateor;
 import com.project.biddingSoft.service.ExceptionsCreateor.AutobidNotSet;
 
@@ -64,119 +64,19 @@ import lombok.ToString;
 @Getter
 public class Lot extends Storable {
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((ZONE == null) ? 0 : ZONE.hashCode());
-		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
-		result = prime * result + ((bidSet == null) ? 0 : bidSet.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(biddingIncrement);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((clock == null) ? 0 : clock.hashCode());
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
-		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
-		temp = Double.doubleToLongBits(highestBid);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((leadingBidder == null) ? 0 : leadingBidder.hashCode());
-		result = prime * result + ((pendingAutoBid == null) ? 0 : pendingAutoBid.hashCode());
-		temp = Double.doubleToLongBits(reservePrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
-		temp = Double.doubleToLongBits(startingPrice);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Lot other = (Lot) obj;
-		if (ZONE == null) {
-			if (other.ZONE != null)
-				return false;
-		} else if (!ZONE.equals(other.ZONE))
-			return false;
-		if (autoExtendDuration == null) {
-			if (other.autoExtendDuration != null)
-				return false;
-		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
-			return false;
-		if (bidSet == null) {
-			if (other.bidSet != null)
-				return false;
-		} else if (!bidSet.equals(other.bidSet))
-			return false;
-		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
-			return false;
-		if (clock == null) {
-			if (other.clock != null)
-				return false;
-		} else if (!clock.equals(other.clock))
-			return false;
-		if (description == null) {
-			if (other.description != null)
-				return false;
-		} else if (!description.equals(other.description))
-			return false;
-		if (endTime == null) {
-			if (other.endTime != null)
-				return false;
-		} else if (!endTime.equals(other.endTime))
-			return false;
-		if (extendedEndtime == null) {
-			if (other.extendedEndtime != null)
-				return false;
-		} else if (!extendedEndtime.equals(other.extendedEndtime))
-			return false;
-		if (Double.doubleToLongBits(highestBid) != Double.doubleToLongBits(other.highestBid))
-			return false;
-		if (leadingBidder == null) {
-			if (other.leadingBidder != null)
-				return false;
-		} else if (!leadingBidder.equals(other.leadingBidder))
-			return false;
-		if (pendingAutoBid == null) {
-			if (other.pendingAutoBid != null)
-				return false;
-		} else if (!pendingAutoBid.equals(other.pendingAutoBid))
-			return false;
-		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
-			return false;
-		if (startTime == null) {
-			if (other.startTime != null)
-				return false;
-		} else if (!startTime.equals(other.startTime))
-			return false;
-		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
-			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
-			return false;
-		if (triggerDuration == null) {
-			if (other.triggerDuration != null)
-				return false;
-		} else if (!triggerDuration.equals(other.triggerDuration))
-			return false;
-		return true;
-	}
-
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
+	@Transient 
+	@JsonIgnore
+	public static final String ANSI_RED = "\u001B[31m";
+	@Transient 
+	@JsonIgnore
+	public static final String ANSI_RESET = "\u001B[0m";
+	@Transient 
+	@JsonIgnore
+	private static final Logger logger = LoggerFactory.getLogger(Lot.class);
+	@Getter
 	@Autowired
 	@Transient
-	private static ExceptionsCreateor bidSoftExcepFactory;
+	public  static ExceptionsCreateor bidSoftExcepFactory;
 
 	@Autowired
 	@Qualifier("BiddingSoftExceptionsFactory")
@@ -215,8 +115,9 @@ public class Lot extends Storable {
 	private double biddingIncrement;
 
 	@JsonProperty("reservePrice")
+	@Value("${Lot.reservePrice}")
 	@Column(nullable = true)
-	private double reservePrice = 0.0;
+	private double reservePrice;
 
 	@JsonProperty("startingPrice")
 	@Value("${Lot.startingPrice}")
@@ -286,9 +187,12 @@ public class Lot extends Storable {
 
 	public Optional<Lot> placeBid(Bid bid) {
 		Objects.requireNonNull(bid);
+		bid.setAmount((((int)(bid.getAmount() /  biddingIncrement))* biddingIncrement));//in a real application we'd want to relate back to the bidder the modified amount
 		if (bid.getBidder().equals(this.user))
 			throw bidSoftExcepFactory.new BidderOwnsLot();
-		bid.setAmount(((int) bid.getAmount() / biddingIncrement) * biddingIncrement);
+		//if bidder bids against themselves and bid amount is higher than highestBid and lower than pendingAutoBid (if there's one)
+		else if (leadingBidder!=null && leadingBidder.equals(bid.getBidder()) && (bid.getAmount()> highestBid && (pendingAutoBid!=null && bid.getAmount()<= pendingAutoBid.getAmount())) )
+			throw bidSoftExcepFactory.new AlreadyLeadingBidder();
 
 		try {
 			addBid(bid);
@@ -299,17 +203,22 @@ public class Lot extends Storable {
 				 		pendingAutoBid = bid;
 				leadingBidder = bid.getBidder();
 			} else {
-				if (bid.getAmount() < pendingAutoBid.getAmount())
+				if (bid.getAmount() < pendingAutoBid.getAmount()) 
 					highestBid = bid.getAmount() + biddingIncrement;
 				else if (bid.getAmount() == pendingAutoBid.getAmount()) {
 					highestBid = pendingAutoBid.getAmount();
 					pendingAutoBid = null;
+					logger.info(ANSI_RED + "Your bid was accepted but equals an existing autobid" +ANSI_RESET);
+					
 				} else {
 					highestBid = pendingAutoBid.getAmount() + biddingIncrement;
+					if(leadingBidder.equals(bid.getBidder()))
+						logger.info(ANSI_RED+ "Your increased bid has been accepted" + ANSI_RESET );
 					leadingBidder = bid.getBidder();
 					if (bid.getAmount() <= highestBid)
 						pendingAutoBid = null;
 					else pendingAutoBid = bid;
+					
 						
 				}
 			}
@@ -325,18 +234,25 @@ public class Lot extends Storable {
 		return Optional.of(this);
 
 	}
-
+	
+	
 	private void addBid(Bid bid) {
 		Instant now = Instant.now(clock);
+		try {
+			checkBidHighEnough(bid);
+			
 		
-		if (!hasLotExpired(now) && isBidHighEnough(bid))
+		if (!hasLotExpired(now)  )//something smells
 			bidSet.add(bid);
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
 
 		if (isInTriggerPeriod(now))
 			extendedEndtime = extendedEndtime.plus(autoExtendDuration);
-
+		}
+		 catch (ExceptionsCreateor.BidTooLow e) {
+			throw e;
+		}
 	}
 
 
@@ -349,7 +265,7 @@ public class Lot extends Storable {
 		return now.compareTo(extendedEndtime) >= 0;
 	}
 
-	private boolean isBidHighEnough(Bid bid) {
+	private void checkBidHighEnough(Bid bid) {
 		boolean isHihger = false;
 		if (highestBid > 0.0)// there are bid/s already placed
 			isHihger = bid.getAmount() >= highestBid + biddingIncrement;
@@ -358,15 +274,15 @@ public class Lot extends Storable {
 				// is lower than 1 increment
 			if (startingPrice > 0.0 && bid.getAmount() < (startingPrice))
 				throw bidSoftExcepFactory.new BidTooLow(startingPrice);
-			else if (startingPrice == 0.0 && bid.getAmount() < (startingPrice + biddingIncrement))
-				throw bidSoftExcepFactory.new BidTooLow(startingPrice + biddingIncrement);
+			else if (startingPrice == 0.0 && (bid.getAmount() <  biddingIncrement))
+				throw bidSoftExcepFactory.new BidTooLow(bid.getAmount() , biddingIncrement);
 			else
 				isHihger = true;
 
 		}
 		if (!isHihger)
-			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), highestBid + biddingIncrement);
-		return true;
+			throw bidSoftExcepFactory.new BidTooLow(bid.getAmount(), highestBid , biddingIncrement);
+		
 
 	}
 
@@ -476,6 +392,113 @@ public class Lot extends Storable {
 			return this;
 		}
 
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((ZONE == null) ? 0 : ZONE.hashCode());
+		result = prime * result + ((autoExtendDuration == null) ? 0 : autoExtendDuration.hashCode());
+		result = prime * result + ((bidSet == null) ? 0 : bidSet.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(biddingIncrement);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((clock == null) ? 0 : clock.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+		result = prime * result + ((extendedEndtime == null) ? 0 : extendedEndtime.hashCode());
+		temp = Double.doubleToLongBits(highestBid);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((leadingBidder == null) ? 0 : leadingBidder.hashCode());
+		result = prime * result + ((pendingAutoBid == null) ? 0 : pendingAutoBid.hashCode());
+		temp = Double.doubleToLongBits(reservePrice);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+		temp = Double.doubleToLongBits(startingPrice);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((triggerDuration == null) ? 0 : triggerDuration.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Lot other = (Lot) obj;
+		if (ZONE == null) {
+			if (other.ZONE != null)
+				return false;
+		} else if (!ZONE.equals(other.ZONE))
+			return false;
+		if (autoExtendDuration == null) {
+			if (other.autoExtendDuration != null)
+				return false;
+		} else if (!autoExtendDuration.equals(other.autoExtendDuration))
+			return false;
+		if (bidSet == null) {
+			if (other.bidSet != null)
+				return false;
+		} else if (!bidSet.equals(other.bidSet))
+			return false;
+		if (Double.doubleToLongBits(biddingIncrement) != Double.doubleToLongBits(other.biddingIncrement))
+			return false;
+		if (clock == null) {
+			if (other.clock != null)
+				return false;
+		} else if (!clock.equals(other.clock))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (endTime == null) {
+			if (other.endTime != null)
+				return false;
+		} else if (!endTime.equals(other.endTime))
+			return false;
+		if (extendedEndtime == null) {
+			if (other.extendedEndtime != null)
+				return false;
+		} else if (!extendedEndtime.equals(other.extendedEndtime))
+			return false;
+		if (Double.doubleToLongBits(highestBid) != Double.doubleToLongBits(other.highestBid))
+			return false;
+		if (leadingBidder == null) {
+			if (other.leadingBidder != null)
+				return false;
+		} else if (!leadingBidder.equals(other.leadingBidder))
+			return false;
+		if (pendingAutoBid == null) {
+			if (other.pendingAutoBid != null)
+				return false;
+		} else if (!pendingAutoBid.equals(other.pendingAutoBid))
+			return false;
+		if (Double.doubleToLongBits(reservePrice) != Double.doubleToLongBits(other.reservePrice))
+			return false;
+		if (startTime == null) {
+			if (other.startTime != null)
+				return false;
+		} else if (!startTime.equals(other.startTime))
+			return false;
+		if (Double.doubleToLongBits(startingPrice) != Double.doubleToLongBits(other.startingPrice))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (triggerDuration == null) {
+			if (other.triggerDuration != null)
+				return false;
+		} else if (!triggerDuration.equals(other.triggerDuration))
+			return false;
+		return true;
 	}
 
 }

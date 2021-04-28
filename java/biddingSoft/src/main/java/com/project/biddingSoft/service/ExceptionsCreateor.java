@@ -51,18 +51,22 @@ public  class ExceptionsCreateor {
 		private static final String throwableMsg = "bid amount less or equal to ";
 		private static final int id = 2;
 		
-		public BidTooLow(double newBidAmount, double highestBidAmount) {
-			super(id, new Throwable(String.format(throwableMsg + "current highest bid: %.2f <= %.2f",newBidAmount, highestBidAmount)));
+		public BidTooLow(double newBidAmount, double highestBidAmount, double biddingIncrement) {
+			super(id, new Throwable(String.format(throwableMsg + "current highest bid + biddingIncrement: %.2f <= %.2f + %.2f",newBidAmount, highestBidAmount, biddingIncrement)));
 		}
 		public BidTooLow(double amount) {
-			super(id, new Throwable(String.format(throwableMsg + "startingPrice= %.2f",amount)));
+			super(id, new Throwable(String.format(throwableMsg + "startingPrice=%.2f",amount)));
 		}
-		
+
+		public BidTooLow(double bidAmount, double biddingIncrement) {
+			super(id, new Throwable(String.format(throwableMsg + "biddingIncrement: %.2f <= %.2f",bidAmount, biddingIncrement)));
+		}	
 
 	}
+
   
   public class AutobidNotSet extends BiddingSoftExceptions {
-	  private static final String throwableMsg = "this lot has no active autobud in place at the moment";
+	  private static final String throwableMsg = "this lot has no active autobid in place at the moment";
 	  private static final int id = 3;
 	  
 	  public AutobidNotSet() {
@@ -75,6 +79,15 @@ public  class ExceptionsCreateor {
 	  private static final int id = 4;
 	  
 	  public BidderOwnsLot() {
+		  super(id, new Throwable(throwableMsg));
+	  }
+	  
+  }
+  public class AlreadyLeadingBidder extends BiddingSoftExceptions {
+	  private static final String throwableMsg = "bidder already in control of lot";
+	  private static final int id = 5;
+	  
+	  public AlreadyLeadingBidder() {
 		  super(id, new Throwable(throwableMsg));
 	  }
 	  

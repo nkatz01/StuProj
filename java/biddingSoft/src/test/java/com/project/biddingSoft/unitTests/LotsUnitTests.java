@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -431,8 +432,13 @@ public class LotsUnitTests {
 		assertTrue(user.getNumberOfLots() == 10);//assure lotsCreatedSet contains 10 lots
 	}
 	
-
-
+//
+//	@Test
+//	void testFieldSetter_onNonDefaultConstructor() {
+//		Lot lot = testLotService.getMeSimpleLot(); 
+//		//assertNull(lot.getTitle());
+//		assertNull(Lot.bidSoftExcepFactory);
+//	}
 
 
 }

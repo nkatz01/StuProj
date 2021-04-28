@@ -14,15 +14,7 @@ import com.project.biddingSoft.domain.StorableDTO;
 
 public interface IDaoService<T extends Storable> {
 
-	public String persistEntity(T iStorable);
-
-	public default void deleteAllEntities(IStorableRepo<Storable> repo) {
-		repo.deleteAll();
-	}
-
-	public default void deleteEntity(IStorableRepo<Storable> repo, Long id) {
-		repo.deleteById(id);
-	}
+	public String persistEntity(T storable);
 
 	public String updateEntity(StorableDTO strblDto);
 
