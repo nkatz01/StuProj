@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -53,11 +54,10 @@ import com.rits.cloning.Cloner;
 
 
 @TestMethodOrder(OrderAnnotation.class)
-@AutoConfigureMockMvc
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @TestInstance(Lifecycle.PER_CLASS)
-public class LotsUnitTests {
+public class UnitTests {
 
 	private Cloner cloner = new Cloner();
 	
@@ -98,8 +98,8 @@ public class LotsUnitTests {
 		assertNotEquals(user1, user2);
 		user2.setBusinessId(strblService.newUUID());//if we don't do this, the next line would throw an error
 		iUserRepo.save(user2);						//as the two are still equal in the eyes of the dtbs
-		
-		
+		iUserRepo.delete(user2);
+		assertEquals(iUserRepo.findById(user2.getId()), Optional.empty());
 	}
 
 	@Test
@@ -136,13 +136,7 @@ public class LotsUnitTests {
 
 
 
-	@Test
-	void createTwoLots_areNotTheSame() throws Exception {
-		Lot lot1 = testLotService.getMeSimpleLot();
-		Lot lot2 = testLotService.getMeSimpleLot();
-		assertNotEquals(lot1, lot2);
-	}
-
+	
 	@Test
 	void whenLotIsCreated_autowiredAttributes_areSet() throws IllegalAccessException {
 		Bid bid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
@@ -273,6 +267,15 @@ public class LotsUnitTests {
 	}
 
 	@Test
+	void placeOneBidIncr_bumpsHighestBidUp_byOneIncr() throws Exception {
+		Bid prevHighestBid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
+		Lot lot = prevHighestBid.getLot();
+		lot.placeBid(prevHighestBid);
+		lot.placeBid(testBidService.getOneIncrBid(lot));
+		assertEquals(testBidService.bumpUpOne(prevHighestBid), lot.getHighestBid());
+	}
+
+	@Test
 	void bidWhenThereIsNoStartingPrice_thatIsLowerThanOneBidIncr_isRefused() {
 		Lot lot = testLotService.getMeSimpleLot();
 		ExceptionsCreateor.BidTooLow exception = assertThrows(ExceptionsCreateor.BidTooLow.class, () -> {
@@ -317,15 +320,6 @@ public class LotsUnitTests {
 		User bidder2 = lot.placeBid(bid2).get().getLeadingBidder();
 		assertTrue(!bidder1.equals(bidder2));
 		assertEquals(lot.getLeadingBidder(), bidder2);
-	}
-
-	@Test
-	void placeOneBidIncr_bumpsHighestBidUp_byOneIncr() throws Exception {
-		Bid prevHighestBid = testBidService.getOneIncrBid(testLotService.getMeSimpleLot());
-		Lot lot = prevHighestBid.getLot();
-		lot.placeBid(prevHighestBid);
-		lot.placeBid(testBidService.getOneIncrBid(lot));
-		assertEquals(testBidService.bumpUpOne(prevHighestBid), lot.getHighestBid());
 	}
 
 	@Test
@@ -432,13 +426,7 @@ public class LotsUnitTests {
 		assertTrue(user.getNumberOfLots() == 10);//assure lotsCreatedSet contains 10 lots
 	}
 	
-//
-//	@Test
-//	void testFieldSetter_onNonDefaultConstructor() {
-//		Lot lot = testLotService.getMeSimpleLot(); 
-//		//assertNull(lot.getTitle());
-//		assertNull(Lot.bidSoftExcepFactory);
-//	}
+
 
 
 }

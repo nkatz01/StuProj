@@ -69,7 +69,7 @@ public abstract class Storable  {
 	@Setter(AccessLevel.NONE)
 	protected Long id;	
 
-	@NaturalId
+	@NaturalId(mutable = true)
 	protected UUID businessId = new UUID(StorableService.get64MostSignificantBitsForVersion1(), StorableService.get64LeastSignificantBitsForVersion1());
 
 	 

@@ -1,6 +1,5 @@
 package com.project.biddingSoft.domain;
 
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -15,5 +14,5 @@ import lombok.Setter;
 @Getter
 public abstract class StorableDTO {
 	private Long id; 
-	private UUID businessId;
+	
 }

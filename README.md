@@ -10,6 +10,9 @@ application poroperties: StuProj/java/biddingSoft/src/main/resources/
 
 test properties: StuProj/java/biddingSoft/src/test/resources/
 
+project proposal
+https://docs.google.com/document/d/17magud4cTrO8-hHEukIO3j09rWxgo7P7/edit
+
 biddingSfotDesignV1
 https://docs.google.com/document/d/1rS10Y5J3YXOE5hW5t6rcgTs38T9ZcUXddyq41qRgN4U/edit?usp=sharing
 

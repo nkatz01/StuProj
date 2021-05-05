@@ -98,7 +98,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@GetMapping(path = "/allents")
-	public @ResponseBody ResponseEntity<Iterable<? extends Storable>> getAllRecords() {
+	public  ResponseEntity<Iterable<? extends Storable>> getAllRecords() {
 		Iterable<? extends Storable> results = iStorableRepo.findAll();
 		if (StreamSupport.stream(results.spliterator(), false).count() > 0)
 			return ResponseEntity.ok(results);
@@ -107,7 +107,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@RequestMapping(path = "/getent/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<? extends Storable> getEntity(@PathVariable Long id) {
+	public  ResponseEntity<? extends Storable> getEntity(@PathVariable Long id) {
 		Optional<? extends Storable> results = iStorableRepo.findByEntityId(id);
 		if (results.isPresent())
 			return ResponseEntity.ok(results.get());

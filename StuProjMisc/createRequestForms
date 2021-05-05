@@ -2,27 +2,28 @@
 
 192.168.0.10
 DESKTOP-AEM1CBO
-neither
-{"type":"bid", "lot": {"type":"lot", "user":{}}, "bidder":{} }
-all
-{"type":"bid", "lot": {"type":"lot","id": "3"}, "bidder":{"id":"2"} }
-only lot
-{"type":"bid", "lot": {"type":"lot","id": "3"}, "bidder":{} }
-only bidder
-{"type":"bid", "lot": {"type":"lot", "user":{}}, "bidder":{"id":"2"} }
-
-only user
-{"type":"bid", "lot": {"type":"lot","user":{"id": "2"}}, "bidder":{} }
-only users existing but both
-{"type":"bid", "lot": {"type":"lot","user":{"id": "4"}}, "bidder":{"id":"6"} }
-
+new lot with existing user
+{"type":"lot", "user":{"id": "2" }}
 *******
 just new lot and new user
 {"type":"lot", "user":{}} 
 ***************
+all existing 
+{"type":"bid", "lot": {"type":"lot","id": "3"}, "bidder":{"id":"2"} }
+only users existing but both
+{"type":"bid", "lot": {"type":"lot","user":{"id": "4"}}, "bidder":{"id":"6"} }
+only bidder
+{"type":"bid", "lot": {"type":"lot", "user":{}}, "bidder":{"id":"2"} }
+only user
+{"type":"bid", "lot": {"type":"lot","user":{"id": "2"}}, "bidder":{} }
+none
+{"type":"bid", "lot": {"type":"lot", "user":{}}, "bidder":{} }
 
-new lot with existing user
-{"type":"lot", "user":{"id": "2" }}
+only lot
+{"type":"bid", "lot": {"type":"lot","id": "3"}, "bidder":{} }
+
+
+
 
 new user
 {}ServiceImpl

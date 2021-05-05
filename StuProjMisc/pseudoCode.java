@@ -80,7 +80,45 @@ private void checkBidHighEnough(bid){
 		throw a bidTooLow exception explaining that the amount is lower thatn the highestBid + one biddingIncrement); 
 }
 
-IStorableRepo<T extends Storable>
-Optional<T> findByEntityId(Long id)
-CrudRepository<T, Long>
-extends CrudRepository<T, Long>
+public String persistEntity(Lot lot){
+	StringBuilder = new StringBuilder();
+	if (lot is not yet associated with lot.getUser())
+		add lot to the user's lotsCreatedSet;
+	if(lot.getUser() is not yet in the database){
+		save the lot's user to the database;
+		append to the stringBuilder the database id of the user; 
+	}
+	else{
+		save just the lot to the database;
+	}
+	append to the stringBuilder the id of the newly created lot; 
+	return stringBuilder.toString();
+}
+
+public String persistEntity(Bid bid){
+	StringBuilder = new StringBuilder();
+	if(bid's lot is not yet in the database)
+		if (bids' lot is not yet associated with its user)
+			add bid's lot to the user's lotsCreatedSet;//doesn't add lot to the database; just associates the two
+	if(bid's lot and lot's user are both not in the database){
+		save the lot and user to the database;
+		append to the stringBuilder the database id of the user and the lot;
+	}
+	else if (only the lot is not in the database){
+		save the lot to the database;
+		append to the stringBuilder the database id of the lot;
+	}
+	if(bid's bidder is not yet in the database){
+		save the lot's bidder (as a user) to the database;
+		append to the stringBuilder the database id of the bidder; 
+	}
+	add this bid to the bidsBadeSet of the bidder;
+	else{
+		save just the lot to the database;
+	}
+	append to the stringBuilder the id of the newly created lot; 
+	save this bid to the database;
+	append to the stringBuilder the id of the newly created bid; 
+	return stringBuilder.toString();
+}
+

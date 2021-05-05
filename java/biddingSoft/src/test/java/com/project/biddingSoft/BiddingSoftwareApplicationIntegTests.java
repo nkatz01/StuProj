@@ -65,13 +65,13 @@ import com.project.biddingSoft.testServices.TestStorableService;
 import com.project.biddingSoft.testServices.TestBidService;
 import com.project.biddingSoft.testServices.TestLotService;
 import com.project.biddingSoft.testServices.TestUserService;
-import com.project.biddingSoft.unitTests.LotsUnitTests;
+import com.project.biddingSoft.unitTests.UnitTests;
 
 @TestMethodOrder(OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @RunWith(JUnitPlatform.class)
 
-@SelectClasses({ BiddingSoftwareApplicationIntegTests.class, LotsUnitTests.class })
+@SelectClasses({ BiddingSoftwareApplicationIntegTests.class, UnitTests.class })
 @ComponentScan(basePackages = { "com.project.biddingSoft" })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class BiddingSoftwareApplicationIntegTests {
@@ -108,7 +108,7 @@ class BiddingSoftwareApplicationIntegTests {
 
 		JUnitCore junit = new JUnitCore();
 		junit.addListener(new TextListener(System.out));
-		junit.run(LotsUnitTests.class);
+		junit.run(UnitTests.class);
 
 	}
 
