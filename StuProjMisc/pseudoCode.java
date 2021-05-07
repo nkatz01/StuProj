@@ -22,9 +22,10 @@ try{
 			log a message explaining that although the bis was accepted, the amount of this bid equals an existing autobid;
 		}
 		else {
-			set the highestBid to the pendingAutoBid amount + one biddingIncreement;
 			if( the leadingBidder.equals(the bidder of this bid)
 				log a message saying that their pendingAutoBid increase was accepted;
+			else
+				set the highestBid to the pendingAutoBid amount + one biddingIncreement;
 			set the leadingBidder to the bidder of this bid;
 			if (the amount of this bid is less or equal to the new highestBid)
 				remove the pendingAutoBid;

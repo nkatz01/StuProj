@@ -96,9 +96,17 @@ public class Lot extends Storable {
 	@JsonProperty("user")
 	private User user;
 	
+	@JsonProperty("startingPrice")
+	@Value("${Lot.startingPrice}")
+	private double startingPrice;
+	
+	@Value("${Lot.biddingIncrement}")
+	@JsonProperty("biddingIncrement")
+	private double biddingIncrement;
 	@Setter(AccessLevel.NONE)
 	@Column(nullable = true)
-	private double highestBid;
+	private double highestBid = startingPrice>0.0 ? startingPrice - biddingIncrement :  startingPrice;
+	
 	@Value("${Lot.title}")
 	@JsonProperty("title")
 	public String title;
@@ -110,18 +118,12 @@ public class Lot extends Storable {
 	@Value("${Lot.timeZone}")
 	@JsonProperty("ZONE")
 	private ZoneId ZONE;
-	@Value("${Lot.biddingIncrement}")
-	@JsonProperty("biddingIncrement")
-	private double biddingIncrement;
 
 	@JsonProperty("reservePrice")
 	@Value("${Lot.reservePrice}")
 	@Column(nullable = true)
 	private double reservePrice;
 
-	@JsonProperty("startingPrice")
-	@Value("${Lot.startingPrice}")
-	private double startingPrice;
 
 	@JsonProperty("startTime")
 	@Column(nullable = false)
@@ -199,7 +201,7 @@ public class Lot extends Storable {
 
 			if (pendingAutoBid == null) {
 				highestBid += biddingIncrement;
-				 	if (bid.getAmount() > highestBid)//if over new highest bid
+				 	if (bid.getAmount() > highestBid)//if bid was more than one increment than previous bid
 				 		pendingAutoBid = bid;
 				leadingBidder = bid.getBidder();
 			} else {
@@ -211,13 +213,15 @@ public class Lot extends Storable {
 					logger.info(ANSI_RED + "Your bid was accepted but equals an existing autobid" +ANSI_RESET);
 					
 				} else {
-					highestBid = pendingAutoBid.getAmount() + biddingIncrement;
 					if(leadingBidder.equals(bid.getBidder()))
-						logger.info(ANSI_RED+ "Your increased bid has been accepted" + ANSI_RESET );
+						logger.info(ANSI_RED+ "Your increased pending auto bid has been accepted" + ANSI_RESET );
+					else
+						highestBid = pendingAutoBid.getAmount() + biddingIncrement;
 					leadingBidder = bid.getBidder();
 					if (bid.getAmount() <= highestBid)
 						pendingAutoBid = null;
-					else pendingAutoBid = bid;
+					else 
+						pendingAutoBid = bid;
 					
 						
 				}
