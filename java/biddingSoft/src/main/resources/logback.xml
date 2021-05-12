@@ -31,8 +31,4 @@
     <appender-ref ref="FILE" />
 </logger>
   
-<!-- <logger name="someClass" level="debug">
- <appender-ref ref="FILE" /> 
-  </logger>-->
-  
 </configuration>

@@ -24,7 +24,7 @@
 		</filter>
 	</appender>
 
-	<!--test classes should log in files -->
+	<!--test classes should also log in files -->
 	<logger name="com.project.biddingSoft">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />

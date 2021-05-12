@@ -53,11 +53,17 @@ public class BidDaoServiceImpl implements IDaoService<Bid> {
 		return mesg;
 	}
 
+	/**
+	 * Receives a new bid to store and checks the states of the dependencies related to the bid. I.e. whether the user, 
+	 * bidder, lot exist already or any possible combination of the three.
+	 * @param bid
+	 * @return string containing the details of the newly stored bid to relay back to the querier
+	 */
 	@Override
 	public String persistEntity(Bid bid) {
 		StringBuilder stringBuilder = new StringBuilder();
 
-		associatCreatorWithLot(bid);
+		associatCreatorWithLot(bid);//doesn't add lot to the database; just associates the two
 
 		if (lotCreatorAndLotAreNew(bid)) {
 
@@ -76,8 +82,8 @@ public class BidDaoServiceImpl implements IDaoService<Bid> {
 
 		bid.getBidder().addBidToSet(bid);// fine (for the purpose of demonstrating persistence) even though bid might
 											// not be valid according to business rules.
-		iBidRepo.save(bid);// doesn't get saved via cascade, as bid wasn't added to lot.bidList via
-							// placeBid() -> addBid().
+		iBidRepo.save(bid);// doesn't get saved via cascade alone, as bid wasn't added to lot.bidList via
+							// placeBid() -> addBid() methods.
 		stringBuilder.append("\n" + bid.getClass().getName() + " " + bid.getId());
 		return stringBuilder.toString();
 
@@ -104,9 +110,6 @@ public class BidDaoServiceImpl implements IDaoService<Bid> {
 		return bid.getBidder().getId() == null;
 
 	}
-	// bidder exists AND //bidder doesn't exist AND
-	// 1. both, lot and user exist //1. both lot and user exist
-	// 2. both don't exist //2. both dont' exist
-	// 3. only user //. only user
+	
 
 }

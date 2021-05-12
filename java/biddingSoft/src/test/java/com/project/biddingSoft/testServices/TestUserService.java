@@ -14,7 +14,7 @@ import com.project.biddingSoft.domain.User;
 @Component
 public class TestUserService {
 	private static final HashSet<String> last200usernameCache = new HashSet<String>();
-
+	private static final int CURRENT_USER_LIMIT = 200;
 	@Bean
 	public User getMeSimpleUser() {
 		return new User.UserBuilder(genRandString(7, false), genRandString(8, true)).lotsCreated(new HashSet<Lot>())
@@ -25,8 +25,15 @@ public class TestUserService {
 		return new User.UserBuilder(genRandString(7, false), genRandString(8, true)).lotsCreated(new HashSet<Lot>())
 				.bidsCreated(new HashSet<Bid>()).build();
 	}
-
-	public static final synchronized String genRandString(int targetStrLength, boolean alphanum) {
+	
+	/**
+	 * A utility function that produces a random string for the use in usernames or passwords. A cache is kept to assure
+	 * that usernames remain unique.
+	 * @param targetStrLength the desired length of the generated string
+	 * @param alphanum indicates whether a username (only letters) or password (letters and digits) is desired
+	 * @return the randomly generated string
+	 */
+	public static final synchronized String genRandString(int targetStrLength, boolean alphanum) {//https://www.baeldung.com/java-random-string
 		Predicate<Integer> cond = (i) -> alphanum ? (i <= 57 || i >= 65) && (i <= 90 || i >= 97)
 				: (i >= 65 && i <= 90) || (i >= 97 && i <= 122); // alphanumeric (=true) or alphabetic
 		int leftLimit = 48; // numeral '0' 
@@ -38,7 +45,7 @@ public class TestUserService {
 			genString = random.ints(leftLimit, rightLimit + 1).filter(i -> cond.test(i)).limit(targetStringLength)
 					.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
 		}
-		if (last200usernameCache.size() + 1 == 200)
+		if (last200usernameCache.size() + 1 == CURRENT_USER_LIMIT)
 			last200usernameCache.clear();
 		last200usernameCache.add(genString);
 		return genString;

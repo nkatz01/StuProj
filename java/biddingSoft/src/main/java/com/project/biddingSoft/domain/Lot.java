@@ -86,7 +86,7 @@ public class Lot extends Storable {
 
 	@JsonManagedReference(value = "bidOnLot")
 	@JsonProperty("bidSet")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lot", cascade = CascadeType.ALL) // variable in Bid class - that links bid to its lot
 	private Set<Bid> bidSet = Collections.synchronizedSet(new HashSet<Bid>());
 	
 	@ToString.Exclude
@@ -197,6 +197,8 @@ public class Lot extends Storable {
 			throw bidSoftExcepFactory.new AlreadyLeadingBidder();
 
 		try {
+			//takes care of checking the timings, assuring bid is higher or equal to at least one biddingIncrement,
+			//and startingPrice (if there is one), and adding bid to bidList.
 			addBid(bid);
 
 			if (pendingAutoBid == null) {
@@ -204,7 +206,7 @@ public class Lot extends Storable {
 				 	if (bid.getAmount() > highestBid)//if bid was more than one increment than previous bid
 				 		pendingAutoBid = bid;
 				leadingBidder = bid.getBidder();
-			} else {
+			} else {//there's already an pendingAutoBid in place
 				if (bid.getAmount() < pendingAutoBid.getAmount()) 
 					highestBid = bid.getAmount() + biddingIncrement;
 				else if (bid.getAmount() == pendingAutoBid.getAmount()) {
@@ -212,7 +214,7 @@ public class Lot extends Storable {
 					pendingAutoBid = null;
 					logger.info(ANSI_RED + "Your bid was accepted but equals an existing autobid" +ANSI_RESET);
 					
-				} else {
+				} else {//bid amount is higher than pendingAutoBid
 					if(leadingBidder.equals(bid.getBidder()))
 						logger.info(ANSI_RED+ "Your increased pending auto bid has been accepted" + ANSI_RESET );
 					else
@@ -235,7 +237,7 @@ public class Lot extends Storable {
 			return Optional.empty();
 		}
 
-		return Optional.of(this);
+		return Optional.of(this);//in order to allow one to use placeBid() in a 'chained' fashion
 
 	}
 	
@@ -246,7 +248,7 @@ public class Lot extends Storable {
 			checkBidHighEnough(bid);
 			
 		
-		if (!hasLotExpired(now)  )//something smells
+		if (!hasLotExpired(now))
 			bidSet.add(bid);
 		else
 			throw bidSoftExcepFactory.new LotHasEndedException();
@@ -298,6 +300,10 @@ public class Lot extends Storable {
 			throw bidSoftExcepFactory.new AutobidNotSet();
 	}
 
+	/**
+	 * @param index
+	 * @return the bid found at the position of index in the iterator based on the set
+	 */
 	public Bid getBid(int index) {
 		Iterator<Bid> iter = bidSet.iterator();
 		Bid bid = null;

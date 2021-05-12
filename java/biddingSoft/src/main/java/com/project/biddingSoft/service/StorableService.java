@@ -4,6 +4,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+/**
+ * @author nuchem
+ * 
+ * Contains utility methods for the creation of new UUIDs.
+ *
+ */
 public class StorableService {
 	
 	public final static long get64LeastSignificantBitsForVersion1() {

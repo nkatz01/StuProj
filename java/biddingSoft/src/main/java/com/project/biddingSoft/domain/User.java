@@ -90,20 +90,21 @@ public class User extends Storable {
 		this.bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>(bidsBadeSet));
 		this.password = password;
 	}
+	@Column(name = "password")
 	private char[] password; 
 	@Column(name = "username")
 	private String username;
 	
 	@JsonProperty("lotsCreatedSet")
 	@JsonManagedReference(value = "lotOnUser")
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user",
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user",// variable in Lot class - that links a user to their lot
 			cascade = CascadeType.ALL)
 	@Getter(AccessLevel.NONE)
 	private Set<Lot> lotsCreatedSet = Collections.synchronizedSet(new HashSet<Lot>());
 
 	@JsonManagedReference(value = "bidOnUser")
 	@JsonProperty("bidsBadeSet")
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder", // variable in Bid class - that links a user to their bid
 			cascade = CascadeType.ALL)
 	@Getter(AccessLevel.NONE)
 	private Set<Bid> bidsBadeSet = Collections.synchronizedSet(new HashSet<Bid>());

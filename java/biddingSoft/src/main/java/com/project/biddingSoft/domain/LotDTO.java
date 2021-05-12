@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 public class LotDTO extends StorableDTO{
 	
-	private Set<Bid> bidSet;//could improve by making sure this would also be synchronised 
+	private Set<Bid> bidSet;
 	private User user;
 	private Double highestBid;
 	private String title;

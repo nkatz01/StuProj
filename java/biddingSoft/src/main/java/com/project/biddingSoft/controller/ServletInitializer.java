@@ -73,9 +73,9 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		else if (entity instanceof BidDTO)
 			message = bidServiceImpl.updateEntity(entity);
 		else
-			return new ResponseEntity("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Object>("Entity type doesn't exist", HttpStatus.BAD_REQUEST);
 
-		return new ResponseEntity(message, HttpStatus.OK);
+		return new ResponseEntity<Object>(message, HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/create")
@@ -93,7 +93,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		} catch (IllegalArgumentException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
-		return new ResponseEntity(message + "\n created successfully", HttpStatus.CREATED);
+		return new ResponseEntity<Object>(message + "\n created successfully", HttpStatus.CREATED);
 
 	}
 
@@ -115,7 +115,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 			return new ResponseEntity("Entity not found", HttpStatus.NOT_FOUND);
 	}
 
-	@DeleteMapping(path = "/delent/{id}") // model catch/throw
+	@DeleteMapping(path = "/delent/{id}")
 	public ResponseEntity<String> deleteEntity(@PathVariable Long id) {
 		ResponseEntity<String> response = null;
 		try {
@@ -128,9 +128,9 @@ public class ServletInitializer extends SpringBootServletInitializer {
 	}
 
 	@DeleteMapping(path = "/delents")
-	public ResponseEntity<String> deleteAllEntities() {
+	public ResponseEntity<Object> deleteAllEntities() {
 		iStorableRepo.deleteAll();
-		return new ResponseEntity("Entities successfully deleted", HttpStatus.OK);
+		return new ResponseEntity<Object>("Entities successfully deleted", HttpStatus.OK);
 	}
 
 }

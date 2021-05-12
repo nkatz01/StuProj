@@ -70,7 +70,7 @@ public class Bid extends Storable {
 	@JoinColumn(name = "lot_id", referencedColumnName = "id", nullable = false)
 	@JsonProperty(value = "lot")
 	@Getter(AccessLevel.NONE)
-	private Lot lot; // setter for the purpose of testing the update endpoint
+	private Lot lot;
 
 	@JsonProperty("amount")
 	private double amount;
